@@ -1,0 +1,4313 @@
+[
+  {
+    "product_id": "advance_canine_adult",
+    "brand": "Advance",
+    "product_name": "Adult Chicken & Rice Dry Dog Food",
+    "species": "DOG",
+    "verified_at": "2026-06-13T10:00:00Z",
+    "fields": {
+      "protein": {
+        "value": 26.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 26,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 26.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "fat": {
+        "value": 14.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 14,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 14.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "fiber": {
+        "value": 3.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 3.0,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 3.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "moisture": {
+        "value": 10.5,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 10.5,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 10.5,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "calories": {
+        "value": 3650.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 3650,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 3650,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "kcal/kg",
+        "tolerance": 5.0
+      },
+      "ingredients": {
+        "normalized_ingredients": [
+          "chicken meal",
+          "rice",
+          "maize gluten",
+          "chicken fat",
+          "sorghum",
+          "dried beet pulp",
+          "fish oil",
+          "sunflower oil",
+          "potassium chloride",
+          "salt",
+          "vitamins",
+          "minerals"
+        ],
+        "agreeing_sources": 1,
+        "conflicting_sources": 0,
+        "overlap_percentage": 100.0,
+        "status": "partial",
+        "source_ingredients": [
+          {
+            "source_name": "seed_data",
+            "ingredients": [
+              "chicken meal",
+              "rice",
+              "maize gluten",
+              "chicken fat",
+              "sorghum",
+              "dried beet pulp",
+              "fish oil",
+              "sunflower oil",
+              "potassium chloride",
+              "salt",
+              "vitamins",
+              "minerals"
+            ]
+          },
+          {
+            "source_name": "manufacturer_official",
+            "ingredients": [
+              "chicken meal",
+              "rice",
+              "maize gluten",
+              "chicken fat",
+              "sorghum",
+              "dried beet pulp",
+              "fish oil",
+              "sunflower oil",
+              "potassium chloride",
+              "salt",
+              "vitamins",
+              "minerals"
+            ]
+          }
+        ]
+      }
+    },
+    "overall_confidence": 0.917,
+    "total_sources": 2,
+    "verification_status": "verified",
+    "conflicts": [],
+    "tier": "SILVER"
+  },
+  {
+    "product_id": "advance_canine_puppy",
+    "brand": "Advance",
+    "product_name": "Puppy Chicken & Rice Dry Dog Food",
+    "species": "DOG",
+    "verified_at": "2026-06-13T10:00:00Z",
+    "fields": {
+      "protein": {
+        "value": 30.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 30,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 30.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "fat": {
+        "value": 18.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 18,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 18.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "fiber": {
+        "value": 2.5,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 2.5,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 2.5,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "moisture": {
+        "value": 10.5,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 10.5,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 10.5,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "calories": {
+        "value": 3850.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 3850,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 3850,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "kcal/kg",
+        "tolerance": 5.0
+      },
+      "ingredients": {
+        "normalized_ingredients": [
+          "chicken meal",
+          "rice",
+          "maize gluten",
+          "chicken fat",
+          "sorghum",
+          "dried beet pulp",
+          "fish oil",
+          "sunflower oil",
+          "potassium chloride",
+          "salt",
+          "vitamins",
+          "minerals",
+          "natural antioxidants"
+        ],
+        "agreeing_sources": 1,
+        "conflicting_sources": 0,
+        "overlap_percentage": 100.0,
+        "status": "partial",
+        "source_ingredients": [
+          {
+            "source_name": "seed_data",
+            "ingredients": [
+              "chicken meal",
+              "rice",
+              "maize gluten",
+              "chicken fat",
+              "sorghum",
+              "dried beet pulp",
+              "fish oil",
+              "sunflower oil",
+              "potassium chloride",
+              "salt",
+              "vitamins",
+              "minerals",
+              "natural antioxidants"
+            ]
+          },
+          {
+            "source_name": "manufacturer_official",
+            "ingredients": [
+              "chicken meal",
+              "rice",
+              "maize gluten",
+              "chicken fat",
+              "sorghum",
+              "dried beet pulp",
+              "fish oil",
+              "sunflower oil",
+              "potassium chloride",
+              "salt",
+              "vitamins",
+              "minerals",
+              "natural antioxidants"
+            ]
+          }
+        ]
+      }
+    },
+    "overall_confidence": 0.917,
+    "total_sources": 2,
+    "verification_status": "verified",
+    "conflicts": [],
+    "tier": "SILVER"
+  },
+  {
+    "product_id": "advance_canine_senior",
+    "brand": "Advance",
+    "product_name": "Senior Chicken & Rice Dry Dog Food",
+    "species": "DOG",
+    "verified_at": "2026-06-13T10:00:00Z",
+    "fields": {
+      "protein": {
+        "value": 22.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 22,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 22.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "fat": {
+        "value": 12.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 12,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 12.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "fiber": {
+        "value": 4.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 4.0,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 4.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "moisture": {
+        "value": 10.5,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 10.5,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 10.5,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "calories": {
+        "value": 3400.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 3400,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 3400,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "kcal/kg",
+        "tolerance": 5.0
+      },
+      "ingredients": {
+        "normalized_ingredients": [
+          "chicken meal",
+          "rice",
+          "maize gluten",
+          "chicken fat",
+          "sorghum",
+          "dried beet pulp",
+          "fish oil",
+          "sunflower oil",
+          "glucosamine",
+          "chondroitin",
+          "potassium chloride",
+          "salt",
+          "vitamins",
+          "minerals"
+        ],
+        "agreeing_sources": 1,
+        "conflicting_sources": 0,
+        "overlap_percentage": 100.0,
+        "status": "partial",
+        "source_ingredients": [
+          {
+            "source_name": "seed_data",
+            "ingredients": [
+              "chicken meal",
+              "rice",
+              "maize gluten",
+              "chicken fat",
+              "sorghum",
+              "dried beet pulp",
+              "fish oil",
+              "sunflower oil",
+              "glucosamine",
+              "chondroitin",
+              "potassium chloride",
+              "salt",
+              "vitamins",
+              "minerals"
+            ]
+          },
+          {
+            "source_name": "manufacturer_official",
+            "ingredients": [
+              "chicken meal",
+              "rice",
+              "maize gluten",
+              "chicken fat",
+              "sorghum",
+              "dried beet pulp",
+              "fish oil",
+              "sunflower oil",
+              "glucosamine",
+              "chondroitin",
+              "potassium chloride",
+              "salt",
+              "vitamins",
+              "minerals"
+            ]
+          }
+        ]
+      }
+    },
+    "overall_confidence": 0.917,
+    "total_sources": 2,
+    "verification_status": "verified",
+    "conflicts": [],
+    "tier": "SILVER"
+  },
+  {
+    "product_id": "advance_feline_adult",
+    "brand": "Advance",
+    "product_name": "Adult Cat Chicken Dry Food",
+    "species": "CAT",
+    "verified_at": "2026-06-13T10:00:00Z",
+    "fields": {
+      "protein": {
+        "value": 36.0,
+        "confidence": 0.95,
+        "sources": 3,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 36,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 36.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "PetCircle",
+            "source_type": "retailer",
+            "value": 36,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "fat": {
+        "value": 16.0,
+        "confidence": 0.95,
+        "sources": 3,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 16,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 16.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "PetCircle",
+            "source_type": "retailer",
+            "value": 16,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "fiber": {
+        "value": 3.0,
+        "confidence": 0.95,
+        "sources": 3,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 3.0,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 3.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "PetCircle",
+            "source_type": "retailer",
+            "value": 3.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "moisture": {
+        "value": 10.0,
+        "confidence": 0.95,
+        "sources": 3,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 10,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 10.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "PetCircle",
+            "source_type": "retailer",
+            "value": 10,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "calories": {
+        "value": 3750.0,
+        "confidence": 0.95,
+        "sources": 3,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 3750,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 3750,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "PetCircle",
+            "source_type": "retailer",
+            "value": 3750,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "kcal/kg",
+        "tolerance": 5.0
+      },
+      "ingredients": {
+        "normalized_ingredients": [
+          "chicken meal",
+          "rice",
+          "maize gluten",
+          "chicken fat",
+          "sorghum",
+          "dried beet pulp",
+          "natural flavour",
+          "fish oil",
+          "sunflower oil",
+          "potassium chloride",
+          "salt",
+          "vitamins",
+          "minerals",
+          "taurine"
+        ],
+        "agreeing_sources": 2,
+        "conflicting_sources": 0,
+        "overlap_percentage": 89.3,
+        "status": "verified",
+        "source_ingredients": [
+          {
+            "source_name": "seed_data",
+            "ingredients": [
+              "chicken meal",
+              "rice",
+              "maize gluten",
+              "chicken fat",
+              "sorghum",
+              "dried beet pulp",
+              "natural flavour",
+              "fish oil",
+              "sunflower oil",
+              "potassium chloride",
+              "salt",
+              "vitamins",
+              "minerals",
+              "taurine"
+            ]
+          },
+          {
+            "source_name": "manufacturer_official",
+            "ingredients": [
+              "chicken meal",
+              "rice",
+              "maize gluten",
+              "chicken fat",
+              "sorghum",
+              "dried beet pulp",
+              "natural flavour",
+              "fish oil",
+              "sunflower oil",
+              "potassium chloride",
+              "salt",
+              "vitamins",
+              "minerals",
+              "taurine"
+            ]
+          },
+          {
+            "source_name": "PetCircle",
+            "ingredients": [
+              "chicken meal",
+              "rice",
+              "maize gluten",
+              "chicken fat",
+              "sorghum",
+              "dried beet pulp",
+              "fish oil",
+              "sunflower oil",
+              "vitamins",
+              "minerals",
+              "taurine"
+            ]
+          }
+        ]
+      }
+    },
+    "overall_confidence": 0.941,
+    "total_sources": 3,
+    "verification_status": "verified",
+    "conflicts": [],
+    "tier": "GOLD"
+  },
+  {
+    "product_id": "bh_canine_adult",
+    "brand": "Black Hawk",
+    "product_name": "Original Adult Dog Lamb & Rice Dry Food",
+    "species": "DOG",
+    "verified_at": "2026-06-13T10:00:00Z",
+    "fields": {
+      "protein": {
+        "value": 24.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 24,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 24.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "fat": {
+        "value": 14.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 14,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 14.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "fiber": {
+        "value": 4.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 4.0,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 4.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "moisture": {
+        "value": 10.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 10,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 10.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "calories": {
+        "value": 3550.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 3550,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 3550,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "kcal/kg",
+        "tolerance": 5.0
+      },
+      "ingredients": {
+        "normalized_ingredients": [
+          "lamb meal",
+          "rice",
+          "maize",
+          "chicken fat",
+          "vegetable protein",
+          "beet pulp",
+          "natural flavour",
+          "fish oil",
+          "sunflower oil",
+          "chickpeas",
+          "yucca schidigera extract",
+          "rosemary extract",
+          "glucosamine",
+          "chondroitin",
+          "vitamins",
+          "minerals"
+        ],
+        "agreeing_sources": 1,
+        "conflicting_sources": 0,
+        "overlap_percentage": 100.0,
+        "status": "partial",
+        "source_ingredients": [
+          {
+            "source_name": "seed_data",
+            "ingredients": [
+              "lamb meal",
+              "rice",
+              "maize",
+              "chicken fat",
+              "vegetable protein",
+              "beet pulp",
+              "natural flavour",
+              "fish oil",
+              "sunflower oil",
+              "chickpeas",
+              "yucca schidigera extract",
+              "rosemary extract",
+              "glucosamine",
+              "chondroitin",
+              "vitamins",
+              "minerals"
+            ]
+          },
+          {
+            "source_name": "manufacturer_official",
+            "ingredients": [
+              "lamb meal",
+              "rice",
+              "maize",
+              "chicken fat",
+              "vegetable protein",
+              "beet pulp",
+              "natural flavour",
+              "fish oil",
+              "sunflower oil",
+              "chickpeas",
+              "yucca schidigera extract",
+              "rosemary extract",
+              "glucosamine",
+              "chondroitin",
+              "vitamins",
+              "minerals"
+            ]
+          }
+        ]
+      }
+    },
+    "overall_confidence": 0.917,
+    "total_sources": 2,
+    "verification_status": "verified",
+    "conflicts": [],
+    "tier": "SILVER"
+  },
+  {
+    "product_id": "bh_feline_adult",
+    "brand": "Black Hawk",
+    "product_name": "Original Adult Cat Chicken Dry Food",
+    "species": "CAT",
+    "verified_at": "2026-06-13T10:00:00Z",
+    "fields": {
+      "protein": {
+        "value": 32.0,
+        "confidence": 0.95,
+        "sources": 3,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 32,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 32.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "PetCircle",
+            "source_type": "retailer",
+            "value": 32,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "fat": {
+        "value": 14.0,
+        "confidence": 0.95,
+        "sources": 3,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 14,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 14.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "PetCircle",
+            "source_type": "retailer",
+            "value": 14,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "fiber": {
+        "value": 5.0,
+        "confidence": 0.95,
+        "sources": 3,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 5.0,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 5.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "PetCircle",
+            "source_type": "retailer",
+            "value": 5.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "moisture": {
+        "value": 10.0,
+        "confidence": 0.95,
+        "sources": 3,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 10,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 10.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "PetCircle",
+            "source_type": "retailer",
+            "value": 10,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "calories": {
+        "value": 3600.0,
+        "confidence": 0.95,
+        "sources": 3,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 3600,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 3600,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "PetCircle",
+            "source_type": "retailer",
+            "value": 3600,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "kcal/kg",
+        "tolerance": 5.0
+      },
+      "ingredients": {
+        "normalized_ingredients": [
+          "chicken meal",
+          "rice",
+          "maize",
+          "chicken fat",
+          "vegetable protein",
+          "beet pulp",
+          "natural flavour",
+          "fish oil",
+          "sunflower oil",
+          "chickpeas",
+          "yucca schidigera extract",
+          "rosemary extract",
+          "vitamins",
+          "minerals",
+          "taurine"
+        ],
+        "agreeing_sources": 2,
+        "conflicting_sources": 0,
+        "overlap_percentage": 86.7,
+        "status": "verified",
+        "source_ingredients": [
+          {
+            "source_name": "seed_data",
+            "ingredients": [
+              "chicken meal",
+              "rice",
+              "maize",
+              "chicken fat",
+              "vegetable protein",
+              "beet pulp",
+              "natural flavour",
+              "fish oil",
+              "sunflower oil",
+              "chickpeas",
+              "yucca schidigera extract",
+              "rosemary extract",
+              "vitamins",
+              "minerals",
+              "taurine"
+            ]
+          },
+          {
+            "source_name": "manufacturer_official",
+            "ingredients": [
+              "chicken meal",
+              "rice",
+              "maize",
+              "chicken fat",
+              "vegetable protein",
+              "beet pulp",
+              "natural flavour",
+              "fish oil",
+              "sunflower oil",
+              "chickpeas",
+              "yucca schidigera extract",
+              "rosemary extract",
+              "vitamins",
+              "minerals",
+              "taurine"
+            ]
+          },
+          {
+            "source_name": "PetCircle",
+            "ingredients": [
+              "chicken meal",
+              "rice",
+              "maize",
+              "chicken fat",
+              "vegetable protein",
+              "beet pulp",
+              "fish oil",
+              "sunflower oil",
+              "vitamins",
+              "minerals",
+              "taurine"
+            ]
+          }
+        ]
+      }
+    },
+    "overall_confidence": 0.936,
+    "total_sources": 3,
+    "verification_status": "verified",
+    "conflicts": [],
+    "tier": "GOLD"
+  },
+  {
+    "product_id": "hills_canine_adult",
+    "brand": "Hill's",
+    "product_name": "Science Diet Adult Dry Dog Food",
+    "species": "DOG",
+    "verified_at": "2026-06-13T10:00:00Z",
+    "fields": {
+      "protein": {
+        "value": 25.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 25,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 25.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "fat": {
+        "value": 15.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 15,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 15.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "fiber": {
+        "value": 3.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 3.0,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 3.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "moisture": {
+        "value": 10.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 10,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 10.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "calories": {
+        "value": 3725.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 3725,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 3725,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "kcal/kg",
+        "tolerance": 5.0
+      },
+      "ingredients": {
+        "normalized_ingredients": [
+          "chicken meal",
+          "whole grain wheat",
+          "cracked pearled barley",
+          "whole grain sorghum",
+          "whole grain corn",
+          "chicken fat",
+          "corn gluten meal",
+          "chicken liver flavour",
+          "dried beet pulp",
+          "soybean oil",
+          "flaxseed",
+          "vitamins",
+          "minerals"
+        ],
+        "agreeing_sources": 1,
+        "conflicting_sources": 0,
+        "overlap_percentage": 100.0,
+        "status": "partial",
+        "source_ingredients": [
+          {
+            "source_name": "seed_data",
+            "ingredients": [
+              "chicken meal",
+              "whole grain wheat",
+              "cracked pearled barley",
+              "whole grain sorghum",
+              "whole grain corn",
+              "chicken fat",
+              "corn gluten meal",
+              "chicken liver flavour",
+              "dried beet pulp",
+              "soybean oil",
+              "flaxseed",
+              "vitamins",
+              "minerals"
+            ]
+          },
+          {
+            "source_name": "manufacturer_official",
+            "ingredients": [
+              "chicken meal",
+              "whole grain wheat",
+              "cracked pearled barley",
+              "whole grain sorghum",
+              "whole grain corn",
+              "chicken fat",
+              "corn gluten meal",
+              "chicken liver flavour",
+              "dried beet pulp",
+              "soybean oil",
+              "flaxseed",
+              "vitamins",
+              "minerals"
+            ]
+          }
+        ]
+      }
+    },
+    "overall_confidence": 0.917,
+    "total_sources": 2,
+    "verification_status": "verified",
+    "conflicts": [],
+    "tier": "SILVER"
+  },
+  {
+    "product_id": "hills_canine_puppy",
+    "brand": "Hill's",
+    "product_name": "Science Diet Puppy Dry Dog Food",
+    "species": "DOG",
+    "verified_at": "2026-06-13T10:00:00Z",
+    "fields": {
+      "protein": {
+        "value": 28.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 28,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 28.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "fat": {
+        "value": 17.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 17,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 17.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "fiber": {
+        "value": 2.5,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 2.5,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 2.5,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "moisture": {
+        "value": 10.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 10,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 10.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "calories": {
+        "value": 3845.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 3845,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 3845,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "kcal/kg",
+        "tolerance": 5.0
+      },
+      "ingredients": {
+        "normalized_ingredients": [
+          "chicken meal",
+          "whole grain wheat",
+          "cracked pearled barley",
+          "whole grain sorghum",
+          "whole grain corn",
+          "chicken fat",
+          "corn gluten meal",
+          "chicken liver flavour",
+          "dried beet pulp",
+          "soybean oil",
+          "fish oil",
+          "vitamins",
+          "minerals"
+        ],
+        "agreeing_sources": 1,
+        "conflicting_sources": 0,
+        "overlap_percentage": 100.0,
+        "status": "partial",
+        "source_ingredients": [
+          {
+            "source_name": "seed_data",
+            "ingredients": [
+              "chicken meal",
+              "whole grain wheat",
+              "cracked pearled barley",
+              "whole grain sorghum",
+              "whole grain corn",
+              "chicken fat",
+              "corn gluten meal",
+              "chicken liver flavour",
+              "dried beet pulp",
+              "soybean oil",
+              "fish oil",
+              "vitamins",
+              "minerals"
+            ]
+          },
+          {
+            "source_name": "manufacturer_official",
+            "ingredients": [
+              "chicken meal",
+              "whole grain wheat",
+              "cracked pearled barley",
+              "whole grain sorghum",
+              "whole grain corn",
+              "chicken fat",
+              "corn gluten meal",
+              "chicken liver flavour",
+              "dried beet pulp",
+              "soybean oil",
+              "fish oil",
+              "vitamins",
+              "minerals"
+            ]
+          }
+        ]
+      }
+    },
+    "overall_confidence": 0.917,
+    "total_sources": 2,
+    "verification_status": "verified",
+    "conflicts": [],
+    "tier": "SILVER"
+  },
+  {
+    "product_id": "hills_feline_adult",
+    "brand": "Hill's",
+    "product_name": "Science Diet Adult Dry Cat Food",
+    "species": "CAT",
+    "verified_at": "2026-06-13T10:00:00Z",
+    "fields": {
+      "protein": {
+        "value": 34.0,
+        "confidence": 1.0,
+        "sources": 4,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 34,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 34.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "PetCircle",
+            "source_type": "retailer",
+            "value": 34,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "Petbarn",
+            "source_type": "retailer",
+            "value": 34,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "fat": {
+        "value": 20.0,
+        "confidence": 1.0,
+        "sources": 4,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 20,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 20.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "PetCircle",
+            "source_type": "retailer",
+            "value": 20,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "Petbarn",
+            "source_type": "retailer",
+            "value": 20,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "fiber": {
+        "value": 3.5,
+        "confidence": 1.0,
+        "sources": 4,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 3.5,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 3.5,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "PetCircle",
+            "source_type": "retailer",
+            "value": 3.5,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "Petbarn",
+            "source_type": "retailer",
+            "value": 3.5,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "moisture": {
+        "value": 8.0,
+        "confidence": 1.0,
+        "sources": 4,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 8,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 8.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "PetCircle",
+            "source_type": "retailer",
+            "value": 8,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "Petbarn",
+            "source_type": "retailer",
+            "value": 8,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "calories": {
+        "value": 3955.0,
+        "confidence": 1.0,
+        "sources": 4,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 3955,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 3955,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "PetCircle",
+            "source_type": "retailer",
+            "value": 3955,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "Petbarn",
+            "source_type": "retailer",
+            "value": 3955,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "kcal/kg",
+        "tolerance": 5.0
+      },
+      "ingredients": {
+        "normalized_ingredients": [
+          "chicken",
+          "brown rice",
+          "wheat gluten",
+          "chicken fat",
+          "whole grain wheat",
+          "corn gluten meal",
+          "dried beet pulp",
+          "chicken liver flavour",
+          "fish oil",
+          "soybean oil",
+          "calcium carbonate",
+          "potassium chloride",
+          "vitamins",
+          "minerals",
+          "taurine"
+        ],
+        "agreeing_sources": 3,
+        "conflicting_sources": 0,
+        "overlap_percentage": 86.7,
+        "status": "verified",
+        "source_ingredients": [
+          {
+            "source_name": "seed_data",
+            "ingredients": [
+              "chicken",
+              "brown rice",
+              "wheat gluten",
+              "chicken fat",
+              "whole grain wheat",
+              "corn gluten meal",
+              "dried beet pulp",
+              "chicken liver flavour",
+              "fish oil",
+              "soybean oil",
+              "calcium carbonate",
+              "potassium chloride",
+              "vitamins",
+              "minerals",
+              "taurine"
+            ]
+          },
+          {
+            "source_name": "manufacturer_official",
+            "ingredients": [
+              "chicken",
+              "brown rice",
+              "wheat gluten",
+              "chicken fat",
+              "whole grain wheat",
+              "corn gluten meal",
+              "dried beet pulp",
+              "chicken liver flavour",
+              "fish oil",
+              "soybean oil",
+              "calcium carbonate",
+              "potassium chloride",
+              "vitamins",
+              "minerals",
+              "taurine"
+            ]
+          },
+          {
+            "source_name": "PetCircle",
+            "ingredients": [
+              "chicken",
+              "brown rice",
+              "wheat gluten",
+              "chicken fat",
+              "whole grain wheat",
+              "corn gluten meal",
+              "dried beet pulp",
+              "fish oil",
+              "soybean oil",
+              "vitamins",
+              "minerals",
+              "taurine"
+            ]
+          },
+          {
+            "source_name": "Petbarn",
+            "ingredients": [
+              "chicken",
+              "brown rice",
+              "wheat gluten",
+              "chicken fat",
+              "whole grain wheat",
+              "corn gluten meal",
+              "dried beet pulp",
+              "fish oil",
+              "soybean oil",
+              "vitamins",
+              "minerals",
+              "taurine"
+            ]
+          }
+        ]
+      }
+    },
+    "overall_confidence": 0.978,
+    "total_sources": 4,
+    "verification_status": "verified",
+    "conflicts": [],
+    "tier": "GOLD"
+  },
+  {
+    "product_id": "hills_feline_kitten",
+    "brand": "Hill's",
+    "product_name": "Science Diet Kitten Dry Cat Food",
+    "species": "CAT",
+    "verified_at": "2026-06-13T10:00:00Z",
+    "fields": {
+      "protein": {
+        "value": 38.0,
+        "confidence": 1.0,
+        "sources": 4,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 38,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 38.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "PetCircle",
+            "source_type": "retailer",
+            "value": 38,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "Petbarn",
+            "source_type": "retailer",
+            "value": 38,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "fat": {
+        "value": 22.0,
+        "confidence": 1.0,
+        "sources": 4,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 22,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 22.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "PetCircle",
+            "source_type": "retailer",
+            "value": 22,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "Petbarn",
+            "source_type": "retailer",
+            "value": 22,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "fiber": {
+        "value": 3.0,
+        "confidence": 1.0,
+        "sources": 4,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 3.0,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 3.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "PetCircle",
+            "source_type": "retailer",
+            "value": 3.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "Petbarn",
+            "source_type": "retailer",
+            "value": 3.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "moisture": {
+        "value": 8.0,
+        "confidence": 1.0,
+        "sources": 4,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 8,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 8.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "PetCircle",
+            "source_type": "retailer",
+            "value": 8,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "Petbarn",
+            "source_type": "retailer",
+            "value": 8,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "calories": {
+        "value": 4035.0,
+        "confidence": 1.0,
+        "sources": 4,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 4035,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 4035,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "PetCircle",
+            "source_type": "retailer",
+            "value": 4035,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "Petbarn",
+            "source_type": "retailer",
+            "value": 4035,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "kcal/kg",
+        "tolerance": 5.0
+      },
+      "ingredients": {
+        "normalized_ingredients": [
+          "chicken",
+          "brown rice",
+          "wheat gluten",
+          "chicken fat",
+          "whole grain wheat",
+          "cracked pearled barley",
+          "dried beet pulp",
+          "chicken liver flavour",
+          "fish oil",
+          "soybean oil",
+          "lactic acid",
+          "calcium carbonate",
+          "potassium chloride",
+          "vitamins",
+          "minerals",
+          "taurine"
+        ],
+        "agreeing_sources": 3,
+        "conflicting_sources": 0,
+        "overlap_percentage": 83.3,
+        "status": "verified",
+        "source_ingredients": [
+          {
+            "source_name": "seed_data",
+            "ingredients": [
+              "chicken",
+              "brown rice",
+              "wheat gluten",
+              "chicken fat",
+              "whole grain wheat",
+              "cracked pearled barley",
+              "dried beet pulp",
+              "chicken liver flavour",
+              "fish oil",
+              "soybean oil",
+              "lactic acid",
+              "calcium carbonate",
+              "potassium chloride",
+              "vitamins",
+              "minerals",
+              "taurine"
+            ]
+          },
+          {
+            "source_name": "manufacturer_official",
+            "ingredients": [
+              "chicken",
+              "brown rice",
+              "wheat gluten",
+              "chicken fat",
+              "whole grain wheat",
+              "cracked pearled barley",
+              "dried beet pulp",
+              "chicken liver flavour",
+              "fish oil",
+              "soybean oil",
+              "lactic acid",
+              "calcium carbonate",
+              "potassium chloride",
+              "vitamins",
+              "minerals",
+              "taurine"
+            ]
+          },
+          {
+            "source_name": "PetCircle",
+            "ingredients": [
+              "chicken",
+              "brown rice",
+              "wheat gluten",
+              "chicken fat",
+              "whole grain wheat",
+              "cracked pearled barley",
+              "dried beet pulp",
+              "fish oil",
+              "soybean oil",
+              "vitamins",
+              "minerals",
+              "taurine"
+            ]
+          },
+          {
+            "source_name": "Petbarn",
+            "ingredients": [
+              "chicken",
+              "brown rice",
+              "wheat gluten",
+              "chicken fat",
+              "whole grain wheat",
+              "cracked pearled barley",
+              "dried beet pulp",
+              "fish oil",
+              "soybean oil",
+              "vitamins",
+              "minerals",
+              "taurine"
+            ]
+          }
+        ]
+      }
+    },
+    "overall_confidence": 0.972,
+    "total_sources": 4,
+    "verification_status": "verified",
+    "conflicts": [],
+    "tier": "GOLD"
+  },
+  {
+    "product_id": "hills_feline_senior",
+    "brand": "Hill's",
+    "product_name": "Science Diet Senior 11+ Dry Cat Food",
+    "species": "CAT",
+    "verified_at": "2026-06-13T10:00:00Z",
+    "fields": {
+      "protein": {
+        "value": 31.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 31,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 31.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "fat": {
+        "value": 18.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 18,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 18.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "fiber": {
+        "value": 4.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 4.0,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 4.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "moisture": {
+        "value": 8.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 8,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 8.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "calories": {
+        "value": 3820.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 3820,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 3820,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "kcal/kg",
+        "tolerance": 5.0
+      },
+      "ingredients": {
+        "normalized_ingredients": [
+          "chicken",
+          "brown rice",
+          "wheat gluten",
+          "chicken fat",
+          "whole grain wheat",
+          "corn gluten meal",
+          "dried beet pulp",
+          "fish oil",
+          "soybean oil",
+          "calcium carbonate",
+          "potassium chloride",
+          "vitamins",
+          "minerals",
+          "taurine"
+        ],
+        "agreeing_sources": 1,
+        "conflicting_sources": 0,
+        "overlap_percentage": 100.0,
+        "status": "partial",
+        "source_ingredients": [
+          {
+            "source_name": "seed_data",
+            "ingredients": [
+              "chicken",
+              "brown rice",
+              "wheat gluten",
+              "chicken fat",
+              "whole grain wheat",
+              "corn gluten meal",
+              "dried beet pulp",
+              "fish oil",
+              "soybean oil",
+              "calcium carbonate",
+              "potassium chloride",
+              "vitamins",
+              "minerals",
+              "taurine"
+            ]
+          },
+          {
+            "source_name": "manufacturer_official",
+            "ingredients": [
+              "chicken",
+              "brown rice",
+              "wheat gluten",
+              "chicken fat",
+              "whole grain wheat",
+              "corn gluten meal",
+              "dried beet pulp",
+              "fish oil",
+              "soybean oil",
+              "calcium carbonate",
+              "potassium chloride",
+              "vitamins",
+              "minerals",
+              "taurine"
+            ]
+          }
+        ]
+      }
+    },
+    "overall_confidence": 0.917,
+    "total_sources": 2,
+    "verification_status": "verified",
+    "conflicts": [],
+    "tier": "SILVER"
+  },
+  {
+    "product_id": "rc_canine_adult",
+    "brand": "Royal Canin",
+    "product_name": "Medium Adult Dry Dog Food",
+    "species": "DOG",
+    "verified_at": "2026-06-13T10:00:00Z",
+    "fields": {
+      "protein": {
+        "value": 25.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 25,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 25.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "fat": {
+        "value": 14.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 14,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 14.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "fiber": {
+        "value": 3.8,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 3.8,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 3.8,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "moisture": {
+        "value": 9.5,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 9.5,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 9.5,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "calories": {
+        "value": 3780.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 3780,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 3780,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "kcal/kg",
+        "tolerance": 5.0
+      },
+      "ingredients": {
+        "normalized_ingredients": [
+          "dehydrated poultry protein",
+          "maize",
+          "wheat",
+          "animal fats",
+          "maize gluten",
+          "beet pulp",
+          "vegetable protein isolate",
+          "fish oil",
+          "minerals",
+          "soya oil",
+          "yeasts"
+        ],
+        "agreeing_sources": 1,
+        "conflicting_sources": 0,
+        "overlap_percentage": 100.0,
+        "status": "partial",
+        "source_ingredients": [
+          {
+            "source_name": "seed_data",
+            "ingredients": [
+              "dehydrated poultry protein",
+              "maize",
+              "wheat",
+              "animal fats",
+              "maize gluten",
+              "beet pulp",
+              "vegetable protein isolate",
+              "fish oil",
+              "minerals",
+              "soya oil",
+              "yeasts"
+            ]
+          },
+          {
+            "source_name": "manufacturer_official",
+            "ingredients": [
+              "dehydrated poultry protein",
+              "maize",
+              "wheat",
+              "animal fats",
+              "maize gluten",
+              "beet pulp",
+              "vegetable protein isolate",
+              "fish oil",
+              "minerals",
+              "soya oil",
+              "yeasts"
+            ]
+          }
+        ]
+      }
+    },
+    "overall_confidence": 0.917,
+    "total_sources": 2,
+    "verification_status": "verified",
+    "conflicts": [],
+    "tier": "SILVER"
+  },
+  {
+    "product_id": "rc_canine_puppy",
+    "brand": "Royal Canin",
+    "product_name": "Medium Puppy Dry Dog Food",
+    "species": "DOG",
+    "verified_at": "2026-06-13T10:00:00Z",
+    "fields": {
+      "protein": {
+        "value": 32.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 32,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 32.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "fat": {
+        "value": 20.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 20,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 20.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "fiber": {
+        "value": 2.5,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 2.5,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 2.5,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "moisture": {
+        "value": 9.5,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 9.5,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 9.5,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "calories": {
+        "value": 3980.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 3980,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 3980,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "kcal/kg",
+        "tolerance": 5.0
+      },
+      "ingredients": {
+        "normalized_ingredients": [
+          "dehydrated poultry protein",
+          "maize",
+          "wheat",
+          "animal fats",
+          "maize gluten",
+          "beet pulp",
+          "vegetable protein isolate",
+          "fish oil",
+          "minerals",
+          "soya oil",
+          "yeasts",
+          "fructo-oligo-saccharides"
+        ],
+        "agreeing_sources": 1,
+        "conflicting_sources": 0,
+        "overlap_percentage": 100.0,
+        "status": "partial",
+        "source_ingredients": [
+          {
+            "source_name": "seed_data",
+            "ingredients": [
+              "dehydrated poultry protein",
+              "maize",
+              "wheat",
+              "animal fats",
+              "maize gluten",
+              "beet pulp",
+              "vegetable protein isolate",
+              "fish oil",
+              "minerals",
+              "soya oil",
+              "yeasts",
+              "fructo-oligo-saccharides"
+            ]
+          },
+          {
+            "source_name": "manufacturer_official",
+            "ingredients": [
+              "dehydrated poultry protein",
+              "maize",
+              "wheat",
+              "animal fats",
+              "maize gluten",
+              "beet pulp",
+              "vegetable protein isolate",
+              "fish oil",
+              "minerals",
+              "soya oil",
+              "yeasts",
+              "fructo-oligo-saccharides"
+            ]
+          }
+        ]
+      }
+    },
+    "overall_confidence": 0.917,
+    "total_sources": 2,
+    "verification_status": "verified",
+    "conflicts": [],
+    "tier": "SILVER"
+  },
+  {
+    "product_id": "rc_canine_senior",
+    "brand": "Royal Canin",
+    "product_name": "Medium Ageing 10+ Dry Dog Food",
+    "species": "DOG",
+    "verified_at": "2026-06-13T10:00:00Z",
+    "fields": {
+      "protein": {
+        "value": 23.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 23,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 23.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "fat": {
+        "value": 14.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 14,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 14.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "fiber": {
+        "value": 4.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 4.0,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 4.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "moisture": {
+        "value": 9.5,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 9.5,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 9.5,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "calories": {
+        "value": 3650.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 3650,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 3650,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "kcal/kg",
+        "tolerance": 5.0
+      },
+      "ingredients": {
+        "normalized_ingredients": [
+          "dehydrated poultry protein",
+          "maize",
+          "wheat",
+          "animal fats",
+          "maize gluten",
+          "beet pulp",
+          "vegetable protein isolate",
+          "fish oil",
+          "minerals",
+          "soya oil",
+          "yeasts",
+          "glucosamine",
+          "chondroitin"
+        ],
+        "agreeing_sources": 1,
+        "conflicting_sources": 0,
+        "overlap_percentage": 100.0,
+        "status": "partial",
+        "source_ingredients": [
+          {
+            "source_name": "seed_data",
+            "ingredients": [
+              "dehydrated poultry protein",
+              "maize",
+              "wheat",
+              "animal fats",
+              "maize gluten",
+              "beet pulp",
+              "vegetable protein isolate",
+              "fish oil",
+              "minerals",
+              "soya oil",
+              "yeasts",
+              "glucosamine",
+              "chondroitin"
+            ]
+          },
+          {
+            "source_name": "manufacturer_official",
+            "ingredients": [
+              "dehydrated poultry protein",
+              "maize",
+              "wheat",
+              "animal fats",
+              "maize gluten",
+              "beet pulp",
+              "vegetable protein isolate",
+              "fish oil",
+              "minerals",
+              "soya oil",
+              "yeasts",
+              "glucosamine",
+              "chondroitin"
+            ]
+          }
+        ]
+      }
+    },
+    "overall_confidence": 0.917,
+    "total_sources": 2,
+    "verification_status": "verified",
+    "conflicts": [],
+    "tier": "SILVER"
+  },
+  {
+    "product_id": "rc_feline_adult",
+    "brand": "Royal Canin",
+    "product_name": "Feline Adult Dry Cat Food",
+    "species": "CAT",
+    "verified_at": "2026-06-13T10:00:00Z",
+    "fields": {
+      "protein": {
+        "value": 32.0,
+        "confidence": 1.0,
+        "sources": 4,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 32,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 32.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "PetCircle",
+            "source_type": "retailer",
+            "value": 32,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "Petbarn",
+            "source_type": "retailer",
+            "value": 32,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "fat": {
+        "value": 15.0,
+        "confidence": 1.0,
+        "sources": 4,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 15,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 15.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "PetCircle",
+            "source_type": "retailer",
+            "value": 15,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "Petbarn",
+            "source_type": "retailer",
+            "value": 15,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "fiber": {
+        "value": 4.2,
+        "confidence": 1.0,
+        "sources": 4,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 4.2,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 4.2,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "PetCircle",
+            "source_type": "retailer",
+            "value": 4.2,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "Petbarn",
+            "source_type": "retailer",
+            "value": 4.2,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "moisture": {
+        "value": 8.0,
+        "confidence": 1.0,
+        "sources": 4,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 8,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 8.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "PetCircle",
+            "source_type": "retailer",
+            "value": 8,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "Petbarn",
+            "source_type": "retailer",
+            "value": 8,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "calories": {
+        "value": 3870.0,
+        "confidence": 1.0,
+        "sources": 4,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 3870,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 3870,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "PetCircle",
+            "source_type": "retailer",
+            "value": 3870,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "Petbarn",
+            "source_type": "retailer",
+            "value": 3870,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "kcal/kg",
+        "tolerance": 5.0
+      },
+      "ingredients": {
+        "normalized_ingredients": [
+          "dehydrated poultry protein",
+          "rice",
+          "maize",
+          "vegetable protein isolate",
+          "animal fats",
+          "maize gluten",
+          "vegetable fibres",
+          "beet pulp",
+          "fish oil",
+          "minerals",
+          "soya oil",
+          "yeasts"
+        ],
+        "agreeing_sources": 3,
+        "conflicting_sources": 0,
+        "overlap_percentage": 100.0,
+        "status": "verified",
+        "source_ingredients": [
+          {
+            "source_name": "seed_data",
+            "ingredients": [
+              "dehydrated poultry protein",
+              "rice",
+              "maize",
+              "vegetable protein isolate",
+              "animal fats",
+              "maize gluten",
+              "vegetable fibres",
+              "beet pulp",
+              "fish oil",
+              "minerals",
+              "soya oil",
+              "yeasts"
+            ]
+          },
+          {
+            "source_name": "manufacturer_official",
+            "ingredients": [
+              "dehydrated poultry protein",
+              "rice",
+              "maize",
+              "vegetable protein isolate",
+              "animal fats",
+              "maize gluten",
+              "vegetable fibres",
+              "beet pulp",
+              "fish oil",
+              "minerals",
+              "soya oil",
+              "yeasts"
+            ]
+          },
+          {
+            "source_name": "PetCircle",
+            "ingredients": [
+              "dehydrated poultry protein",
+              "rice",
+              "maize",
+              "vegetable protein isolate",
+              "animal fats",
+              "maize gluten",
+              "vegetable fibres",
+              "beet pulp",
+              "fish oil",
+              "minerals",
+              "soya oil",
+              "yeasts"
+            ]
+          },
+          {
+            "source_name": "Petbarn",
+            "ingredients": [
+              "dehydrated poultry protein",
+              "rice",
+              "maize",
+              "vegetable protein isolate",
+              "animal fats",
+              "maize gluten",
+              "vegetable fibres",
+              "beet pulp",
+              "fish oil",
+              "minerals",
+              "soya oil",
+              "yeasts"
+            ]
+          }
+        ]
+      }
+    },
+    "overall_confidence": 1.0,
+    "total_sources": 4,
+    "verification_status": "verified",
+    "conflicts": [],
+    "tier": "GOLD"
+  },
+  {
+    "product_id": "rc_feline_kitten",
+    "brand": "Royal Canin",
+    "product_name": "Kitten Dry Cat Food",
+    "species": "CAT",
+    "verified_at": "2026-06-13T10:00:00Z",
+    "fields": {
+      "protein": {
+        "value": 34.0,
+        "confidence": 1.0,
+        "sources": 4,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 34,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 34.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "PetCircle",
+            "source_type": "retailer",
+            "value": 34,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "Petbarn",
+            "source_type": "retailer",
+            "value": 34,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "fat": {
+        "value": 16.0,
+        "confidence": 1.0,
+        "sources": 4,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 16,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 16.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "PetCircle",
+            "source_type": "retailer",
+            "value": 16,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "Petbarn",
+            "source_type": "retailer",
+            "value": 16,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "fiber": {
+        "value": 3.8,
+        "confidence": 1.0,
+        "sources": 4,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 3.8,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 3.8,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "PetCircle",
+            "source_type": "retailer",
+            "value": 3.8,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "Petbarn",
+            "source_type": "retailer",
+            "value": 3.8,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "moisture": {
+        "value": 8.0,
+        "confidence": 1.0,
+        "sources": 4,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 8,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 8.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "PetCircle",
+            "source_type": "retailer",
+            "value": 8,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "Petbarn",
+            "source_type": "retailer",
+            "value": 8,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "calories": {
+        "value": 3940.0,
+        "confidence": 1.0,
+        "sources": 4,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 3940,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 3940,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "PetCircle",
+            "source_type": "retailer",
+            "value": 3940,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "Petbarn",
+            "source_type": "retailer",
+            "value": 3940,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "kcal/kg",
+        "tolerance": 5.0
+      },
+      "ingredients": {
+        "normalized_ingredients": [
+          "dehydrated poultry protein",
+          "rice",
+          "maize",
+          "vegetable protein isolate",
+          "animal fats",
+          "maize gluten",
+          "vegetable fibres",
+          "beet pulp",
+          "fish oil",
+          "minerals",
+          "soya oil",
+          "yeasts",
+          "fructo-oligo-saccharides",
+          "hydrolysed yeast",
+          "marigold extract"
+        ],
+        "agreeing_sources": 3,
+        "conflicting_sources": 0,
+        "overlap_percentage": 86.7,
+        "status": "verified",
+        "source_ingredients": [
+          {
+            "source_name": "seed_data",
+            "ingredients": [
+              "dehydrated poultry protein",
+              "rice",
+              "maize",
+              "vegetable protein isolate",
+              "animal fats",
+              "maize gluten",
+              "vegetable fibres",
+              "beet pulp",
+              "fish oil",
+              "minerals",
+              "soya oil",
+              "yeasts",
+              "fructo-oligo-saccharides",
+              "hydrolysed yeast",
+              "marigold extract"
+            ]
+          },
+          {
+            "source_name": "manufacturer_official",
+            "ingredients": [
+              "dehydrated poultry protein",
+              "rice",
+              "maize",
+              "vegetable protein isolate",
+              "animal fats",
+              "maize gluten",
+              "vegetable fibres",
+              "beet pulp",
+              "fish oil",
+              "minerals",
+              "soya oil",
+              "yeasts",
+              "fructo-oligo-saccharides",
+              "hydrolysed yeast",
+              "marigold extract"
+            ]
+          },
+          {
+            "source_name": "PetCircle",
+            "ingredients": [
+              "dehydrated poultry protein",
+              "rice",
+              "maize",
+              "vegetable protein isolate",
+              "animal fats",
+              "maize gluten",
+              "vegetable fibres",
+              "beet pulp",
+              "fish oil",
+              "minerals",
+              "soya oil",
+              "yeasts"
+            ]
+          },
+          {
+            "source_name": "Petbarn",
+            "ingredients": [
+              "dehydrated poultry protein",
+              "rice",
+              "maize",
+              "vegetable protein isolate",
+              "animal fats",
+              "maize gluten",
+              "vegetable fibres",
+              "beet pulp",
+              "fish oil",
+              "minerals",
+              "soya oil",
+              "yeasts"
+            ]
+          }
+        ]
+      }
+    },
+    "overall_confidence": 0.978,
+    "total_sources": 4,
+    "verification_status": "verified",
+    "conflicts": [],
+    "tier": "GOLD"
+  },
+  {
+    "product_id": "rc_feline_senior",
+    "brand": "Royal Canin",
+    "product_name": "Ageing 12+ Dry Cat Food",
+    "species": "CAT",
+    "verified_at": "2026-06-13T10:00:00Z",
+    "fields": {
+      "protein": {
+        "value": 28.0,
+        "confidence": 1.0,
+        "sources": 4,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 28,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 28.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "PetCircle",
+            "source_type": "retailer",
+            "value": 28,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "Petbarn",
+            "source_type": "retailer",
+            "value": 28,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "fat": {
+        "value": 12.0,
+        "confidence": 1.0,
+        "sources": 4,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 12,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 12.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "PetCircle",
+            "source_type": "retailer",
+            "value": 12,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "Petbarn",
+            "source_type": "retailer",
+            "value": 12,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "fiber": {
+        "value": 5.0,
+        "confidence": 1.0,
+        "sources": 4,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 5.0,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 5.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "PetCircle",
+            "source_type": "retailer",
+            "value": 5.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "Petbarn",
+            "source_type": "retailer",
+            "value": 5.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "moisture": {
+        "value": 8.0,
+        "confidence": 1.0,
+        "sources": 4,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 8,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 8.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "PetCircle",
+            "source_type": "retailer",
+            "value": 8,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "Petbarn",
+            "source_type": "retailer",
+            "value": 8,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "calories": {
+        "value": 3713.3,
+        "confidence": 1.0,
+        "sources": 4,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 3720,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 3720,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "PetCircle",
+            "source_type": "retailer",
+            "value": 3700,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "Petbarn",
+            "source_type": "retailer",
+            "value": 3720,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "kcal/kg",
+        "tolerance": 5.0
+      },
+      "ingredients": {
+        "normalized_ingredients": [
+          "dehydrated poultry protein",
+          "rice",
+          "maize",
+          "vegetable protein isolate",
+          "animal fats",
+          "maize gluten",
+          "vegetable fibres",
+          "beet pulp",
+          "fish oil",
+          "minerals",
+          "soya oil",
+          "yeasts",
+          "glucosamine"
+        ],
+        "agreeing_sources": 3,
+        "conflicting_sources": 0,
+        "overlap_percentage": 94.9,
+        "status": "verified",
+        "source_ingredients": [
+          {
+            "source_name": "seed_data",
+            "ingredients": [
+              "dehydrated poultry protein",
+              "rice",
+              "maize",
+              "vegetable protein isolate",
+              "animal fats",
+              "maize gluten",
+              "vegetable fibres",
+              "beet pulp",
+              "fish oil",
+              "minerals",
+              "soya oil",
+              "yeasts",
+              "glucosamine"
+            ]
+          },
+          {
+            "source_name": "manufacturer_official",
+            "ingredients": [
+              "dehydrated poultry protein",
+              "rice",
+              "maize",
+              "vegetable protein isolate",
+              "animal fats",
+              "maize gluten",
+              "vegetable fibres",
+              "beet pulp",
+              "fish oil",
+              "minerals",
+              "soya oil",
+              "yeasts",
+              "glucosamine"
+            ]
+          },
+          {
+            "source_name": "PetCircle",
+            "ingredients": [
+              "dehydrated poultry protein",
+              "rice",
+              "maize",
+              "vegetable protein isolate",
+              "animal fats",
+              "maize gluten",
+              "vegetable fibres",
+              "beet pulp",
+              "fish oil",
+              "minerals",
+              "soya oil",
+              "yeasts"
+            ]
+          },
+          {
+            "source_name": "Petbarn",
+            "ingredients": [
+              "dehydrated poultry protein",
+              "rice",
+              "maize",
+              "vegetable protein isolate",
+              "animal fats",
+              "maize gluten",
+              "vegetable fibres",
+              "beet pulp",
+              "fish oil",
+              "minerals",
+              "soya oil",
+              "yeasts"
+            ]
+          }
+        ]
+      }
+    },
+    "overall_confidence": 0.991,
+    "total_sources": 4,
+    "verification_status": "verified",
+    "conflicts": [],
+    "tier": "GOLD"
+  },
+  {
+    "product_id": "rc_feline_sterilised",
+    "brand": "Royal Canin",
+    "product_name": "Sterilised 37 Dry Cat Food",
+    "species": "CAT",
+    "verified_at": "2026-06-13T10:00:00Z",
+    "fields": {
+      "protein": {
+        "value": 37.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 37,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 37.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "fat": {
+        "value": 12.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 12,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 12.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "fiber": {
+        "value": 6.2,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 6.2,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 6.2,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "moisture": {
+        "value": 8.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 8,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 8.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "calories": {
+        "value": 3500.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 3500,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 3500,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "kcal/kg",
+        "tolerance": 5.0
+      },
+      "ingredients": {
+        "normalized_ingredients": [
+          "dehydrated poultry protein",
+          "maize",
+          "wheat",
+          "vegetable protein isolate",
+          "vegetable fibres",
+          "animal fats",
+          "maize gluten",
+          "beet pulp",
+          "fish oil",
+          "minerals",
+          "psyllium",
+          "fructo-oligo-saccharides"
+        ],
+        "agreeing_sources": 1,
+        "conflicting_sources": 0,
+        "overlap_percentage": 100.0,
+        "status": "partial",
+        "source_ingredients": [
+          {
+            "source_name": "seed_data",
+            "ingredients": [
+              "dehydrated poultry protein",
+              "maize",
+              "wheat",
+              "vegetable protein isolate",
+              "vegetable fibres",
+              "animal fats",
+              "maize gluten",
+              "beet pulp",
+              "fish oil",
+              "minerals",
+              "psyllium",
+              "fructo-oligo-saccharides"
+            ]
+          },
+          {
+            "source_name": "manufacturer_official",
+            "ingredients": [
+              "dehydrated poultry protein",
+              "maize",
+              "wheat",
+              "vegetable protein isolate",
+              "vegetable fibres",
+              "animal fats",
+              "maize gluten",
+              "beet pulp",
+              "fish oil",
+              "minerals",
+              "psyllium",
+              "fructo-oligo-saccharides"
+            ]
+          }
+        ]
+      }
+    },
+    "overall_confidence": 0.917,
+    "total_sources": 2,
+    "verification_status": "verified",
+    "conflicts": [],
+    "tier": "SILVER"
+  },
+  {
+    "product_id": "ziwi_canine_adult",
+    "brand": "Ziwi Peak",
+    "product_name": "Air-Dried Lamb Dog Recipe",
+    "species": "DOG",
+    "verified_at": "2026-06-13T10:00:00Z",
+    "fields": {
+      "protein": {
+        "value": 38.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 38,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 38.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "fat": {
+        "value": 28.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 28,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 28.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "fiber": {
+        "value": 3.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 3.0,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 3.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "moisture": {
+        "value": 14.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 14,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 14.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "calories": {
+        "value": 5200.0,
+        "confidence": 0.9,
+        "sources": 2,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 5200,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 5200,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "kcal/kg",
+        "tolerance": 5.0
+      },
+      "ingredients": {
+        "normalized_ingredients": [
+          "lamb",
+          "lamb heart",
+          "lamb tripe",
+          "lamb liver",
+          "lamb kidney",
+          "lamb lung",
+          "new zealand green mussel",
+          "lamb bone",
+          "lecithin",
+          "inulin",
+          "dried kelp",
+          "vitamins",
+          "minerals",
+          "salt"
+        ],
+        "agreeing_sources": 1,
+        "conflicting_sources": 0,
+        "overlap_percentage": 100.0,
+        "status": "partial",
+        "source_ingredients": [
+          {
+            "source_name": "seed_data",
+            "ingredients": [
+              "lamb",
+              "lamb heart",
+              "lamb tripe",
+              "lamb liver",
+              "lamb kidney",
+              "lamb lung",
+              "new zealand green mussel",
+              "lamb bone",
+              "lecithin",
+              "inulin",
+              "dried kelp",
+              "vitamins",
+              "minerals",
+              "salt"
+            ]
+          },
+          {
+            "source_name": "manufacturer_official",
+            "ingredients": [
+              "lamb",
+              "lamb heart",
+              "lamb tripe",
+              "lamb liver",
+              "lamb kidney",
+              "lamb lung",
+              "new zealand green mussel",
+              "lamb bone",
+              "lecithin",
+              "inulin",
+              "dried kelp",
+              "vitamins",
+              "minerals",
+              "salt"
+            ]
+          }
+        ]
+      }
+    },
+    "overall_confidence": 0.917,
+    "total_sources": 2,
+    "verification_status": "verified",
+    "conflicts": [],
+    "tier": "SILVER"
+  },
+  {
+    "product_id": "ziwi_feline_adult",
+    "brand": "Ziwi Peak",
+    "product_name": "Air-Dried Mackerel & Lamb Cat Recipe",
+    "species": "CAT",
+    "verified_at": "2026-06-13T10:00:00Z",
+    "fields": {
+      "protein": {
+        "value": 44.0,
+        "confidence": 0.95,
+        "sources": 3,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 44,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 44.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "PetCircle",
+            "source_type": "retailer",
+            "value": 44,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "fat": {
+        "value": 24.0,
+        "confidence": 0.95,
+        "sources": 3,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 24,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 24.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "PetCircle",
+            "source_type": "retailer",
+            "value": 24,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "fiber": {
+        "value": 2.0,
+        "confidence": 0.95,
+        "sources": 3,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 2.0,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 2.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "PetCircle",
+            "source_type": "retailer",
+            "value": 2.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "moisture": {
+        "value": 14.0,
+        "confidence": 0.95,
+        "sources": 3,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 14,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 14.0,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "PetCircle",
+            "source_type": "retailer",
+            "value": 14,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "%",
+        "tolerance": 5.0
+      },
+      "calories": {
+        "value": 4800.0,
+        "confidence": 0.95,
+        "sources": 3,
+        "source_values": [
+          {
+            "source_name": "seed_data",
+            "source_type": "seed",
+            "value": 4800,
+            "captured_at": "2026-01-01T00:00:00Z"
+          },
+          {
+            "source_name": "manufacturer_official",
+            "source_type": "manufacturer",
+            "value": 4800,
+            "captured_at": "2026-06-13T10:00:00Z"
+          },
+          {
+            "source_name": "PetCircle",
+            "source_type": "retailer",
+            "value": 4800,
+            "captured_at": "2026-06-13T10:00:00Z"
+          }
+        ],
+        "status": "verified",
+        "unit": "kcal/kg",
+        "tolerance": 5.0
+      },
+      "ingredients": {
+        "normalized_ingredients": [
+          "mackerel",
+          "lamb",
+          "lamb heart",
+          "lamb tripe",
+          "lamb liver",
+          "lamb lung",
+          "new zealand green mussel",
+          "lamb kidney",
+          "lamb bone",
+          "lecithin",
+          "inulin",
+          "dried kelp",
+          "vitamins",
+          "minerals",
+          "salt",
+          "taurine"
+        ],
+        "agreeing_sources": 2,
+        "conflicting_sources": 0,
+        "overlap_percentage": 96.9,
+        "status": "verified",
+        "source_ingredients": [
+          {
+            "source_name": "seed_data",
+            "ingredients": [
+              "mackerel",
+              "lamb",
+              "lamb heart",
+              "lamb tripe",
+              "lamb liver",
+              "lamb lung",
+              "new zealand green mussel",
+              "lamb kidney",
+              "lamb bone",
+              "lecithin",
+              "inulin",
+              "dried kelp",
+              "vitamins",
+              "minerals",
+              "salt",
+              "taurine"
+            ]
+          },
+          {
+            "source_name": "manufacturer_official",
+            "ingredients": [
+              "mackerel",
+              "lamb",
+              "lamb heart",
+              "lamb tripe",
+              "lamb liver",
+              "lamb lung",
+              "new zealand green mussel",
+              "lamb kidney",
+              "lamb bone",
+              "lecithin",
+              "inulin",
+              "dried kelp",
+              "vitamins",
+              "minerals",
+              "salt",
+              "taurine"
+            ]
+          },
+          {
+            "source_name": "PetCircle",
+            "ingredients": [
+              "mackerel",
+              "lamb",
+              "lamb heart",
+              "lamb tripe",
+              "lamb liver",
+              "lamb lung",
+              "new zealand green mussel",
+              "lamb kidney",
+              "lamb bone",
+              "lecithin",
+              "inulin",
+              "dried kelp",
+              "vitamins",
+              "minerals",
+              "taurine"
+            ]
+          }
+        ]
+      }
+    },
+    "overall_confidence": 0.953,
+    "total_sources": 3,
+    "verification_status": "verified",
+    "conflicts": [],
+    "tier": "GOLD"
+  }
+]

@@ -1,0 +1,6 @@
+brand_id,brand_name,website,country,source_count,confidence_score,verification_status
+1,Royal Canin,https://www.royalcanin.com.au,AU,0,0.0,UNVERIFIED
+2,Hill's Science Diet,https://www.hillspet.com.au,US,0,0.0,UNVERIFIED
+3,Advance,https://www.advancepet.com.au,AU,0,0.0,UNVERIFIED
+4,Black Hawk,https://www.blackhawkpetcare.com.au,AU,0,0.0,UNVERIFIED
+5,Ziwi Peak,https://www.ziwipets.com,NZ,0,0.0,UNVERIFIED

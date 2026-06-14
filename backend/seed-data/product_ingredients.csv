@@ -1,0 +1,121 @@
+ingredient_id,product_id,raw_text,normalized_ingredient,ingredient_id_ref,confidence,position
+1,1,Chicken meal,Chicken meal,1,1.0,1
+2,1,Brown rice,Brown rice,2,1.0,2
+3,1,Corn gluten meal,Corn gluten meal,3,1.0,3
+4,1,Chicken fat,Chicken fat,4,1.0,4
+5,1,Natural flavours,Natural flavours,5,1.0,5
+6,1,Fish oil,Fish oil,6,1.0,6
+7,2,Chicken meal,Chicken meal,7,1.0,1
+8,2,Chicken fat,Chicken fat,8,1.0,2
+9,2,Brewers rice,Brewers rice,9,1.0,3
+10,2,Corn gluten meal,Corn gluten meal,10,1.0,4
+11,2,Fish oil,Fish oil,11,1.0,5
+12,2,Taurine,Taurine,12,1.0,6
+13,3,Chicken meal,Chicken meal,13,1.0,1
+14,3,Corn,Corn,14,1.0,2
+15,3,Corn gluten meal,Corn gluten meal,15,1.0,3
+16,3,Chicken fat,Chicken fat,16,1.0,4
+17,3,Fish oil,Fish oil,17,1.0,5
+18,3,Green-lipped mussel,Green-lipped mussel,18,1.0,6
+19,4,Chicken meal,Chicken meal,19,1.0,1
+20,4,Brewers rice,Brewers rice,20,1.0,2
+21,4,Corn,Corn,21,1.0,3
+22,4,Chicken fat,Chicken fat,22,1.0,4
+23,4,Beet pulp,Beet pulp,23,1.0,5
+24,4,Fish oil,Fish oil,24,1.0,6
+25,5,Chicken meal,Chicken meal,25,1.0,1
+26,5,Chicken fat,Chicken fat,26,1.0,2
+27,5,Brewers rice,Brewers rice,27,1.0,3
+28,5,Corn gluten meal,Corn gluten meal,28,1.0,4
+29,5,Fish oil,Fish oil,29,1.0,5
+30,5,Taurine,Taurine,30,1.0,6
+31,6,Chicken meal,Chicken meal,31,1.0,1
+32,6,Whole grain wheat,Whole grain wheat,32,1.0,2
+33,6,Brewers rice,Brewers rice,33,1.0,3
+34,6,Corn gluten meal,Corn gluten meal,34,1.0,4
+35,6,Chicken fat,Chicken fat,35,1.0,5
+36,6,Fish oil,Fish oil,36,1.0,6
+37,7,Chicken meal,Chicken meal,37,1.0,1
+38,7,Brewers rice,Brewers rice,38,1.0,2
+39,7,Whole grain corn,Whole grain corn,39,1.0,3
+40,7,Chicken fat,Chicken fat,40,1.0,4
+41,7,Fish oil,Fish oil,41,1.0,5
+42,7,Green-lipped mussel,Green-lipped mussel,42,1.0,6
+43,8,Chicken meal,Chicken meal,43,1.0,1
+44,8,Whole grain wheat,Whole grain wheat,44,1.0,2
+45,8,Brewers rice,Brewers rice,45,1.0,3
+46,8,Soybean meal,Soybean meal,46,1.0,4
+47,8,Chicken fat,Chicken fat,47,1.0,5
+48,8,Fish oil,Fish oil,48,1.0,6
+49,9,Chicken meal,Chicken meal,49,1.0,1
+50,9,Whole grain wheat,Whole grain wheat,50,1.0,2
+51,9,Brewers rice,Brewers rice,51,1.0,3
+52,9,Chicken fat,Chicken fat,52,1.0,4
+53,9,Fish oil,Fish oil,53,1.0,5
+54,9,Taurine,Taurine,54,1.0,6
+55,10,Chicken meal,Chicken meal,55,1.0,1
+56,10,Rice,Rice,56,1.0,2
+57,10,Chicken fat,Chicken fat,57,1.0,3
+58,10,Maize gluten meal,Maize gluten meal,58,1.0,4
+59,10,Fish oil,Fish oil,59,1.0,5
+60,10,Taurine,Taurine,60,1.0,6
+61,11,Chicken meal,Chicken meal,61,1.0,1
+62,11,Chicken fat,Chicken fat,62,1.0,2
+63,11,Rice,Rice,63,1.0,3
+64,11,Fish oil,Fish oil,64,1.0,4
+65,11,Taurine,Taurine,65,1.0,5
+66,11,Colostrum,Colostrum,66,1.0,6
+67,12,Chicken meal,Chicken meal,67,1.0,1
+68,12,Rice,Rice,68,1.0,2
+69,12,Chicken fat,Chicken fat,69,1.0,3
+70,12,Beet pulp,Beet pulp,70,1.0,4
+71,12,Fish oil,Fish oil,71,1.0,5
+72,12,Vitamin E,Vitamin E,72,1.0,6
+73,13,Chicken meal,Chicken meal,73,1.0,1
+74,13,Rice,Rice,74,1.0,2
+75,13,Chicken fat,Chicken fat,75,1.0,3
+76,13,Beet pulp,Beet pulp,76,1.0,4
+77,13,Fish oil,Fish oil,77,1.0,5
+78,13,Glucosamine,Glucosamine,78,1.0,6
+79,14,Chicken meal,Chicken meal,79,1.0,1
+80,14,Peas,Peas,80,1.0,2
+81,14,Chicken fat,Chicken fat,81,1.0,3
+82,14,Fish meal,Fish meal,82,1.0,4
+83,14,Sweet potato,Sweet potato,83,1.0,5
+84,14,Taurine,Taurine,84,1.0,6
+85,15,Chicken meal,Chicken meal,85,1.0,1
+86,15,Chicken fat,Chicken fat,86,1.0,2
+87,15,Peas,Peas,87,1.0,3
+88,15,Fish meal,Fish meal,88,1.0,4
+89,15,Taurine,Taurine,89,1.0,5
+90,15,Chicken liver,Chicken liver,90,1.0,6
+91,16,Chicken meal,Chicken meal,91,1.0,1
+92,16,Peas,Peas,92,1.0,2
+93,16,Chicken fat,Chicken fat,93,1.0,3
+94,16,Fish meal,Fish meal,94,1.0,4
+95,16,Sweet potato,Sweet potato,95,1.0,5
+96,16,Beet pulp,Beet pulp,96,1.0,6
+97,17,Chicken meal,Chicken meal,97,1.0,1
+98,17,Chicken fat,Chicken fat,98,1.0,2
+99,17,Peas,Peas,99,1.0,3
+100,17,Fish meal,Fish meal,100,1.0,4
+101,17,Taurine,Taurine,101,1.0,5
+102,17,Chicken liver,Chicken liver,102,1.0,6
+103,18,Lamb,Lamb,103,1.0,1
+104,18,Lamb broth,Lamb broth,104,1.0,2
+105,18,Lamb liver,Lamb liver,105,1.0,3
+106,18,Chickpeas,Chickpeas,106,1.0,4
+107,18,New Zealand green mussel,New Zealand green mussel,107,1.0,5
+108,18,Taurine,Taurine,108,1.0,6
+109,19,Beef,Beef,109,1.0,1
+110,19,Beef liver,Beef liver,110,1.0,2
+111,19,Beef kidney,Beef kidney,111,1.0,3
+112,19,Beef heart,Beef heart,112,1.0,4
+113,19,Chicory inulin,Chicory inulin,113,1.0,5
+114,19,New Zealand green mussel,New Zealand green mussel,114,1.0,6
+115,20,Chicken,Chicken,115,1.0,1
+116,20,Chicken liver,Chicken liver,116,1.0,2
+117,20,Chicken heart,Chicken heart,117,1.0,3
+118,20,Chicory inulin,Chicory inulin,118,1.0,4
+119,20,New Zealand green mussel,New Zealand green mussel,119,1.0,5
+120,20,Kelp,Kelp,120,1.0,6

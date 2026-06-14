@@ -1,0 +1,23 @@
+{
+  "total_products": 20,
+  "verified": 20,
+  "partial": 0,
+  "conflict": 0,
+  "unverified": 0,
+  "field_coverage": {
+    "protein": 20,
+    "fat": 20,
+    "fiber": 20,
+    "moisture": 20,
+    "calories": 20,
+    "ingredients": 20
+  },
+  "tier_distribution": {
+    "GOLD": 8,
+    "SILVER": 12,
+    "BRONZE": 0,
+    "UNVERIFIED": 0
+  },
+  "average_overall_confidence": 0.938,
+  "total_conflicts": 0
+}

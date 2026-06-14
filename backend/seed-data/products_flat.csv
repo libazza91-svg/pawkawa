@@ -1,0 +1,21 @@
+product_id,brand_id,product_name,species,life_stage,product_type,weight_kg,description,source_count,confidence_score,verification_status
+1,1,Royal Canin Feline Health Nutrition Indoor Adult Dry Cat Food,CAT,ADULT,DRY_FOOD,2.0,Complete balanced nutrition for indoor adult cats with moderate energy needs,0,0.0,UNVERIFIED
+2,1,Royal Canin Feline Health Nutrition Kitten Dry Cat Food,CAT,KITTEN,DRY_FOOD,2.0,Specially formulated to support growth and immune system development in kittens,0,0.0,UNVERIFIED
+3,1,Royal Canin Feline Health Nutrition Aging 12+ Dry Cat Food,CAT,SENIOR,DRY_FOOD,2.0,Supports healthy aging in senior cats with enhanced joint and kidney support,0,0.0,UNVERIFIED
+4,1,Royal Canin Canine Health Nutrition Medium Adult Dry Dog Food,DOG,ADULT,DRY_FOOD,4.0,Precise nutrition for medium breed adult dogs maintaining optimal body condition,0,0.0,UNVERIFIED
+5,1,Royal Canin Canine Health Nutrition Medium Puppy Dry Dog Food,DOG,PUPPY,DRY_FOOD,4.0,Supports healthy growth and digestive health in medium breed puppies,0,0.0,UNVERIFIED
+6,2,Hill's Science Diet Adult Indoor Dry Cat Food,CAT,ADULT,DRY_FOOD,1.8,Clinically proven nutrition for indoor adult cats with natural fibre for hairball control,0,0.0,UNVERIFIED
+7,2,Hill's Science Diet Senior 11+ Indoor Dry Cat Food,CAT,SENIOR,DRY_FOOD,1.8,Advanced nutrition for senior indoor cats with balanced minerals for kidney health,0,0.0,UNVERIFIED
+8,2,Hill's Science Diet Adult Large Breed Dry Dog Food,DOG,ADULT,DRY_FOOD,6.8,Optimal nutrition for large breed adult dogs with glucosamine and chondroitin for joint health,0,0.0,UNVERIFIED
+9,2,Hill's Science Diet Puppy Large Breed Dry Dog Food,DOG,PUPPY,DRY_FOOD,6.8,Precise nutrition for large breed puppies with controlled calcium for healthy bone development,0,0.0,UNVERIFIED
+10,3,Advance Adult Chicken Dry Cat Food,CAT,ADULT,DRY_FOOD,1.5,Australian-made nutrition for adult cats with real chicken as the first ingredient,0,0.0,UNVERIFIED
+11,3,Advance Kitten Growth Dry Cat Food,CAT,KITTEN,DRY_FOOD,1.5,Supports healthy growth in kittens with colostrum and essential nutrients,0,0.0,UNVERIFIED
+12,3,Advance Adult All Breed Dry Dog Food,DOG,ADULT,DRY_FOOD,3.0,Complete nutrition for adult dogs of all breeds with optimal protein and fat levels,0,0.0,UNVERIFIED
+13,3,Advance Senior Plus Dry Dog Food,DOG,SENIOR,DRY_FOOD,3.0,Tailored nutrition for senior dogs with glucosamine for joint support,0,0.0,UNVERIFIED
+14,4,Black Hawk Original Adult Dry Cat Food,CAT,ADULT,DRY_FOOD,1.5,Naturally grain-free nutrition for adult cats with Australian chicken and functional oils,0,0.0,UNVERIFIED
+15,4,Black Hawk Kitten Dry Cat Food,CAT,KITTEN,DRY_FOOD,1.5,Grain-free kitten food with high protein from real Australian chicken,0,0.0,UNVERIFIED
+16,4,Black Hawk Original Adult Dry Dog Food,DOG,ADULT,DRY_FOOD,3.0,Naturally grain-free nutrition for adult dogs with Australian chicken and peas,0,0.0,UNVERIFIED
+17,4,Black Hawk Puppy Dry Dog Food,DOG,PUPPY,DRY_FOOD,3.0,Grain-free puppy food with real Australian chicken for healthy growth,0,0.0,UNVERIFIED
+18,5,Ziwi Peak Lamb Recipe Wet Cat Food,CAT,ADULT,WET_FOOD,0.185,Air-dried wet cat food with 96% free-range lamb, organs and New Zealand green mussels,0,0.0,UNVERIFIED
+19,5,Ziwi Peak Air-Dried Beef Dog Food,DOG,ADULT,DRY_FOOD,1.0,Air-dried dog food with 96% grass-fed beef, organs and New Zealand green mussels,0,0.0,UNVERIFIED
+20,5,Ziwi Peak Air-Dried Chicken Dog Food,DOG,ALL_LIFE_STAGES,DRY_FOOD,1.0,Air-dried dog food with 96% free-range chicken, organs and New Zealand green mussels,0,0.0,UNVERIFIED
