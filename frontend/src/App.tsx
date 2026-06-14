@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   brands,
   getAverageConfidence,
@@ -7,121 +7,33 @@ import {
   lifeStageOptions,
   products,
   speciesOptions,
-  type LifeStage,
   type Product,
-  type Species,
   type VerificationGrade
 } from './data';
-
-type RouteName = 'landing' | 'search' | 'product' | 'compare' | 'brand';
-type CatMood = 'sit' | 'walk' | 'sniff' | 'loaf';
-
-type Filters = {
-  keyword: string;
-  brand: string;
-  species: 'All Species' | Species;
-  lifeStage: 'All Life Stages' | LifeStage;
-  grade: 'All Grades' | VerificationGrade;
-  maxPrice: number;
-};
-
-type ProductInsight = {
-  product_id: string;
-  quick_verdict: string;
-  strengths: string[];
-  considerations: string[];
-  best_for: string[];
-  avoid_if: string[];
-  confidence: number;
-  trust_grade: VerificationGrade;
-};
-
-type RecommendationContext = {
-  constraints: Array<{ code: string; label: string; type: 'PREFER' | 'AVOID' | 'REQUIRES_VET'; reason: string }>;
-  recommendations: Array<{ product_id: string; product_slug: string; product_name: string; suitability_score: number; reasons: string[]; cautions: string[] }>;
-  warnings: string[];
-};
-
-type ProductListResponse = {
-  items: Array<{
-    product_id: number;
-    name: string;
-    slug: string;
-    brand_name: string | null;
-    species: 'CAT' | 'DOG' | null;
-    life_stage: string | null;
-    confidence: number;
-    trust_grade: VerificationGrade;
-  }>;
-  pagination: {
-    page: number;
-    pageSize: number;
-    total: number;
-  };
-};
-
-type CompareResponse = {
-  products: Array<{
-    product_id: number;
-    slug: string;
-    product_name: string;
-    brand_name: string;
-    species: 'CAT' | 'DOG' | null;
-    life_stage: string | null;
-    format: string | null;
-    origin: string | null;
-    confidence: number;
-    trust_grade: VerificationGrade;
-    market_availability: 'ACTIVE' | 'LIMITED' | 'DISCONTINUED';
-  }>;
-  comparison: {
-    nutritionTable: Array<Record<string, string | null>>;
-    ingredientSets: Array<{ product_id: number; product_name: string; ingredients: string[] }>;
-    priceComparison: Array<{
-      product_id: number;
-      product_name: string;
-      retailers: Array<{ retailer: string | null; price_aud: string; unit_price_aud_per_kg: string | null }>;
-    }>;
-  };
-};
-
-type CompareRecommendationResponse = RecommendationContext & {
-  disclaimer?: string;
-};
-
-type RecoveryTopic = {
-  id: string;
-  title: string;
-  owner_summary: string;
-};
-
-type ApiResponse<T> = {
-  success: boolean;
-  data: T;
-};
-
-async function readApi<T>(url: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(url, init);
-  const payload = (await response.json()) as ApiResponse<T>;
-  if (!response.ok || !payload.success) throw new Error(`API request failed: ${url}`);
-  return payload.data;
-}
-
-type CatFrame = {
-  index: number;
-  left: number;
-  top: number;
-  right: number;
-  bottom: number;
-};
-
-const CAT_FRAME_WIDTH = 362;
-const CAT_FRAMES: Record<CatMood, CatFrame> = {
-  sit: { index: 0, left: 79, top: 201, right: 307, bottom: 506 },
-  walk: { index: 1, left: 16, top: 225, right: 362, bottom: 505 },
-  sniff: { index: 2, left: 0, top: 207, right: 362, bottom: 505 },
-  loaf: { index: 3, left: 0, top: 333, right: 362, bottom: 506 }
-};
+import type {
+  CompareRecommendationResponse,
+  CompareResponse,
+  Filters,
+  ProductInsight,
+  ProductListResponse,
+  RecommendationContext,
+  RecoveryTopic
+} from './app-types';
+import { readApi } from './api';
+import { LivingCat } from './components/LivingCat';
+import {
+  AppHeader,
+  ConfidenceMeter,
+  EmptyState,
+  IngredientTag,
+  InsightList,
+  NutritionCard,
+  PriceCard,
+  SectionHeader,
+  TrustBadge
+} from './components/ui';
+import { ComparePage } from './pages/ComparePage';
+import { parseRoute } from './routing';
 
 const defaultFilters: Filters = {
   keyword: '',
@@ -131,215 +43,6 @@ const defaultFilters: Filters = {
   grade: 'All Grades',
   maxPrice: 180
 };
-
-const compareFields = [
-  ['Brand', (product: Product) => product.brand],
-  ['Product Name', (product: Product) => product.name],
-  ['Species', (product: Product) => product.species],
-  ['Life Stage', (product: Product) => product.lifeStage],
-  ['Protein', (product: Product) => `${product.nutrition.protein}%`],
-  ['Fat', (product: Product) => `${product.nutrition.fat}%`],
-  ['Fiber', (product: Product) => `${product.nutrition.fiber}%`],
-  ['Calories', (product: Product) => `${product.nutrition.calories} kcal/kg`],
-  ['Price/kg', (product: Product) => `$${getPrimaryPrice(product).unitPriceKg.toFixed(2)}`],
-  ['Verification Grade', (product: Product) => product.verificationGrade],
-  ['Confidence Score', (product: Product) => `${product.confidence}%`],
-  ['Market Availability', (product: Product) => product.marketAvailability]
-] as const;
-
-function clamp(value: number, min: number, max: number) {
-  return Math.max(min, Math.min(max, value));
-}
-
-function parseRoute(pathname: string): { name: RouteName; slug?: string } {
-  if (pathname.startsWith('/product/')) return { name: 'product', slug: decodeURIComponent(pathname.replace('/product/', '')) };
-  if (pathname.startsWith('/brand/')) return { name: 'brand', slug: decodeURIComponent(pathname.replace('/brand/', '')) };
-  if (pathname === '/search') return { name: 'search' };
-  if (pathname === '/compare') return { name: 'compare' };
-  return { name: 'landing' };
-}
-
-function LivingCat() {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const canvasNode = canvas;
-    const context = ctx;
-
-    const sprite = new Image();
-    let spriteReady = false;
-    sprite.onload = () => {
-      spriteReady = true;
-    };
-    sprite.src = '/pet/mochi-natural.png';
-
-    const cat = {
-      x: 72,
-      y: 44,
-      targetX: 72,
-      mood: 'sit' as CatMood,
-      nextDecision: 0,
-      facing: 1
-    };
-
-    let width = 0;
-    let height = 0;
-    let animationId = 0;
-    let lastTime = performance.now();
-
-    function resize() {
-      const ratio = window.devicePixelRatio || 1;
-      const bounds = canvasNode.getBoundingClientRect();
-      width = Math.max(220, bounds.width);
-      height = Math.max(132, bounds.height);
-      canvasNode.width = Math.floor(width * ratio);
-      canvasNode.height = Math.floor(height * ratio);
-      context.setTransform(ratio, 0, 0, ratio, 0, 0);
-      context.imageSmoothingEnabled = false;
-      cat.y = height - 110;
-    }
-
-    function chooseTarget(now: number) {
-      const moods: CatMood[] = ['sit', 'walk', 'sniff', 'loaf'];
-      cat.targetX = 24 + Math.random() * Math.max(40, width - 150);
-      cat.mood = moods[Math.floor(Math.random() * moods.length)];
-      cat.facing = cat.targetX >= cat.x ? 1 : -1;
-      cat.nextDecision = now + 4200 + Math.random() * 2600;
-    }
-
-    function drawCat(now: number) {
-      if (!spriteReady) return;
-      const frame = CAT_FRAMES[cat.mood];
-      const pad = 10;
-      const sx = frame.index * CAT_FRAME_WIDTH + Math.max(0, frame.left - pad);
-      const sy = Math.max(0, frame.top - pad);
-      const sw = Math.min(CAT_FRAME_WIDTH, frame.right + pad) - Math.max(0, frame.left - pad);
-      const sh = Math.min(sprite.height, frame.bottom + pad) - Math.max(0, frame.top - pad);
-      const dh = cat.mood === 'loaf' ? 58 : 82;
-      const dw = dh * (sw / sh);
-      const x = clamp(cat.x, 12, width - dw - 12);
-      const y = clamp(cat.y, 18, height - dh - 18);
-      const bob = cat.mood === 'walk' ? Math.sin(now / 120) * 1.1 : Math.sin(now / 700) * 0.4;
-
-      context.save();
-      context.fillStyle = 'rgba(15, 23, 42, 0.1)';
-      context.beginPath();
-      context.ellipse(x + dw * 0.5, y + dh + 4, dw * 0.32, 4, 0, 0, Math.PI * 2);
-      context.fill();
-      context.translate(x + (cat.facing < 0 ? dw : 0), y + bob);
-      context.scale(cat.facing < 0 ? -1 : 1, 1);
-      context.drawImage(sprite, sx, sy, sw, sh, 0, 0, dw, dh);
-      context.restore();
-    }
-
-    function draw(now: number) {
-      const dt = Math.min(32, now - lastTime) / 1000;
-      lastTime = now;
-      context.clearRect(0, 0, width, height);
-      context.fillStyle = 'rgba(255, 255, 255, 0.62)';
-      roundRect(context, 10, height - 48, width - 20, 34, 14);
-      context.fill();
-
-      if (now > cat.nextDecision) chooseTarget(now);
-      const dx = cat.targetX - cat.x;
-      cat.x += dx * clamp(dt * 1.7, 0, 1);
-      if (Math.abs(dx) > 20) cat.mood = 'walk';
-      drawCat(now);
-      animationId = requestAnimationFrame(draw);
-    }
-
-    function roundRect(context: CanvasRenderingContext2D, x: number, y: number, rectWidth: number, rectHeight: number, radius: number) {
-      context.beginPath();
-      context.moveTo(x + radius, y);
-      context.lineTo(x + rectWidth - radius, y);
-      context.quadraticCurveTo(x + rectWidth, y, x + rectWidth, y + radius);
-      context.lineTo(x + rectWidth, y + rectHeight - radius);
-      context.quadraticCurveTo(x + rectWidth, y + rectHeight, x + rectWidth - radius, y + rectHeight);
-      context.lineTo(x + radius, y + rectHeight);
-      context.quadraticCurveTo(x, y + rectHeight, x, y + rectHeight - radius);
-      context.lineTo(x, y + radius);
-      context.quadraticCurveTo(x, y, x + radius, y);
-      context.closePath();
-    }
-
-    resize();
-    chooseTarget(performance.now());
-    animationId = requestAnimationFrame(draw);
-    window.addEventListener('resize', resize);
-
-    return () => {
-      cancelAnimationFrame(animationId);
-      window.removeEventListener('resize', resize);
-    };
-  }, []);
-
-  return (
-    <div className="pet-zone" aria-hidden="true">
-      <canvas ref={canvasRef} />
-      <div className="pet-caption">
-        <strong>Mochi is checking sources</strong>
-        <span>quietly watching nutrition, price and trust signals</span>
-      </div>
-    </div>
-  );
-}
-
-function TrustBadge({ grade }: { grade: VerificationGrade }) {
-  return <span className={`trust-badge grade-${grade.toLowerCase()}`}>{grade}</span>;
-}
-
-function ConfidenceMeter({ score }: { score: number }) {
-  const level = score >= 85 ? 'High' : score >= 70 ? 'Medium' : 'Low';
-  return (
-    <div className="confidence-meter">
-      <div>
-        <strong>{score}%</strong>
-        <span>{level} confidence</span>
-      </div>
-      <div className="meter-track">
-        <span style={{ width: `${score}%` }} />
-      </div>
-    </div>
-  );
-}
-
-function NutritionCard({ label, value, suffix }: { label: string; value: string | number; suffix?: string }) {
-  return (
-    <div className="nutrition-card">
-      <span>{label}</span>
-      <strong>
-        {value}
-        {suffix}
-      </strong>
-    </div>
-  );
-}
-
-function IngredientTag({ label, warning = false }: { label: string; warning?: boolean }) {
-  return <span className={warning ? 'ingredient-tag warning' : 'ingredient-tag'}>{label}</span>;
-}
-
-function PriceCard({ price }: { price: Product['prices'][number] }) {
-  return (
-    <article className="price-card">
-      <div>
-        <strong>{price.retailer}</strong>
-        <span>{price.packSize}</span>
-      </div>
-      <div>
-        <strong>${price.price.toFixed(2)}</strong>
-        <span>${price.unitPriceKg.toFixed(2)} / kg</span>
-      </div>
-      <a href={price.sourceUrl} target="_blank" rel="noreferrer">
-        {price.status}
-      </a>
-    </article>
-  );
-}
 
 function ProductCard({
   product,
@@ -388,81 +91,6 @@ function ProductCard({
         </button>
       </div>
     </article>
-  );
-}
-
-function CompareTable({ items }: { items: Product[] }) {
-  if (items.length === 0) {
-    return <EmptyState title="No products selected" body="Add products from Search to build a comparison table." />;
-  }
-
-  return (
-    <div className="compare-table-wrap">
-      <table className="compare-table">
-        <thead>
-          <tr>
-            <th>Field</th>
-            {items.map((product) => (
-              <th key={product.id}>{product.name}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {compareFields.map(([label, getValue]) => (
-            <tr key={label}>
-              <td>{label}</td>
-              {items.map((product) => (
-                <td key={`${product.id}-${label}`}>{getValue(product)}</td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-function EmptyState({ title, body }: { title: string; body: string }) {
-  return (
-    <div className="empty-state">
-      <strong>{title}</strong>
-      <p>{body}</p>
-    </div>
-  );
-}
-
-function InsightList({ items, empty }: { items: string[]; empty: string }) {
-  if (items.length === 0) return <p className="muted">{empty}</p>;
-  return (
-    <ul className="insight-list">
-      {items.map((item) => (
-        <li key={item}>{item}</li>
-      ))}
-    </ul>
-  );
-}
-
-function AppHeader({ route, navigate }: { route: RouteName; navigate: (path: string) => void }) {
-  const links: Array<[RouteName, string, string]> = [
-    ['landing', '/', 'Home'],
-    ['search', '/search', 'Search'],
-    ['compare', '/compare', 'Compare']
-  ];
-
-  return (
-    <header className="app-header">
-      <button className="brand-lockup" onClick={() => navigate('/')} type="button">
-        <span>Pawkawa</span>
-        <small>Trusted Pet Food Intelligence</small>
-      </button>
-      <nav className="view-tabs" aria-label="Primary navigation">
-        {links.map(([name, path, label]) => (
-          <button className={route === name ? 'active' : ''} key={path} onClick={() => navigate(path)} type="button">
-            {label}
-          </button>
-        ))}
-      </nav>
-    </header>
   );
 }
 
@@ -864,193 +492,6 @@ function ProductDetailPage({ product, insight, navigate, onAddCompare, isCompare
   );
 }
 
-function ComparePage({
-  compareCatalog,
-  compareData,
-  compareError,
-  compareLoading,
-  compareRecommendations,
-  compareSlugs,
-  onAddCompare,
-  navigate,
-  unavailableCompareSlugs
-}: {
-  compareCatalog: ProductListResponse['items'];
-  compareData: CompareResponse | null;
-  compareError: string | null;
-  compareLoading: boolean;
-  compareRecommendations: CompareRecommendationResponse | null;
-  compareSlugs: string[];
-  onAddCompare: (slug: string) => void;
-  navigate: (path: string) => void;
-  unavailableCompareSlugs: string[];
-}) {
-  const compareProducts = compareData?.products || [];
-  const nutritionTable = compareData?.comparison.nutritionTable || [];
-  const ingredientSets = compareData?.comparison.ingredientSets || [];
-  const priceComparison = compareData?.comparison.priceComparison || [];
-  const nutritionLookup = new Map(
-    nutritionTable.map((row) => [String(row.metric), row])
-  );
-
-  function readNumericMetric(metric: string, productId: number) {
-    const row = nutritionLookup.get(metric);
-    const raw = row ? row[`product_${productId}`] : null;
-    if (typeof raw !== 'string') return null;
-    const parsed = parseFloat(raw);
-    return Number.isNaN(parsed) ? null : parsed;
-  }
-
-  const highestProtein = compareProducts
-    .map((product) => ({ product, value: readNumericMetric('Protein', product.product_id) }))
-    .filter((item): item is { product: CompareResponse['products'][number]; value: number } => item.value !== null)
-    .sort((a, b) => b.value - a.value)[0]?.product;
-  const lowestPrice = priceComparison
-    .map((product) => ({
-      product,
-      value: product.retailers
-        .map((retailer) => Number(retailer.unit_price_aud_per_kg ?? 0))
-        .filter((value) => value > 0)
-        .sort((a, b) => a - b)[0] ?? null
-    }))
-    .filter((item): item is { product: CompareResponse['comparison']['priceComparison'][number]; value: number } => item.value !== null)
-    .sort((a, b) => a.value - b.value)[0]?.product;
-  const highestConfidence = [...compareProducts].sort((a, b) => b.confidence - a.confidence)[0];
-  const sharedIngredients =
-    ingredientSets.length > 1
-      ? ingredientSets[0].ingredients.filter((ingredient) => ingredientSets.every((product) => product.ingredients.includes(ingredient)))
-      : [];
-  const uniqueIngredients = Array.from(new Set(ingredientSets.flatMap((product) => product.ingredients))).filter((ingredient) => !sharedIngredients.includes(ingredient));
-  const controversial = compareRecommendations
-    ? Array.from(
-        new Set(
-          compareRecommendations.recommendations.flatMap((recommendation) =>
-            recommendation.cautions.filter((item) => item.toLowerCase().includes('watch-list'))
-          )
-        )
-      )
-    : [];
-
-  return (
-    <main className="page-stack">
-      <section className="compare-hero">
-        <div>
-          <p className="eyebrow">Compare Foods</p>
-          <h1>See the clearest differences first.</h1>
-          <p className="body-copy">Pick a few foods and Pawkawa summarizes the practical differences before showing the full data table.</p>
-        </div>
-        <button className="primary-button" onClick={() => navigate('/search')} type="button">
-          Search and add product
-        </button>
-      </section>
-
-      <section className="panel">
-        <div className="summary-strip">
-          <span>{compareSlugs.length}/4 selected</span>
-          <span>Highest protein: {highestProtein ? highestProtein.product_name : 'None'}</span>
-          <span>Highest confidence: {highestConfidence ? `${highestConfidence.confidence}%` : 'None'}</span>
-        </div>
-        <div className="quick-add-grid">
-          {compareCatalog.map((product) => (
-            <button className={compareSlugs.includes(product.slug) ? 'quick-add active' : 'quick-add'} key={product.slug} onClick={() => onAddCompare(product.slug)} type="button">
-              <span>{product.name}</span>
-              <TrustBadge grade={product.trust_grade} />
-            </button>
-          ))}
-        </div>
-        {unavailableCompareSlugs.length > 0 && <p className="muted">Some compare selections are still mock-only and not available in the backend dataset yet.</p>}
-      </section>
-
-      <section className="insight-grid">
-        <article className="panel">
-          <SectionHeader eyebrow="Difference Highlights" title="Fast read" />
-          <ul className="plain-list">
-            <li>{highestProtein ? `${highestProtein.product_name} has the highest protein.` : 'Add backend products to calculate highest protein.'}</li>
-            <li>{lowestPrice ? `${lowestPrice.product_name} has the lowest unit price.` : 'Add backend products to calculate lowest price/kg.'}</li>
-            <li>{highestConfidence ? `${highestConfidence.product_name} has the strongest source verification.` : 'Add backend products to calculate confidence.'}</li>
-            <li>{highestConfidence ? `${highestConfidence.product_name} is currently the best verified product in this comparison.` : 'No best verified product yet.'}</li>
-          </ul>
-          {compareRecommendations && (
-            <div className="tag-cloud">
-              {compareRecommendations.recommendations.slice(0, 4).map((item) => (
-                <IngredientTag key={item.product_slug} label={`${item.product_name}: ${item.suitability_score}`} />
-              ))}
-            </div>
-          )}
-        </article>
-        <article className="panel">
-          <SectionHeader eyebrow="Ingredient Comparison" title="Shared, unique and watch-list ingredients" />
-          <p className="small-label">Shared ingredients</p>
-          <div className="tag-cloud">{sharedIngredients.length ? sharedIngredients.map((item) => <IngredientTag key={item} label={item} />) : <span className="muted">None yet</span>}</div>
-          <p className="small-label">Unique ingredients</p>
-          <div className="tag-cloud">{uniqueIngredients.slice(0, 10).map((item) => <IngredientTag key={item} label={item} />)}</div>
-          <p className="small-label">Controversial ingredients</p>
-          <div className="tag-cloud">{controversial.length ? controversial.map((item) => <IngredientTag key={item} label={item} warning />) : <span className="muted">No watch-list ingredients found.</span>}</div>
-        </article>
-      </section>
-
-      {compareRecommendations && (
-        <section className="panel">
-          <SectionHeader eyebrow="Suitability" title="Rule-based comparison rationale" />
-          <div className="summary-strip">
-            {compareRecommendations.constraints.slice(0, 3).map((constraint) => (
-              <span key={constraint.code}>{constraint.label}</span>
-            ))}
-          </div>
-          <div className="product-grid">
-            {compareRecommendations.recommendations.map((item) => (
-              <article className="product-card" key={item.product_slug}>
-                <div className="card-body">
-                  <div className="card-topline">
-                    <span>Suitability</span>
-                    <span>{item.suitability_score}/100</span>
-                  </div>
-                  <h3 className="product-title">{item.product_name}</h3>
-                  <p className="card-verdict">{item.reasons.slice(0, 2).join(' · ') || 'No standout strengths yet.'}</p>
-                  <p className="small-label">Cautions</p>
-                  <div className="tag-cloud">
-                    {item.cautions.length ? item.cautions.map((caution) => <IngredientTag key={caution} label={caution} warning />) : <span className="muted">No major cautions.</span>}
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
-          {compareRecommendations.disclaimer && <p className="disclaimer">{compareRecommendations.disclaimer}</p>}
-        </section>
-      )}
-
-      {compareLoading && <p className="muted">Loading backend comparison...</p>}
-      {compareError && <p className="disclaimer">{compareError}</p>}
-
-      <details className="evidence-panel">
-        <summary>Show detailed comparison table</summary>
-        <div className="compare-table-wrap">
-          <table className="compare-table">
-            <thead>
-              <tr>
-                <th>Metric</th>
-                {compareProducts.map((product) => (
-                  <th key={product.slug}>{product.product_name}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {nutritionTable.map((row) => (
-                <tr key={String(row.metric)}>
-                  <td>{row.metric}</td>
-                  {compareProducts.map((product) => (
-                    <td key={`${String(row.metric)}-${product.slug}`}>{row[`product_${product.product_id}`] ?? '-'}</td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </details>
-    </main>
-  );
-}
-
 function BrandPage({ brandSlug, insightsByProductId, navigate, onAddCompare, compareIds }: { brandSlug: string; insightsByProductId: Record<string, ProductInsight>; navigate: (path: string) => void; onAddCompare: (slug: string) => void; compareIds: string[] }) {
   const brand = brands.find((item) => item.slug === brandSlug);
   const brandProducts = products.filter((product) => product.brandSlug === brandSlug);
@@ -1101,15 +542,6 @@ function BrandPage({ brandSlug, insightsByProductId, navigate, onAddCompare, com
         ))}
       </div>
     </main>
-  );
-}
-
-function SectionHeader({ eyebrow, title }: { eyebrow: string; title: string }) {
-  return (
-    <div className="section-heading">
-      <p className="eyebrow">{eyebrow}</p>
-      <h2>{title}</h2>
-    </div>
   );
 }
 
