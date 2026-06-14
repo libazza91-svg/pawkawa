@@ -88,5 +88,7 @@ export class RuleRegistry {
 /** Singleton instance */
 export const ruleRegistry = new RuleRegistry();
 
+export { buildProfileConstraints, buildRecommendationContextFromRules, buildRecommendationFromRules } from './context-engine';
+
 // Re-export types for convenience
 export type { Rule, RuleCategory, BreedRiskEntry, BreedRiskOutput, SuitabilityScoreV1, ProductIntelligenceV1 } from './types';

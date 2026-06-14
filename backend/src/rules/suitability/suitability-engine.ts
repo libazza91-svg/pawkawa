@@ -56,6 +56,8 @@ export function generateProductIntelligenceV1(product: VerifiedProduct): Product
   const priceBand = getPriceBand(product);
   const speciesLabel = product.species.toLowerCase() + 's';
   const lifeStageLabel = getLifeStageLabel(product.life_stage);
+  const strengths: string[] = [];
+  const avoidIf: string[] = ['Veterinary prescription diet required'];
 
   // Protein level classification
   const proteinLevel =
@@ -84,6 +86,15 @@ export function generateProductIntelligenceV1(product: VerifiedProduct): Product
   // Build quick_verdict from 5 dimensions
   const quick_verdict = `${product.name} is a ${proteinLevel}, ${priceLabel} food for ${audience}, with ${trustLabel} product data.`;
 
+  if (product.nutrition.protein >= 36) strengths.push('High Protein');
+  else if (product.nutrition.protein >= 30) strengths.push('Balanced Protein');
+
+  if (product.confidence >= 90) strengths.push('Strong Source Verification');
+  else if (product.confidence >= 80) strengths.push('Good Source Verification');
+  else strengths.push('Limited Verification Depth');
+
+  if (priceBand === 'value') strengths.push('Good Everyday Value');
+
   // Build best_for from suitability_tags + rule-derived categories
   const bestFor: string[] = [...product.suitability_tags];
 
@@ -110,30 +121,33 @@ export function generateProductIntelligenceV1(product: VerifiedProduct): Product
   const considerations: string[] = [];
 
   if (product.nutrition.fat >= 28) {
-    considerations.push(`High Fat (${product.nutrition.fat}%) — may not suit weight management, GI-sensitive, or sedentary pets.`);
+    considerations.push('High Fat');
+    avoidIf.push('Fat Restriction Recommended');
   }
   if (priceBand === 'premium') {
-    considerations.push(`Above Average Price ($${product.unit_price_aud_per_kg.toFixed(2)}/kg)`);
+    considerations.push('Above Average Price');
   }
   if (product.controversial_ingredients.length > 0) {
-    considerations.push(
-      `Contains Watch-List Ingredients (${product.controversial_ingredients.join(', ')})`
-    );
+    considerations.push('Contains Watch-List Ingredients');
+    avoidIf.push('Ingredient Sensitivity Suspected');
   }
   if (product.market_availability === 'LIMITED') {
-    considerations.push('Limited Availability — may face supply disruption');
+    considerations.push('Limited Availability');
   }
   if (product.confidence < 80) {
-    considerations.push('Limited Verification Depth — product data may be less reliable');
+    considerations.push('Limited Verification Depth');
   }
   if (product.life_stage !== 'ALL_LIFE_STAGES') {
-    considerations.push(`Formulated for ${lifeStageLabel} ${speciesLabel} only — not suitable for all life stages.`);
+    avoidIf.push('Not intended for all life stages');
   }
 
   return {
+    product_id: product.id,
     quick_verdict,
+    strengths: dedupeStringArray(strengths),
     best_for: dedupeStringArray(bestFor),
     considerations,
+    avoid_if: dedupeStringArray(avoidIf),
     confidence: product.confidence,
     trust_grade: product.verification_grade,
   };

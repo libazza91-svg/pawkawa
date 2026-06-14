@@ -1,18 +1,18 @@
 # Pawkawa Frontend Architecture
 
-This frontend is a Vite + React prototype for Pawkawa, a trusted pet food intelligence platform for Australia and New Zealand.
+This frontend is the current Vite + React review surface for Pawkawa, a trusted pet food intelligence platform for Australia and New Zealand.
 
 ## Main Locations
 
 - Frontend root: `/Users/barryli/Desktop/PetFoodCompare/frontend`
 - HTML shell and page metadata: `/Users/barryli/Desktop/PetFoodCompare/frontend/index.html`
 - React entry: `/Users/barryli/Desktop/PetFoodCompare/frontend/src/main.tsx`
-- Route handling, pages, reusable components, and fixed pet zone: `/Users/barryli/Desktop/PetFoodCompare/frontend/src/App.tsx`
-- Product, brand, verification, nutrition, ingredient, and price mock data: `/Users/barryli/Desktop/PetFoodCompare/frontend/src/data.ts`
-- Frontend intelligence API consumer: `/Users/barryli/Desktop/PetFoodCompare/frontend/src/App.tsx`
+- Route handling, pages, reusable components, and compare integration surface: `/Users/barryli/Desktop/PetFoodCompare/frontend/src/App.tsx`
+- Product, brand, verification, nutrition, ingredient, and price prototype fixtures: `/Users/barryli/Desktop/PetFoodCompare/frontend/src/data.ts`
+- Frontend intelligence and compare API consumer: `/Users/barryli/Desktop/PetFoodCompare/frontend/src/App.tsx`
 - Vite API proxy to backend: `/Users/barryli/Desktop/PetFoodCompare/frontend/vite.config.ts`
 - Global visual system and responsive layout: `/Users/barryli/Desktop/PetFoodCompare/frontend/src/styles.css`
-- Pixel pet image assets: `/Users/barryli/Desktop/PetFoodCompare/frontend/public/pet/`
+- Pixel pet image assets and experiments: `/Users/barryli/Desktop/PetFoodCompare/frontend/public/pet/`
 
 ## Implemented Routes
 
@@ -31,19 +31,19 @@ This frontend is a Vite + React prototype for Pawkawa, a trusted pet food intell
 - `PriceCard`: Renders retailer, pack size, price, unit price/kg, and verification status.
 - `IngredientTag`: Renders normalized ingredient and warning tags.
 - `CompareTable`: Renders horizontal comparison fields.
-- `LivingCat`: Embedded, low-priority pixel pet detail inside a fixed content box, not a global floating layer.
+- `LivingCat`: Prototype pet component kept inside a bounded content zone. This is currently experimental UI, not stable product architecture.
 
 ## Routing Note
 
-The prototype uses a small History API router inside `App.tsx` instead of adding `react-router`. This keeps the V1 simple, but the route boundaries are already explicit enough to migrate to a formal router later.
+The prototype uses a small History API router inside `App.tsx` instead of adding `react-router`. This keeps V1 light, but it is now one of the main architectural upgrade candidates as the page count and backend integrations continue to grow.
 
 ## UX Principle
 
-The UI uses progressive disclosure: everyday users see simple actions, plain-language verdicts, and the most important nutrition/price/trust signals first. Professional verification details, full tables, source checks, and advanced filters remain available inside expandable `Advanced filters` and `Evidence` sections.
+The UI uses progressive disclosure: everyday users see simple actions, plain-language verdicts, and the most important nutrition, price, and trust signals first. Technical evidence stays available, but should never dominate the initial reading path.
 
 ## Backend Intelligence Layer
 
-Sprint 1.4B moved business logic out of React. The frontend now calls backend intelligence APIs and renders only.
+Sprint 1.4B moved business logic out of React. The frontend should render backend-owned intelligence outputs and should not recreate nutrition interpretation rules locally.
 
 - Backend product insight engine: `/Users/barryli/Desktop/PetFoodCompare/backend/src/intelligence/product-insight-engine.ts`
 - Backend recovery knowledge base: `/Users/barryli/Desktop/PetFoodCompare/backend/src/intelligence/recovery-knowledge-base.ts`
@@ -51,14 +51,35 @@ Sprint 1.4B moved business logic out of React. The frontend now calls backend in
 - Backend suitability scoring engine: `/Users/barryli/Desktop/PetFoodCompare/backend/src/intelligence/suitability-engine.ts`
 - Backend shared intelligence types: `/Users/barryli/Desktop/PetFoodCompare/backend/src/intelligence/types.ts`
 - Backend route: `/Users/barryli/Desktop/PetFoodCompare/backend/src/routes/intelligence.ts`
+- Backend compare route: `/Users/barryli/Desktop/PetFoodCompare/backend/src/routes/compare.ts`
 
 Implemented APIs:
 
 - `GET /api/intelligence/product/:id`
 - `POST /api/intelligence/context`
 - `GET /api/intelligence/recovery`
+- `GET /api/products`
+- `GET /api/products/search`
+- `POST /api/compare`
+- `POST /api/compare/recommend`
 
 The backend returns suitability scoring, constraints, recommendations, and warnings. It does not output medical treatment recommendations.
+
+## Compare Integration
+
+The compare page has been partially stabilized around real backend APIs.
+
+- Product selection should come from backend product lists, not hardcoded mock ids.
+- Frontend compare state now prefers `product_slugs`.
+- Compare tables and recommendation panels should be rendered from API responses, not recomputed in React.
+- Mock fixtures may still exist for UI scaffolding, but they should be treated as fallback display data only.
+
+## Known Architecture Risks
+
+- `App.tsx` is still too large and currently combines routing, page composition, state orchestration, and API consumption.
+- Product detail rendering still carries prototype-era assumptions and is a good candidate for extraction into route modules plus dedicated data hooks.
+- The pet animation area is still experimental and should remain isolated from core product workflows until the interaction model is genuinely production-ready.
+- The current router is acceptable for the prototype, but should be upgraded before the next significant page expansion.
 
 ## Local Commands
 

@@ -5,8 +5,8 @@
  * Consumed by Data Quality Dashboard V2.
  */
 
-import { VerifiedProductProfile, VerificationSummary } from '../verified-profile';
-import { buildVerificationSummary, verifyAllProducts, SeedNutrition } from '../product-verifier';
+import { VerifiedProductProfile, VerificationSummary } from './verified-profile';
+import { buildVerificationSummary, verifyAllProducts, SeedNutrition } from './product-verifier';
 
 export interface VerificationDashboardMetrics {
   /** Overall summary */

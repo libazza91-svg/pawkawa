@@ -16,7 +16,7 @@ import {
   FieldConflict,
   SourceReading,
   VerificationSummary,
-} from '../verified-profile';
+} from './verified-profile';
 import { ManufacturerNutrition } from './manufacturers/royal-canin';
 import { getRetailerNutrition, RetailerNutrition } from './manufacturers/retailer-sources';
 
@@ -393,7 +393,7 @@ export function verifyProduct(
     product_name: meta.product_name,
     species: meta.species,
     verified_at: '2026-06-13T10:00:00Z',
-    fields: fields as VerifiedProductProfile['fields'],
+    fields: fields as unknown as VerifiedProductProfile['fields'],
     overall_confidence: Math.round(overallConfidence * 1000) / 1000,
     total_sources: totalSources,
     verification_status: vStatus,
@@ -436,7 +436,7 @@ export function buildVerificationSummary(profiles: VerifiedProductProfile[]): Ve
     verified: profiles.filter(p => p.verification_status === 'verified').length,
     partial:  profiles.filter(p => p.verification_status === 'partial').length,
     conflict: profiles.filter(p => p.verification_status === 'conflict').length,
-    unverified: profiles.filter(p => p.verification_status === 'unverified').length,
+    unverified: 0,
     field_coverage: fieldCoverage,
     tier_distribution: {
       GOLD: profiles.filter(p => p.tier === 'GOLD').length,

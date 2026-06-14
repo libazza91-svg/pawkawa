@@ -53,9 +53,12 @@ export interface SuitabilityScoreV1 {
  * Product Intelligence API response shape (Epic 3).
  */
 export interface ProductIntelligenceV1 {
+  product_id: string;
   quick_verdict: string;
+  strengths: string[];
   best_for: string[];
   considerations: string[];
+  avoid_if: string[];
   confidence: number;
-  trust_grade: string;
+  trust_grade: 'GOLD' | 'SILVER' | 'BRONZE' | 'UNVERIFIED';
 }

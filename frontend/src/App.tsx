@@ -26,17 +26,67 @@ type Filters = {
 };
 
 type ProductInsight = {
+  product_id: string;
   quick_verdict: string;
   strengths: string[];
   considerations: string[];
   best_for: string[];
   avoid_if: string[];
+  confidence: number;
+  trust_grade: VerificationGrade;
 };
 
 type RecommendationContext = {
   constraints: Array<{ code: string; label: string; type: 'PREFER' | 'AVOID' | 'REQUIRES_VET'; reason: string }>;
   recommendations: Array<{ product_id: string; product_slug: string; product_name: string; suitability_score: number; reasons: string[]; cautions: string[] }>;
   warnings: string[];
+};
+
+type ProductListResponse = {
+  items: Array<{
+    product_id: number;
+    name: string;
+    slug: string;
+    brand_name: string | null;
+    species: 'CAT' | 'DOG' | null;
+    life_stage: string | null;
+    confidence: number;
+    trust_grade: VerificationGrade;
+  }>;
+  pagination: {
+    page: number;
+    pageSize: number;
+    total: number;
+  };
+};
+
+type CompareResponse = {
+  products: Array<{
+    product_id: number;
+    slug: string;
+    product_name: string;
+    brand_name: string;
+    species: 'CAT' | 'DOG' | null;
+    life_stage: string | null;
+    format: string | null;
+    origin: string | null;
+    confidence: number;
+    trust_grade: VerificationGrade;
+    market_availability: 'ACTIVE' | 'LIMITED' | 'DISCONTINUED';
+  }>;
+  comparison: {
+    nutritionTable: Array<Record<string, string | null>>;
+    ingredientSets: Array<{ product_id: number; product_name: string; ingredients: string[] }>;
+    priceComparison: Array<{
+      product_id: number;
+      product_name: string;
+      retailers: Array<{ retailer: string | null; price_aud: string; unit_price_aud_per_kg: string | null }>;
+    }>;
+  };
+};
+
+type CompareRecommendationResponse = RecommendationContext & {
+  disclaimer?: string;
 };
 
 type RecoveryTopic = {
@@ -301,7 +351,7 @@ function ProductCard({
   product: Product;
   insight?: ProductInsight;
   isCompared: boolean;
-  onAddCompare: (id: string) => void;
+  onAddCompare: (slug: string) => void;
   onNavigate: (path: string) => void;
 }) {
   const primaryPrice = getPrimaryPrice(product);
@@ -333,7 +383,7 @@ function ProductCard({
           <NutritionCard label="Fat" value={product.nutrition.fat} suffix="%" />
           <NutritionCard label="Confidence" value={product.confidence} suffix="%" />
         </div>
-        <button className={isCompared ? 'secondary-button active' : 'secondary-button'} onClick={() => onAddCompare(product.id)} type="button">
+        <button className={isCompared ? 'secondary-button active' : 'secondary-button'} onClick={() => onAddCompare(product.slug)} type="button">
           {isCompared ? 'Added to Compare' : 'Add to Compare'}
         </button>
       </div>
@@ -432,7 +482,7 @@ function LandingPage({
   recoveryTopics: RecoveryTopic[];
   contextDemo: RecommendationContext | null;
   compareIds: string[];
-  onAddCompare: (id: string) => void;
+  onAddCompare: (slug: string) => void;
   navigate: (path: string) => void;
 }) {
   const featured = products.slice(0, 6);
@@ -521,7 +571,7 @@ function LandingPage({
       <div className="product-grid featured-grid">
         {featured.map((product) => (
           <ProductCard
-            isCompared={compareIds.includes(product.id)}
+            isCompared={compareIds.includes(product.slug)}
             insight={insightsByProductId[product.id]}
             key={product.id}
             onAddCompare={onAddCompare}
@@ -584,7 +634,7 @@ function SearchPage({
   results: Product[];
   insightsByProductId: Record<string, ProductInsight>;
   compareIds: string[];
-  onAddCompare: (id: string) => void;
+  onAddCompare: (slug: string) => void;
   navigate: (path: string) => void;
 }) {
   return (
@@ -660,7 +710,7 @@ function SearchPage({
           <div className="product-grid">
             {results.map((product) => (
               <ProductCard
-                isCompared={compareIds.includes(product.id)}
+                isCompared={compareIds.includes(product.slug)}
                 insight={insightsByProductId[product.id]}
                 key={product.id}
                 onAddCompare={onAddCompare}
@@ -675,7 +725,7 @@ function SearchPage({
   );
 }
 
-function ProductDetailPage({ product, insight, navigate, onAddCompare, isCompared }: { product: Product; insight?: ProductInsight; navigate: (path: string) => void; onAddCompare: (id: string) => void; isCompared: boolean }) {
+function ProductDetailPage({ product, insight, navigate, onAddCompare, isCompared }: { product: Product; insight?: ProductInsight; navigate: (path: string) => void; onAddCompare: (slug: string) => void; isCompared: boolean }) {
   const primaryPrice = getPrimaryPrice(product);
 
   return (
@@ -697,7 +747,7 @@ function ProductDetailPage({ product, insight, navigate, onAddCompare, isCompare
             <span>{product.marketAvailability}</span>
           </div>
         </div>
-        <button className={isCompared ? 'primary-button active' : 'primary-button'} onClick={() => onAddCompare(product.id)} type="button">
+        <button className={isCompared ? 'primary-button active' : 'primary-button'} onClick={() => onAddCompare(product.slug)} type="button">
           {isCompared ? 'In Compare' : 'Add to Compare'}
         </button>
       </section>
@@ -814,13 +864,72 @@ function ProductDetailPage({ product, insight, navigate, onAddCompare, isCompare
   );
 }
 
-function ComparePage({ compareItems, compareIds, onAddCompare, navigate }: { compareItems: Product[]; compareIds: string[]; onAddCompare: (id: string) => void; navigate: (path: string) => void }) {
-  const highestProtein = [...compareItems].sort((a, b) => b.nutrition.protein - a.nutrition.protein)[0];
-  const lowestPrice = [...compareItems].sort((a, b) => getPrimaryPrice(a).unitPriceKg - getPrimaryPrice(b).unitPriceKg)[0];
-  const highestConfidence = [...compareItems].sort((a, b) => b.confidence - a.confidence)[0];
-  const sharedIngredients = compareItems.length > 1 ? compareItems[0].ingredientsNormalized.filter((ingredient) => compareItems.every((product) => product.ingredientsNormalized.includes(ingredient))) : [];
-  const uniqueIngredients = Array.from(new Set(compareItems.flatMap((product) => product.ingredientsNormalized))).filter((ingredient) => !sharedIngredients.includes(ingredient));
-  const controversial = Array.from(new Set(compareItems.flatMap((product) => product.controversialIngredients)));
+function ComparePage({
+  compareCatalog,
+  compareData,
+  compareError,
+  compareLoading,
+  compareRecommendations,
+  compareSlugs,
+  onAddCompare,
+  navigate,
+  unavailableCompareSlugs
+}: {
+  compareCatalog: ProductListResponse['items'];
+  compareData: CompareResponse | null;
+  compareError: string | null;
+  compareLoading: boolean;
+  compareRecommendations: CompareRecommendationResponse | null;
+  compareSlugs: string[];
+  onAddCompare: (slug: string) => void;
+  navigate: (path: string) => void;
+  unavailableCompareSlugs: string[];
+}) {
+  const compareProducts = compareData?.products || [];
+  const nutritionTable = compareData?.comparison.nutritionTable || [];
+  const ingredientSets = compareData?.comparison.ingredientSets || [];
+  const priceComparison = compareData?.comparison.priceComparison || [];
+  const nutritionLookup = new Map(
+    nutritionTable.map((row) => [String(row.metric), row])
+  );
+
+  function readNumericMetric(metric: string, productId: number) {
+    const row = nutritionLookup.get(metric);
+    const raw = row ? row[`product_${productId}`] : null;
+    if (typeof raw !== 'string') return null;
+    const parsed = parseFloat(raw);
+    return Number.isNaN(parsed) ? null : parsed;
+  }
+
+  const highestProtein = compareProducts
+    .map((product) => ({ product, value: readNumericMetric('Protein', product.product_id) }))
+    .filter((item): item is { product: CompareResponse['products'][number]; value: number } => item.value !== null)
+    .sort((a, b) => b.value - a.value)[0]?.product;
+  const lowestPrice = priceComparison
+    .map((product) => ({
+      product,
+      value: product.retailers
+        .map((retailer) => Number(retailer.unit_price_aud_per_kg ?? 0))
+        .filter((value) => value > 0)
+        .sort((a, b) => a - b)[0] ?? null
+    }))
+    .filter((item): item is { product: CompareResponse['comparison']['priceComparison'][number]; value: number } => item.value !== null)
+    .sort((a, b) => a.value - b.value)[0]?.product;
+  const highestConfidence = [...compareProducts].sort((a, b) => b.confidence - a.confidence)[0];
+  const sharedIngredients =
+    ingredientSets.length > 1
+      ? ingredientSets[0].ingredients.filter((ingredient) => ingredientSets.every((product) => product.ingredients.includes(ingredient)))
+      : [];
+  const uniqueIngredients = Array.from(new Set(ingredientSets.flatMap((product) => product.ingredients))).filter((ingredient) => !sharedIngredients.includes(ingredient));
+  const controversial = compareRecommendations
+    ? Array.from(
+        new Set(
+          compareRecommendations.recommendations.flatMap((recommendation) =>
+            recommendation.cautions.filter((item) => item.toLowerCase().includes('watch-list'))
+          )
+        )
+      )
+    : [];
 
   return (
     <main className="page-stack">
@@ -837,29 +946,37 @@ function ComparePage({ compareItems, compareIds, onAddCompare, navigate }: { com
 
       <section className="panel">
         <div className="summary-strip">
-          <span>{compareIds.length}/4 selected</span>
-          <span>Highest protein: {highestProtein ? highestProtein.name : 'None'}</span>
+          <span>{compareSlugs.length}/4 selected</span>
+          <span>Highest protein: {highestProtein ? highestProtein.product_name : 'None'}</span>
           <span>Highest confidence: {highestConfidence ? `${highestConfidence.confidence}%` : 'None'}</span>
         </div>
         <div className="quick-add-grid">
-          {products.map((product) => (
-            <button className={compareIds.includes(product.id) ? 'quick-add active' : 'quick-add'} key={product.id} onClick={() => onAddCompare(product.id)} type="button">
+          {compareCatalog.map((product) => (
+            <button className={compareSlugs.includes(product.slug) ? 'quick-add active' : 'quick-add'} key={product.slug} onClick={() => onAddCompare(product.slug)} type="button">
               <span>{product.name}</span>
-              <TrustBadge grade={product.verificationGrade} />
+              <TrustBadge grade={product.trust_grade} />
             </button>
           ))}
         </div>
+        {unavailableCompareSlugs.length > 0 && <p className="muted">Some compare selections are still mock-only and not available in the backend dataset yet.</p>}
       </section>
 
       <section className="insight-grid">
         <article className="panel">
           <SectionHeader eyebrow="Difference Highlights" title="Fast read" />
           <ul className="plain-list">
-            <li>{highestProtein ? `${highestProtein.name} has the highest protein.` : 'Add products to calculate highest protein.'}</li>
-            <li>{lowestPrice ? `${lowestPrice.name} has the lowest unit price.` : 'Add products to calculate lowest price/kg.'}</li>
-            <li>{highestConfidence ? `${highestConfidence.name} has the strongest source verification.` : 'Add products to calculate confidence.'}</li>
-            <li>{highestConfidence ? `${highestConfidence.name} is currently the best verified product in this comparison.` : 'No best verified product yet.'}</li>
+            <li>{highestProtein ? `${highestProtein.product_name} has the highest protein.` : 'Add backend products to calculate highest protein.'}</li>
+            <li>{lowestPrice ? `${lowestPrice.product_name} has the lowest unit price.` : 'Add backend products to calculate lowest price/kg.'}</li>
+            <li>{highestConfidence ? `${highestConfidence.product_name} has the strongest source verification.` : 'Add backend products to calculate confidence.'}</li>
+            <li>{highestConfidence ? `${highestConfidence.product_name} is currently the best verified product in this comparison.` : 'No best verified product yet.'}</li>
           </ul>
+          {compareRecommendations && (
+            <div className="tag-cloud">
+              {compareRecommendations.recommendations.slice(0, 4).map((item) => (
+                <IngredientTag key={item.product_slug} label={`${item.product_name}: ${item.suitability_score}`} />
+              ))}
+            </div>
+          )}
         </article>
         <article className="panel">
           <SectionHeader eyebrow="Ingredient Comparison" title="Shared, unique and watch-list ingredients" />
@@ -872,15 +989,69 @@ function ComparePage({ compareItems, compareIds, onAddCompare, navigate }: { com
         </article>
       </section>
 
+      {compareRecommendations && (
+        <section className="panel">
+          <SectionHeader eyebrow="Suitability" title="Rule-based comparison rationale" />
+          <div className="summary-strip">
+            {compareRecommendations.constraints.slice(0, 3).map((constraint) => (
+              <span key={constraint.code}>{constraint.label}</span>
+            ))}
+          </div>
+          <div className="product-grid">
+            {compareRecommendations.recommendations.map((item) => (
+              <article className="product-card" key={item.product_slug}>
+                <div className="card-body">
+                  <div className="card-topline">
+                    <span>Suitability</span>
+                    <span>{item.suitability_score}/100</span>
+                  </div>
+                  <h3 className="product-title">{item.product_name}</h3>
+                  <p className="card-verdict">{item.reasons.slice(0, 2).join(' · ') || 'No standout strengths yet.'}</p>
+                  <p className="small-label">Cautions</p>
+                  <div className="tag-cloud">
+                    {item.cautions.length ? item.cautions.map((caution) => <IngredientTag key={caution} label={caution} warning />) : <span className="muted">No major cautions.</span>}
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+          {compareRecommendations.disclaimer && <p className="disclaimer">{compareRecommendations.disclaimer}</p>}
+        </section>
+      )}
+
+      {compareLoading && <p className="muted">Loading backend comparison...</p>}
+      {compareError && <p className="disclaimer">{compareError}</p>}
+
       <details className="evidence-panel">
         <summary>Show detailed comparison table</summary>
-        <CompareTable items={compareItems} />
+        <div className="compare-table-wrap">
+          <table className="compare-table">
+            <thead>
+              <tr>
+                <th>Metric</th>
+                {compareProducts.map((product) => (
+                  <th key={product.slug}>{product.product_name}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {nutritionTable.map((row) => (
+                <tr key={String(row.metric)}>
+                  <td>{row.metric}</td>
+                  {compareProducts.map((product) => (
+                    <td key={`${String(row.metric)}-${product.slug}`}>{row[`product_${product.product_id}`] ?? '-'}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </details>
     </main>
   );
 }
 
-function BrandPage({ brandSlug, insightsByProductId, navigate, onAddCompare, compareIds }: { brandSlug: string; insightsByProductId: Record<string, ProductInsight>; navigate: (path: string) => void; onAddCompare: (id: string) => void; compareIds: string[] }) {
+function BrandPage({ brandSlug, insightsByProductId, navigate, onAddCompare, compareIds }: { brandSlug: string; insightsByProductId: Record<string, ProductInsight>; navigate: (path: string) => void; onAddCompare: (slug: string) => void; compareIds: string[] }) {
   const brand = brands.find((item) => item.slug === brandSlug);
   const brandProducts = products.filter((product) => product.brandSlug === brandSlug);
 
@@ -920,7 +1091,7 @@ function BrandPage({ brandSlug, insightsByProductId, navigate, onAddCompare, com
       <div className="product-grid">
         {brandProducts.map((product) => (
           <ProductCard
-            isCompared={compareIds.includes(product.id)}
+            isCompared={compareIds.includes(product.slug)}
             insight={insightsByProductId[product.id]}
             key={product.id}
             onAddCompare={onAddCompare}
@@ -956,10 +1127,15 @@ function MissingPage({ navigate }: { navigate: (path: string) => void }) {
 export default function App() {
   const [route, setRoute] = useState(() => parseRoute(window.location.pathname));
   const [filters, setFilters] = useState<Filters>(defaultFilters);
-  const [compareIds, setCompareIds] = useState<string[]>(['ziwi-peak-mackerel-lamb', 'black-hawk-indoor-chicken-rice']);
+  const [compareSlugs, setCompareSlugs] = useState<string[]>([]);
   const [insightsByProductId, setInsightsByProductId] = useState<Record<string, ProductInsight>>({});
   const [recoveryTopics, setRecoveryTopics] = useState<RecoveryTopic[]>([]);
   const [contextDemo, setContextDemo] = useState<RecommendationContext | null>(null);
+  const [compareCatalog, setCompareCatalog] = useState<ProductListResponse['items']>([]);
+  const [compareData, setCompareData] = useState<CompareResponse | null>(null);
+  const [compareRecommendations, setCompareRecommendations] = useState<CompareRecommendationResponse | null>(null);
+  const [compareLoading, setCompareLoading] = useState(false);
+  const [compareError, setCompareError] = useState<string | null>(null);
 
   useEffect(() => {
     const onPopState = () => setRoute(parseRoute(window.location.pathname));
@@ -971,7 +1147,7 @@ export default function App() {
     let cancelled = false;
 
     async function loadIntelligence() {
-      const [insightEntries, recoveryData, contextData] = await Promise.all([
+      const [insightEntries, recoveryData, contextData, productList] = await Promise.all([
         Promise.all(
           products.map(async (product) => {
             const insight = await readApi<ProductInsight>(`/api/intelligence/product/${product.id}`);
@@ -983,13 +1159,16 @@ export default function App() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ species: 'CAT', age_years: 3, breed: 'RAGDOLL', health_conditions: ['GI_SENSITIVE'] })
-        })
+        }),
+        readApi<ProductListResponse>('/api/products?pageSize=100')
       ]);
 
       if (cancelled) return;
       setInsightsByProductId(Object.fromEntries(insightEntries));
       setRecoveryTopics(recoveryData);
       setContextDemo(contextData);
+      setCompareCatalog(productList.items);
+      setCompareSlugs((current) => (current.length > 0 ? current : productList.items.slice(0, 2).map((item) => item.slug)));
     }
 
     loadIntelligence().catch((error) => {
@@ -1007,11 +1186,61 @@ export default function App() {
     window.scrollTo({ top: 0 });
   }
 
-  function addCompare(id: string) {
-    setCompareIds((current) => {
-      if (current.includes(id)) return current.filter((item) => item !== id);
-      if (current.length >= 4) return [...current.slice(1), id];
-      return [...current, id];
+  useEffect(() => {
+    const availableSlugs = compareCatalog.filter((product) => compareSlugs.includes(product.slug)).map((product) => product.slug);
+
+    if (availableSlugs.length < 2) {
+      setCompareData(null);
+      setCompareRecommendations(null);
+      setCompareError(null);
+      return;
+    }
+
+    let cancelled = false;
+
+    async function loadCompare() {
+      setCompareLoading(true);
+      setCompareError(null);
+
+      const comparison = await readApi<CompareResponse>('/api/compare', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ product_slugs: availableSlugs })
+      });
+
+      const selectedProducts = compareCatalog.filter((product) => availableSlugs.includes(product.slug));
+      const speciesSet = Array.from(new Set(selectedProducts.map((product) => product.species).filter(Boolean)));
+      const recommendations =
+        speciesSet.length === 1 && (speciesSet[0] === 'CAT' || speciesSet[0] === 'DOG')
+          ? await readApi<CompareRecommendationResponse>('/api/compare/recommend', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ product_slugs: availableSlugs, species: speciesSet[0], age_years: 3, health_conditions: [] })
+            })
+          : null;
+
+      if (cancelled) return;
+      setCompareData(comparison);
+      setCompareRecommendations(recommendations);
+      setCompareLoading(false);
+    }
+
+    loadCompare().catch(() => {
+      if (cancelled) return;
+      setCompareError('The backend comparison is not available right now.');
+      setCompareLoading(false);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [compareCatalog, compareSlugs]);
+
+  function addCompare(slug: string) {
+    setCompareSlugs((current) => {
+      if (current.includes(slug)) return current.filter((item) => item !== slug);
+      if (current.length >= 4) return [...current.slice(1), slug];
+      return [...current, slug];
     });
   }
 
@@ -1030,17 +1259,17 @@ export default function App() {
     });
   }, [filters]);
 
-  const compareItems = useMemo(() => products.filter((product) => compareIds.includes(product.id)).sort((a, b) => compareIds.indexOf(a.id) - compareIds.indexOf(b.id)), [compareIds]);
   const currentProduct = route.name === 'product' ? products.find((product) => product.slug === route.slug) : undefined;
+  const unavailableCompareSlugs = compareSlugs.filter((slug) => !compareCatalog.some((product) => product.slug === slug));
 
   return (
     <div className="app-shell">
       <AppHeader navigate={navigate} route={route.name} />
-      {route.name === 'landing' && <LandingPage compareIds={compareIds} contextDemo={contextDemo} filters={filters} insightsByProductId={insightsByProductId} navigate={navigate} onAddCompare={addCompare} recoveryTopics={recoveryTopics} setFilters={setFilters} />}
-      {route.name === 'search' && <SearchPage compareIds={compareIds} filters={filters} insightsByProductId={insightsByProductId} navigate={navigate} onAddCompare={addCompare} results={results} setFilters={setFilters} />}
-      {route.name === 'compare' && <ComparePage compareIds={compareIds} compareItems={compareItems} navigate={navigate} onAddCompare={addCompare} />}
-      {route.name === 'product' && (currentProduct ? <ProductDetailPage insight={insightsByProductId[currentProduct.id]} isCompared={compareIds.includes(currentProduct.id)} navigate={navigate} onAddCompare={addCompare} product={currentProduct} /> : <MissingPage navigate={navigate} />)}
-      {route.name === 'brand' && <BrandPage brandSlug={route.slug || ''} compareIds={compareIds} insightsByProductId={insightsByProductId} navigate={navigate} onAddCompare={addCompare} />}
+      {route.name === 'landing' && <LandingPage compareIds={compareSlugs} contextDemo={contextDemo} filters={filters} insightsByProductId={insightsByProductId} navigate={navigate} onAddCompare={addCompare} recoveryTopics={recoveryTopics} setFilters={setFilters} />}
+      {route.name === 'search' && <SearchPage compareIds={compareSlugs} filters={filters} insightsByProductId={insightsByProductId} navigate={navigate} onAddCompare={addCompare} results={results} setFilters={setFilters} />}
+      {route.name === 'compare' && <ComparePage compareCatalog={compareCatalog} compareData={compareData} compareError={compareError} compareLoading={compareLoading} compareRecommendations={compareRecommendations} compareSlugs={compareSlugs} navigate={navigate} onAddCompare={addCompare} unavailableCompareSlugs={unavailableCompareSlugs} />}
+      {route.name === 'product' && (currentProduct ? <ProductDetailPage insight={insightsByProductId[currentProduct.id]} isCompared={compareSlugs.includes(currentProduct.slug)} navigate={navigate} onAddCompare={addCompare} product={currentProduct} /> : <MissingPage navigate={navigate} />)}
+      {route.name === 'brand' && <BrandPage brandSlug={route.slug || ''} compareIds={compareSlugs} insightsByProductId={insightsByProductId} navigate={navigate} onAddCompare={addCompare} />}
     </div>
   );
 }

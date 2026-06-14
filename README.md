@@ -1,108 +1,150 @@
----
-AIGC:
-    Label: "1"
-    ContentProducer: 001191440300708461136T1XGW3
-    ProduceID: 138a78d932efb7dc55f25a1060c7d6bf_d2c3a40066f711f18805525400d9a7a1
-    ReservedCode1: HlglV/IQB4jr5ulN7M9t8aeYp0RIflBBpY6gbPnoSV7O2DqpEEPPeiTHOeSenvRrr+HlnB/vD1GSo3d1m9CEBpJ6K48XPRmuzIgh6YCsF42Is/tEmNTeI719ZeAq0WkvNHrNKEsa0yTLVlTFgKSrqswcJoWjQAIL2nkoatR1TpUgsattEepv4hH1khI=
-    ContentPropagator: 001191440300708461136T1XGW3
-    PropagateID: 138a78d932efb7dc55f25a1060c7d6bf_d2c3a40066f711f18805525400d9a7a1
-    ReservedCode2: HlglV/IQB4jr5ulN7M9t8aeYp0RIflBBpY6gbPnoSV7O2DqpEEPPeiTHOeSenvRrr+HlnB/vD1GSo3d1m9CEBpJ6K48XPRmuzIgh6YCsF42Is/tEmNTeI719ZeAq0WkvNHrNKEsa0yTLVlTFgKSrqswcJoWjQAIL2nkoatR1TpUgsattEepv4hH1khI=
----
+# Pawkawa
 
-# PetFoodCompare.au — 项目主工作区
+Trusted Pet Food Intelligence for Australia and New Zealand.
 
-> 宠物食品对比平台 | 后端代码 + 文档索引 | 2026-06-13
+This repository contains the current frontend prototype and backend API for verified pet food search, product intelligence, and product comparison.
 
----
+## Workspace Map
 
-## 一、目录结构
+- Frontend app: `/Users/barryli/Desktop/PetFoodCompare/frontend`
+- Backend API: `/Users/barryli/Desktop/PetFoodCompare/backend`
+- Frontend architecture notes: `/Users/barryli/Desktop/PetFoodCompare/frontend/FRONTEND_ARCHITECTURE.md`
+- Backend API contract: `/Users/barryli/Desktop/PetFoodCompare/backend/API_CONTRACT.md`
 
-```
-PetFoodCompare/
-├── README.md          ← 本索引文件
-├── backend/           ← 后端完整代码（src + tests + seed-data + deps）
-├── frontend/          ← 前端原型（React + Vite）
-└── (Obsidian 文档库)   → /Users/barryli/Desktop/Paw paw paw/
-```
+## Current Sprint
 
-## 二、快速入口
+`Stabilization Sprint` is the active release-readiness sprint.
 
-| 内容 | 位置 |
-|------|------|
-| 后端源码 | `backend/src/` |
-| 前端源码 | `frontend/src/` |
-| 测试套件 | `backend/tests/` |
-| 种子数据 | `backend/seed-data/` |
-| 数据库 Schema | `backend/schema.sql` |
-| API 入口 | `backend/src/index.ts` |
-| 前端启动 | `cd frontend && npm install && npm run dev` |
-| Obsidian 文档库 | `/Users/barryli/Desktop/Paw paw paw/` |
+Focus:
 
-## 三、当前状态：Sprint 1.3B — ACCEPTED
+- Backend build stability
+- Unified frontend/backend API contract
+- Shared rules registry as the single rule source
+- Real compare flow through backend APIs
+- Documentation and repo hygiene for team review
 
-### 已交付治理文档（全部批准）：
+Explicitly paused:
 
-| # | 文档 | Obsidian 路径 |
-|---|------|--------------|
-| 1 | Data Dictionary V1 | `07-数据治理/` |
-| 2 | Ingredient Normalization Strategy V1 | `07-数据治理/` |
-| 3 | Ingredient Taxonomy V1 | `09-知识图谱/` |
-| 4 | Health Need Taxonomy V1 | `09-知识图谱/` |
-| 5 | Nutrition Rule Mapping V1 | `09-知识图谱/` |
-| 6 | OPFF Field Mapping V1 | `10-数据管道/` |
-| 7 | OPFF Validation Rules V1 | `10-数据管道/` |
-| 8 | Confidence Score Rules V2 | `10-数据管道/` |
-| 9 | Data Quality Dashboard V1 | `04-系统架构/` |
-| 10 | Architecture Snapshot Updates | `04-系统架构/` + `开发日志` |
+- New connectors
+- Neo4j
+- AI recommendations
+- SEO generators
+- Affiliate features
+- More visual decoration work
 
-### 当前阻塞
+## Current Status
 
-**Runtime Environment Verification** — 需在本地执行：
+Completed in the current branch:
+
+- `backend npm run build` passes
+- `backend npx tsc --noEmit` passes
+- `backend npm test` passes
+- `frontend npm run build` passes
+- Product Intelligence Layer is backend-owned
+- Frontend consumes backend intelligence APIs through the Vite proxy
+- `/api/compare` supports real product selection via `product_ids` or `product_slugs`
+- `/api/compare/recommend` uses the shared rules layer
+- Local git repository has been initialized for reliable review and diffing
+
+Current runtime note:
+
+- The backend is resilient when PostgreSQL is unavailable.
+- `GET /api/products`
+- `GET /api/products/search`
+- `POST /api/compare`
+- `POST /api/compare/recommend`
+
+These routes fall back to the verified fixture catalog so the frontend can keep validating real API flows while database setup is incomplete.
+
+## Local Development
+
+### Backend
 
 ```bash
-npx tsx seed-data/import-seed.ts
+cd /Users/barryli/Desktop/PetFoodCompare/backend
+npm install
+npm run dev
+```
+
+Checks:
+
+```bash
+npm run build
+npx tsc --noEmit
 npm test
 ```
 
-验证端点：
-- `GET /api/products`
-- `GET /api/brands`
-- `GET /api/metrics/data-quality`
+### Frontend
 
-期望结果：Brands≥5 / Products≥20 / Ingredients≥120 / Prices≥20 / Overall Quality Score>0
+```bash
+cd /Users/barryli/Desktop/PetFoodCompare/frontend
+npm install
+npm run dev -- --host 127.0.0.1
+```
 
-## 四、里程碑 M1：First Production Dataset
+Check:
 
-M1 完成后进入 Sprint 1.3C：
+```bash
+npm run build
+```
 
-| 范围 | 说明 |
-|------|------|
-| OPFF Real Run | 30-50 Products 真实导入 |
-| Import Validation | 导入验证与完整性分析 |
-| Confidence Analysis | 可信度评分 |
+Default local URLs:
 
-**禁止启动**：Neo4j / AI Recommendation / Frontend Rewrite / Additional Connectors / New Governance Documents
+- Frontend: `http://127.0.0.1:4173/`
+- Backend: `http://127.0.0.1:3001/`
+- Swagger: `http://127.0.0.1:3001/api/docs`
 
-## 五、数据资产指标
+## Architecture Summary
 
-| 维度 | 目标 |
-|------|------|
-| 已导入品牌数 | ≥5 |
-| 已导入产品数 | ≥20 (M1) → ≥50 (1.3C) |
-| 成分标准化覆盖率 | TBD |
-| 平均数据可信度 | >0 |
-| API 响应格式 | `{success, data/error}` |
+### Frontend
 
-## 六、技术栈
+- Vite + React
+- Single-app prototype with explicit page boundaries
+- UI renders backend-owned intelligence data instead of generating nutrition logic in React
 
-- **Runtime**: Node.js / TypeScript (tsx)
-- **框架**: Express
-- **ORM**: Drizzle ORM
-- **数据库**: PostgreSQL（10 张表）
-- **测试**: Vitest（176 tests）
-- **API 文档**: Swagger (/api/docs)
+### Backend
 
----
+- Express + TypeScript
+- Drizzle ORM
+- PostgreSQL-first data layer
+- Shared rules registry under `/Users/barryli/Desktop/PetFoodCompare/backend/src/rules`
+- Intelligence services under `/Users/barryli/Desktop/PetFoodCompare/backend/src/intelligence`
 
-> **下一步**：在本地环境中执行种子数据导入和测试，解除 M1 阻塞后进入 Sprint 1.3C。
-*（内容由AI生成，仅供参考）*
+### Shared Domain Direction
+
+These capabilities are now expected to reuse the same rules source:
+
+- Product insight generation
+- Suitability scoring
+- Compare recommendation logic
+- Future search/recommendation assistant layers
+
+## Git Workflow
+
+Local branches currently prepared:
+
+- `main`
+- `develop`
+- `feature/stabilization-sprint`
+
+Recommended branch naming:
+
+- `feature/<scope>`
+- `fix/<scope>`
+- `docs/<scope>`
+
+GitHub publishing should use a dedicated standalone repository under the user's account and must not be mixed with unrelated projects.
+
+## What Reviewers Should Inspect First
+
+- Backend rules registry: `/Users/barryli/Desktop/PetFoodCompare/backend/src/rules`
+- Backend compare routes: `/Users/barryli/Desktop/PetFoodCompare/backend/src/routes/compare.ts`
+- Backend intelligence routes: `/Users/barryli/Desktop/PetFoodCompare/backend/src/routes/intelligence.ts`
+- Frontend integration surface: `/Users/barryli/Desktop/PetFoodCompare/frontend/src/App.tsx`
+- Frontend architecture notes: `/Users/barryli/Desktop/PetFoodCompare/frontend/FRONTEND_ARCHITECTURE.md`
+
+## Remaining Risks
+
+- Product detail pages in the frontend still contain prototype-era coupling and should continue migrating toward real backend product detail payloads.
+- Database-backed compare is stable, but the local environment is still running on API fallback mode until PostgreSQL is available.
+- The frontend route system is intentionally lightweight for V1, but should move to a formal router before large-scale page growth.

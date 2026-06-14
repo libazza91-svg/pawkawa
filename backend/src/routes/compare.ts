@@ -1,11 +1,13 @@
 import { Router, Request, Response } from 'express';
 import { eq, inArray } from 'drizzle-orm';
 import { db } from '../db/client';
+import { checkConnection } from '../db/client';
 import { products, brands, productNutrition, productIngredients, productPrices } from '../db/schema';
-import { scoreProductSuitability } from '../intelligence/suitability-engine';
 import { buildRecommendationContext } from '../intelligence/recommendation-context-engine';
 import { PetProfileInput, VerifiedProduct } from '../intelligence/types';
+import { slugifyProductName, toConfidencePercent, toVerificationGrade } from '../lib/product-slug';
 import { verifiedProducts } from '../intelligence/product-insight-engine';
+import { sendError, sendSuccess } from '../middleware/response';
 
 export const compareRouter = Router();
 
@@ -15,12 +17,16 @@ type NutritionData = Record<string, string | number | null>;
 
 interface ComparisonRow {
   product_id: number;
+  slug: string;
   product_name: string;
   brand_name: string;
   species: string | null;
   life_stage: string | null;
   format: string | null;
   origin: string | null;
+  confidence: number;
+  trust_grade: 'GOLD' | 'SILVER' | 'BRONZE' | 'UNVERIFIED';
+  market_availability: 'ACTIVE' | 'LIMITED' | 'DISCONTINUED';
   nutrition: Record<string, string | number | null>;
   ingredients: string[];
   prices: Array<{
@@ -28,6 +34,108 @@ interface ComparisonRow {
     price_aud: string;
     unit_price_aud_per_kg: string | null;
   }>;
+}
+
+function mapMarketAvailability(status: string | null): 'ACTIVE' | 'LIMITED' | 'DISCONTINUED' {
+  const normalized = (status || '').toUpperCase();
+  if (normalized === 'DISCONTINUED') return 'DISCONTINUED';
+  if (normalized === 'LIMITED') return 'LIMITED';
+  return 'ACTIVE';
+}
+
+function detectControversialIngredients(ingredients: string[]): string[] {
+  const watchList = ['maize', 'corn', 'natural flavour', 'animal fat', 'soy'];
+  return ingredients.filter((ingredient) =>
+    watchList.some((term) => ingredient.toLowerCase().includes(term))
+  );
+}
+
+function deriveSuitabilityTags(product: {
+  species: string | null;
+  life_stage: string | null;
+  protein: number;
+  fat: number;
+  fiber: number;
+  ingredients: string[];
+}): string[] {
+  const tags: string[] = [];
+
+  if (product.protein >= 36) tags.push('High Protein');
+  if (product.fat <= 15) tags.push('Weight Control');
+  if (product.species === 'CAT' && product.life_stage === 'ADULT' && product.fiber >= 5) tags.push('Indoor Cat');
+  if (product.life_stage === 'PUPPY' || product.life_stage === 'KITTEN') tags.push('Growth Support');
+  if (product.ingredients.some((ingredient) => ingredient.toLowerCase().includes('rice'))) tags.push('Sensitive Stomach');
+
+  return Array.from(new Set(tags));
+}
+
+async function resolveProductIds(productIds?: unknown, productSlugs?: unknown): Promise<number[]> {
+  const resolvedIds = new Set<number>();
+
+  if (Array.isArray(productIds)) {
+    for (const value of productIds) {
+      if (typeof value === 'number' && Number.isInteger(value)) resolvedIds.add(value);
+    }
+  }
+
+  if (Array.isArray(productSlugs) && productSlugs.length > 0) {
+    const dbProducts = await db
+      .select({ product_id: products.product_id, name: products.name })
+      .from(products);
+    const slugMap = new Map(dbProducts.map((item) => [slugifyProductName(item.name), item.product_id]));
+
+    for (const value of productSlugs) {
+      if (typeof value !== 'string') continue;
+      const productId = slugMap.get(value);
+      if (productId !== undefined) resolvedIds.add(productId);
+    }
+  }
+
+  return Array.from(resolvedIds);
+}
+
+function resolveFallbackProducts(productIds?: unknown, productSlugs?: unknown): VerifiedProduct[] {
+  const requestedSlugs = Array.isArray(productSlugs) ? productSlugs.filter((item): item is string => typeof item === 'string') : [];
+  const requestedIds = Array.isArray(productIds) ? productIds.map((item) => String(item)) : [];
+
+  if (requestedSlugs.length === 0 && requestedIds.length === 0) return [];
+
+  return verifiedProducts.filter((product, index) => {
+    return requestedSlugs.includes(product.slug) || requestedIds.includes(product.id) || requestedIds.includes(String(index + 1));
+  });
+}
+
+function buildFallbackCompareData(items: VerifiedProduct[]): ComparisonRow[] {
+  return items.map((product, index) => ({
+    product_id: index + 1,
+    slug: product.slug,
+    product_name: product.name,
+    brand_name: product.brand,
+    species: product.species,
+    life_stage: product.life_stage,
+    format: null,
+    origin: null,
+    confidence: product.confidence,
+    trust_grade: product.verification_grade,
+    market_availability: product.market_availability,
+    nutrition: {
+      protein_pct: String(product.nutrition.protein),
+      fat_pct: String(product.nutrition.fat),
+      fiber_pct: String(product.nutrition.fiber),
+      moisture_pct: String(product.nutrition.moisture),
+      ash_pct: String(product.nutrition.ash),
+      phosphorus_pct: String(product.nutrition.phosphorus),
+      calories_kcal: String(product.nutrition.calories),
+    },
+    ingredients: product.ingredients_normalized,
+    prices: [
+      {
+        retailer: 'Verified catalog',
+        price_aud: product.unit_price_aud_per_kg.toFixed(2),
+        unit_price_aud_per_kg: product.unit_price_aud_per_kg.toFixed(2),
+      },
+    ],
+  }));
 }
 
 async function fetchCompareData(productIds: number[]): Promise<ComparisonRow[]> {
@@ -41,6 +149,8 @@ async function fetchCompareData(productIds: number[]): Promise<ComparisonRow[]> 
       life_stage: products.life_stage,
       format: products.format,
       origin: products.origin,
+      status: products.status,
+      confidence_score: products.confidence_score,
     })
     .from(products)
     .leftJoin(brands, eq(products.brand_id, brands.brand_id))
@@ -80,6 +190,10 @@ async function fetchCompareData(productIds: number[]): Promise<ComparisonRow[]> 
         unit_price_aud_per_kg: pr.unit_price_aud_per_kg != null ? String(pr.unit_price_aud_per_kg) : null,
       }));
 
+    const protein = nut?.protein_pct != null ? Number(nut.protein_pct) : 0;
+    const fat = nut?.fat_pct != null ? Number(nut.fat_pct) : 0;
+    const fiber = (nut?.fiber_pct ?? nut?.crude_fiber_pct) != null ? Number(nut?.fiber_pct ?? nut?.crude_fiber_pct) : 0;
+
     const nutrition: NutritionData = nut
       ? {
           protein_pct: nut.protein_pct != null ? String(nut.protein_pct) : null,
@@ -99,12 +213,16 @@ async function fetchCompareData(productIds: number[]): Promise<ComparisonRow[]> 
 
     return {
       product_id: p.product_id,
+      slug: slugifyProductName(p.product_name),
       product_name: p.product_name,
       brand_name: p.brand_name || 'Unknown',
       species: p.species,
       life_stage: p.life_stage,
       format: p.format,
       origin: p.origin,
+      confidence: toConfidencePercent(p.confidence_score ?? null),
+      trust_grade: toVerificationGrade(p.confidence_score ?? null),
+      market_availability: mapMarketAvailability(p.status),
       nutrition,
       ingredients: ings,
       prices: prc,
@@ -164,89 +282,161 @@ function buildComparison(data: ComparisonRow[]) {
 compareRouter.post('/', async (req: Request, res: Response) => {
   try {
     const { product_ids } = req.body;
-
-    if (!Array.isArray(product_ids) || product_ids.length < 2 || product_ids.length > 4) {
-      res.status(400).json({ success: false, error: 'product_ids must contain 2-4 product IDs' });
+    if (!(await checkConnection())) {
+      const fallbackProducts = resolveFallbackProducts(product_ids, req.body.product_slugs);
+      if (fallbackProducts.length < 2 || fallbackProducts.length > 4) {
+        sendError(res, 'INVALID_PARAMETER', 'Provide 2-4 valid product_ids or product_slugs', 400);
+        return;
+      }
+      const fallbackData = buildFallbackCompareData(fallbackProducts);
+      sendSuccess(res, {
+        products: fallbackData.map((product) => ({
+          product_id: product.product_id,
+          slug: product.slug,
+          product_name: product.product_name,
+          brand_name: product.brand_name,
+          species: product.species,
+          life_stage: product.life_stage,
+          format: product.format,
+          origin: product.origin,
+          confidence: product.confidence,
+          trust_grade: product.trust_grade,
+          market_availability: product.market_availability,
+        })),
+        comparison: buildComparison(fallbackData),
+      });
       return;
     }
 
-    const data = await fetchCompareData(product_ids);
+    const resolvedProductIds = await resolveProductIds(product_ids, req.body.product_slugs);
+
+    if (resolvedProductIds.length < 2 || resolvedProductIds.length > 4) {
+      sendError(res, 'INVALID_PARAMETER', 'Provide 2-4 valid product_ids or product_slugs', 400);
+      return;
+    }
+
+    const data = await fetchCompareData(resolvedProductIds);
     const comparison = buildComparison(data);
 
-    res.json({
-      success: true,
-      data: {
-        products: data.map((p) => ({
-          product_id: p.product_id,
-          product_name: p.product_name,
-          brand_name: p.brand_name,
-          species: p.species,
-          life_stage: p.life_stage,
-          format: p.format,
-          origin: p.origin,
-        })),
-        comparison,
-      },
+    sendSuccess(res, {
+      products: data.map((p) => ({
+        product_id: p.product_id,
+        slug: p.slug,
+        product_name: p.product_name,
+        brand_name: p.brand_name,
+        species: p.species,
+        life_stage: p.life_stage,
+        format: p.format,
+        origin: p.origin,
+        confidence: p.confidence,
+        trust_grade: p.trust_grade,
+        market_availability: p.market_availability,
+      })),
+      comparison,
     });
   } catch (err: any) {
-    res.status(500).json({ success: false, error: err.message || 'Comparison failed' });
+    sendError(res, 'COMPARE_FAILED', err.message || 'Comparison failed', 500);
   }
 });
 
 // POST /api/compare/recommend — Health-aware comparison ranking
 compareRouter.post('/recommend', async (req: Request, res: Response) => {
   try {
-    const { product_ids, species, health_conditions, vet_prescription_required } = req.body;
+    const { product_ids, product_slugs, species, age_years, breed, health_conditions, vet_prescription_required } = req.body;
+    if (!(await checkConnection())) {
+      const fallbackProducts = resolveFallbackProducts(product_ids, product_slugs);
+      if (fallbackProducts.length < 2) {
+        sendError(res, 'INVALID_PARAMETER', 'Provide at least 2 valid product_ids or product_slugs', 400);
+        return;
+      }
+      const profile: PetProfileInput = {
+        species,
+        age_years: typeof age_years === 'number' ? age_years : 3,
+        breed: typeof breed === 'string' ? breed : undefined,
+        health_conditions: health_conditions || [],
+        vet_prescription_required: vet_prescription_required || false,
+      };
+      const result = buildRecommendationContext(profile, fallbackProducts);
+      sendSuccess(res, {
+        constraints: result.constraints,
+        recommendations: result.recommendations,
+        warnings: result.warnings,
+        disclaimer: '以上分析仅供参考，不构成兽医建议。实际饮食决策请在兽医指导下进行。',
+      });
+      return;
+    }
+    const resolvedProductIds = await resolveProductIds(product_ids, product_slugs);
 
-    if (!Array.isArray(product_ids) || product_ids.length < 2) {
-      res.status(400).json({ success: false, error: 'product_ids must contain at least 2 product IDs' });
+    if (resolvedProductIds.length < 2) {
+      sendError(res, 'INVALID_PARAMETER', 'Provide at least 2 valid product_ids or product_slugs', 400);
       return;
     }
 
     if (!species || !['CAT', 'DOG'].includes(species)) {
-      res.status(400).json({ success: false, error: 'species must be CAT or DOG' });
+      sendError(res, 'INVALID_PARAMETER', 'species must be CAT or DOG', 400);
       return;
     }
 
-    // Match DB products to verified products catalog by name
-    // First get product names from DB
-    const dbProducts = await db
-      .select({ product_id: products.product_id, name: products.name })
-      .from(products)
-      .where(inArray(products.product_id, product_ids));
+    const compareRows = await fetchCompareData(resolvedProductIds);
+    const catalogSubset: VerifiedProduct[] = compareRows.map((row) => {
+      const protein = Number(row.nutrition.protein_pct ?? 0);
+      const fat = Number(row.nutrition.fat_pct ?? 0);
+      const fiber = Number((row.nutrition.fiber_pct ?? row.nutrition.crude_fiber_pct) ?? 0);
+      const calories = Number((row.nutrition.calories_kcal ?? row.nutrition.me_kcal_per_kg) ?? 0);
+      const moisture = Number(row.nutrition.moisture_pct ?? 0);
+      const ash = Number(row.nutrition.ash_pct ?? 0);
+      const phosphorus = Number(row.nutrition.phosphorus_pct ?? 0);
+      const lowestUnitPrice = row.prices
+        .map((price) => Number(price.unit_price_aud_per_kg ?? 0))
+        .filter((value) => value > 0)
+        .sort((a, b) => a - b)[0] ?? 0;
 
-    const dbNameMap = new Map(dbProducts.map((p) => [p.name.toLowerCase(), p.product_id]));
-
-    // Filter verifiedProducts to those matching requested product_ids (by name)
-    const catalogSubset = verifiedProducts.filter((vp) =>
-      dbNameMap.has(vp.name.toLowerCase())
-    );
+      return {
+        id: String(row.product_id),
+        slug: row.slug,
+        name: row.product_name,
+        brand: row.brand_name,
+        species: row.species === 'DOG' ? 'DOG' : 'CAT',
+        life_stage: (row.life_stage as VerifiedProduct['life_stage']) || 'ALL_LIFE_STAGES',
+        verification_grade: row.trust_grade,
+        confidence: row.confidence,
+        market_availability: row.market_availability,
+        nutrition: { protein, fat, fiber, calories, moisture, ash, phosphorus },
+        ingredients_normalized: row.ingredients,
+        controversial_ingredients: detectControversialIngredients(row.ingredients),
+        suitability_tags: deriveSuitabilityTags({
+          species: row.species,
+          life_stage: row.life_stage,
+          protein,
+          fat,
+          fiber,
+          ingredients: row.ingredients,
+        }),
+        unit_price_aud_per_kg: lowestUnitPrice,
+      };
+    });
 
     const profile: PetProfileInput = {
-      species: species,
-      age_years: 0,
+      species,
+      age_years: typeof age_years === 'number' ? age_years : 3,
+      breed: typeof breed === 'string' ? breed : undefined,
       health_conditions: health_conditions || [],
       vet_prescription_required: vet_prescription_required || false,
     };
 
     const result = buildRecommendationContext(profile, catalogSubset);
-
-    // Map back to DB product IDs for the response
     const enrichedRecommendations = result.recommendations.map((rec) => ({
       ...rec,
-      db_product_id: dbNameMap.get(rec.product_name.toLowerCase()) || null,
+      db_product_id: Number(rec.product_id),
     }));
 
-    res.json({
-      success: true,
-      data: {
-        constraints: result.constraints,
-        recommendations: enrichedRecommendations.sort((a, b) => b.suitability_score - a.suitability_score),
-        warnings: result.warnings,
-        disclaimer: '以上分析仅供参考，不构成兽医建议。实际饮食决策请在兽医指导下进行。',
-      },
+    sendSuccess(res, {
+      constraints: result.constraints,
+      recommendations: enrichedRecommendations.sort((a, b) => b.suitability_score - a.suitability_score),
+      warnings: result.warnings,
+      disclaimer: '以上分析仅供参考，不构成兽医建议。实际饮食决策请在兽医指导下进行。',
     });
   } catch (err: any) {
-    res.status(500).json({ success: false, error: err.message || 'Recommendation failed' });
+    sendError(res, 'COMPARE_RECOMMEND_FAILED', err.message || 'Recommendation failed', 500);
   }
 });

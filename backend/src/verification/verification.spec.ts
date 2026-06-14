@@ -11,9 +11,9 @@ import {
   verifyAllProducts,
   buildVerificationSummary,
   SeedNutrition,
-} from '../product-verifier';
-import { VerifiedProductProfile } from '../verified-profile';
-import { buildVerificationDashboardMetrics } from '../verification-dashboard';
+} from './product-verifier';
+import { VerifiedProductProfile } from './verified-profile';
+import { buildVerificationDashboardMetrics } from './verification-dashboard';
 
 // ── verifyNumericField ──────────────────────────────────────
 
@@ -223,9 +223,9 @@ describe('Sprint 1.3C-P2 Acceptance Criteria', () => {
   });
 
   it('✓ Source conflict detection active — conflicts array present', () => {
-    const { conflicts } = verifyNumericField('protein', 20, 32, [{ source: 'PetCircle', value: 32 }], '%');
-    expect(conflicts).not.toBeNull();
-    expect(conflicts!.severity).toBe('HIGH');
+    const { conflict } = verifyNumericField('protein', 20, 32, [{ source: 'PetCircle', value: 32 }], '%');
+    expect(conflict).not.toBeNull();
+    expect(conflict!.severity).toBe('HIGH');
   });
 
   it('✓ Confidence score recalculated — overall_confidence present', () => {

@@ -5,8 +5,53 @@ import { eq, and, ilike, asc, sql } from 'drizzle-orm';
 import { productQuerySchema, productSearchSchema } from '../validation/schemas';
 import { sendSuccess, sendError } from '../middleware/response';
 import { ZodError } from 'zod';
+import { slugifyProductName, toConfidencePercent, toVerificationGrade } from '../lib/product-slug';
+import { checkConnection } from '../db/client';
+import { verifiedProducts } from '../intelligence/product-insight-engine';
 
 export const productsRouter = Router();
+
+function serializeProductListItem(item: {
+  product_id: number;
+  brand_id: number | null;
+  name: string;
+  species: string | null;
+  life_stage: string | null;
+  format: string | null;
+  origin: string | null;
+  status: string | null;
+  created_at: Date | null;
+  updated_at: Date | null;
+  brand_name: string | null;
+  confidence_score?: number | null;
+  verification_status?: string | null;
+}) {
+  return {
+    ...item,
+    slug: slugifyProductName(item.name),
+    confidence: toConfidencePercent(item.confidence_score ?? null),
+    trust_grade: toVerificationGrade(item.confidence_score ?? null),
+  };
+}
+
+function buildFallbackProductItems() {
+  return verifiedProducts.map((product, index) => ({
+    product_id: index + 1,
+    brand_id: null,
+    name: product.name,
+    species: product.species,
+    life_stage: product.life_stage,
+    format: null,
+    origin: null,
+    status: product.market_availability,
+    created_at: null,
+    updated_at: null,
+    brand_name: product.brand,
+    slug: product.slug,
+    confidence: product.confidence,
+    trust_grade: product.verification_grade,
+  }));
+}
 
 // ── Error wrapper ──────────────────────────────────────────────────
 function asyncHandler(fn: (req: Request, res: Response) => Promise<void>) {
@@ -38,6 +83,21 @@ productsRouter.get(
 
     const { page, pageSize, species, lifeStage, brand } = query.data;
 
+    if (!(await checkConnection())) {
+      const fallbackItems = buildFallbackProductItems().filter((item) => {
+        const matchesSpecies = !species || item.species === species;
+        const matchesLifeStage = !lifeStage || item.life_stage === lifeStage;
+        const matchesBrand = !brand || (item.brand_name || '').toLowerCase().includes(brand.toLowerCase());
+        return matchesSpecies && matchesLifeStage && matchesBrand;
+      });
+      const offset = (page - 1) * pageSize;
+      sendSuccess(res, {
+        items: fallbackItems.slice(offset, offset + pageSize),
+        pagination: { page, pageSize, total: fallbackItems.length },
+      });
+      return;
+    }
+
     // Build SQL conditions
     const whereParts: ReturnType<typeof eq>[] = [];
     if (species) whereParts.push(eq(products.species, species));
@@ -63,6 +123,8 @@ productsRouter.get(
         format: products.format,
         origin: products.origin,
         status: products.status,
+        confidence_score: products.confidence_score,
+        verification_status: products.verification_status,
         created_at: products.created_at,
         updated_at: products.updated_at,
         brand_name: brands.name,
@@ -75,7 +137,7 @@ productsRouter.get(
       .offset((page - 1) * pageSize);
 
     sendSuccess(res, {
-      items,
+      items: items.map(serializeProductListItem),
       pagination: { page, pageSize, total },
     });
   })
@@ -94,6 +156,19 @@ productsRouter.get(
 
     const { q, page, pageSize } = query.data;
     const searchPattern = `%${q}%`;
+
+    if (!(await checkConnection())) {
+      const fallbackItems = buildFallbackProductItems().filter((item) => {
+        const haystack = `${item.name} ${item.brand_name || ''}`.toLowerCase();
+        return haystack.includes(q.toLowerCase());
+      });
+      const offset = (page - 1) * pageSize;
+      sendSuccess(res, {
+        items: fallbackItems.slice(offset, offset + pageSize),
+        pagination: { page, pageSize, total: fallbackItems.length },
+      });
+      return;
+    }
 
     // Count
     const [{ count: total }] = await db
@@ -115,6 +190,8 @@ productsRouter.get(
         format: products.format,
         origin: products.origin,
         status: products.status,
+        confidence_score: products.confidence_score,
+        verification_status: products.verification_status,
         created_at: products.created_at,
         updated_at: products.updated_at,
         brand_name: brands.name,
@@ -129,7 +206,7 @@ productsRouter.get(
       .offset((page - 1) * pageSize);
 
     sendSuccess(res, {
-      items,
+      items: items.map(serializeProductListItem),
       pagination: { page, pageSize, total },
     });
   })

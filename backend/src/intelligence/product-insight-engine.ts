@@ -1,3 +1,4 @@
+import { generateProductIntelligenceV1 } from '../rules/suitability/suitability-engine';
 import { ProductInsight, VerifiedProduct } from './types';
 
 export const verifiedProducts: VerifiedProduct[] = [
@@ -114,43 +115,5 @@ export function findVerifiedProduct(idOrSlug: string): VerifiedProduct | undefin
 }
 
 export function generateProductInsight(product: VerifiedProduct): ProductInsight {
-  const priceBand = getPriceBand(product);
-  const strengths: string[] = [];
-  const considerations: string[] = [];
-  const bestFor: string[] = [];
-  const avoidIf: string[] = ['Veterinary prescription diet required'];
-
-  if (product.nutrition.protein >= 36) strengths.push('High Protein');
-  else if (product.nutrition.protein >= 30) strengths.push('Balanced Protein');
-
-  if (product.confidence >= 90) strengths.push('Strong Source Verification');
-  else if (product.confidence >= 80) strengths.push('Good Source Verification');
-  else considerations.push('Limited Verification Depth');
-
-  if (product.nutrition.fat >= 28) considerations.push('High Fat');
-  if (priceBand === 'premium') considerations.push('Above Average Price');
-  if (priceBand === 'value') strengths.push('Good Everyday Value');
-  if (product.controversial_ingredients.length > 0) considerations.push('Contains Watch-List Ingredients');
-  if (product.market_availability === 'LIMITED') considerations.push('Limited Availability');
-
-  bestFor.push(...product.suitability_tags);
-  if (product.species === 'CAT' && product.life_stage === 'ADULT') bestFor.push('Adult Cats');
-  if (product.species === 'DOG' && product.life_stage === 'PUPPY') bestFor.push('Growing Puppies');
-  if (product.nutrition.protein >= 36 && product.species === 'CAT') bestFor.push('Active Cats');
-  if (product.nutrition.fat >= 28) avoidIf.push('Fat Restriction Recommended');
-  if (product.controversial_ingredients.length > 0) avoidIf.push('Ingredient Sensitivity Suspected');
-  if (product.life_stage !== 'ALL_LIFE_STAGES') avoidIf.push('Not intended for all life stages');
-
-  const proteinPhrase = product.nutrition.protein >= 36 ? 'high-protein' : product.nutrition.protein >= 30 ? 'balanced-protein' : 'moderate-protein';
-  const trustPhrase = product.confidence >= 90 ? 'strongly verified' : product.confidence >= 80 ? 'well verified' : 'partially verified';
-  const pricePhrase = priceBand === 'premium' ? 'premium-priced' : priceBand === 'value' ? 'good-value' : 'mid-priced';
-  const audience = product.life_stage === 'ALL_LIFE_STAGES' ? `${product.species.toLowerCase()}s across life stages` : `${product.life_stage.toLowerCase()} ${product.species.toLowerCase()}s`;
-
-  return {
-    quick_verdict: `${product.name} is a ${proteinPhrase}, ${pricePhrase} food for ${audience}, with ${trustPhrase} product data.`,
-    strengths: unique(strengths).slice(0, 5),
-    considerations: unique(considerations).slice(0, 5),
-    best_for: unique(bestFor).slice(0, 6),
-    avoid_if: unique(avoidIf).slice(0, 5),
-  };
+  return generateProductIntelligenceV1(product);
 }

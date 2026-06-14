@@ -30,12 +30,17 @@ export interface VerifiedProduct {
 }
 
 export interface ProductInsight {
+  product_id: string;
   quick_verdict: string;
   strengths: string[];
   considerations: string[];
   best_for: string[];
   avoid_if: string[];
+  confidence: number;
+  trust_grade: VerificationGrade;
 }
+
+export type ProductIntelligenceResponse = ProductInsight;
 
 export interface PetProfileInput {
   species: Species;

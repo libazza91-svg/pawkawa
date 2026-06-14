@@ -11,7 +11,7 @@ import {
 } from '../db/schema';
 import { eq, and } from 'drizzle-orm';
 import { createBatch, finalizeBatch, getBatchReport } from '../importer/logger';
-import { validateImportRows } from '../importer/validation';
+import { ProductImportRow, validateImportRows } from '../importer/validation';
 import {
   calcConfidenceScore,
   calcVerificationStatus,
@@ -116,7 +116,7 @@ export abstract class BaseConnector implements Connector {
       const brandId = await this.upsertBrand(row.brand_name);
 
       // Dedup: name + brand_id + package_size_g
-      const pkgSize = row.package_size_g ? parseInt(row.package_size_g, 10) : undefined;
+      const pkgSize = row.package_size_g;
       const conditions = [
         eq(products.name, row.name),
         eq(products.brand_id, brandId),
@@ -179,26 +179,30 @@ export abstract class BaseConnector implements Connector {
 
       // Nutrition
       const hasNutrition =
-        row.protein_pct !== '' ||
-        row.fat_pct !== '' ||
-        row.crude_fiber_pct !== '' ||
-        row.moisture_pct !== '' ||
-        row.ash_pct !== '' ||
-        row.me_kcal_per_kg !== '';
+        row.protein_pct !== undefined ||
+        row.fat_pct !== undefined ||
+        row.crude_fiber_pct !== undefined ||
+        row.moisture_pct !== undefined ||
+        row.ash_pct !== undefined ||
+        row.me_kcal_per_kg !== undefined ||
+        row.omega_3_pct !== undefined ||
+        row.omega_6_pct !== undefined ||
+        row.calcium_pct !== undefined ||
+        row.phosphorus_pct !== undefined;
 
       if (hasNutrition) {
         await db.insert(productNutrition).values({
           product_id: productId,
-          protein_pct: row.protein_pct || null,
-          fat_pct: row.fat_pct || null,
-          crude_fiber_pct: row.crude_fiber_pct || null,
-          moisture_pct: row.moisture_pct || null,
-          ash_pct: row.ash_pct || null,
-          me_kcal_per_kg: row.me_kcal_per_kg || null,
-          omega_3_pct: row.omega_3_pct || null,
-          omega_6_pct: row.omega_6_pct || null,
-          calcium_pct: row.calcium_pct || null,
-          phosphorus_pct: row.phosphorus_pct || null,
+          protein_pct: row.protein_pct?.toString() ?? null,
+          fat_pct: row.fat_pct?.toString() ?? null,
+          crude_fiber_pct: row.crude_fiber_pct?.toString() ?? null,
+          moisture_pct: row.moisture_pct?.toString() ?? null,
+          ash_pct: row.ash_pct?.toString() ?? null,
+          me_kcal_per_kg: row.me_kcal_per_kg?.toString() ?? null,
+          omega_3_pct: row.omega_3_pct?.toString() ?? null,
+          omega_6_pct: row.omega_6_pct?.toString() ?? null,
+          calcium_pct: row.calcium_pct?.toString() ?? null,
+          phosphorus_pct: row.phosphorus_pct?.toString() ?? null,
         });
       }
 
@@ -215,11 +219,11 @@ export abstract class BaseConnector implements Connector {
       }
 
       // Price
-      if (row.unit_price_aud && row.unit_price_aud !== '') {
+      if (row.unit_price_aud !== undefined) {
         await db.insert(productPrices).values({
           product_id: productId,
           retailer: row.store_name || null,
-          price_aud: row.unit_price_aud,
+          price_aud: row.unit_price_aud.toString(),
           captured_at: row.price_date ? new Date(row.price_date) : new Date(),
         });
       }
