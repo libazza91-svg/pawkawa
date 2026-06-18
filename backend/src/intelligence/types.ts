@@ -38,6 +38,9 @@ export interface ProductInsight {
   avoid_if: string[];
   confidence: number;
   trust_grade: VerificationGrade;
+  suitability?: import('../domain').SuitabilityResult[];
+  evidence_refs?: import('../domain').EvidenceRef[];
+  disclaimer?: string;
 }
 
 export type ProductIntelligenceResponse = ProductInsight;
@@ -46,6 +49,7 @@ export interface PetProfileInput {
   species: Species;
   age_years: number;
   breed?: string;
+  need_codes?: import('../domain').NeedProfileCode[];
   health_conditions?: HealthCondition[];
   vet_prescription_required?: boolean;
 }
@@ -64,12 +68,16 @@ export interface SuitabilityRecommendation {
   suitability_score: number;
   reasons: string[];
   cautions: string[];
+  suitability_result?: import('../domain').SuitabilityResult;
+  evidence_refs?: import('../domain').EvidenceRef[];
 }
 
 export interface RecommendationContextResult {
+  need_profiles?: import('../domain').NeedProfile[];
   constraints: RecommendationConstraint[];
   recommendations: SuitabilityRecommendation[];
   warnings: string[];
+  disclaimer_required?: boolean;
 }
 
 export interface RecoveryKnowledgeTopic {

@@ -3,13 +3,32 @@ import path from 'path';
 import { pool } from './client';
 
 export async function migrate(): Promise<void> {
-  const schemaPath = path.resolve(__dirname, '../../schema.sql');
-  const sql = fs.readFileSync(schemaPath, 'utf-8');
+  const migrationsDir = path.resolve(__dirname, 'migrations');
+  const migrationFiles = fs
+    .readdirSync(migrationsDir)
+    .filter((file) => file.endsWith('.sql'))
+    .sort();
+
+  if (migrationFiles.length === 0) {
+    throw new Error(`No SQL migrations found in ${migrationsDir}`);
+  }
 
   const client = await pool.connect();
   try {
-    await client.query(sql);
-    console.log('Migration completed successfully.');
+    for (const file of migrationFiles) {
+      const migrationPath = path.join(migrationsDir, file);
+      const sql = fs.readFileSync(migrationPath, 'utf-8');
+      console.log(`Applying migration: ${file}`);
+      await client.query('BEGIN');
+      try {
+        await client.query(sql);
+        await client.query('COMMIT');
+      } catch (error) {
+        await client.query('ROLLBACK');
+        throw error;
+      }
+    }
+    console.log(`Migration completed successfully. Applied ${migrationFiles.length} files.`);
   } catch (error) {
     console.error('Migration failed:', error);
     throw error;

@@ -1,0 +1,162 @@
+[
+  {
+    "retailer": "petbarn",
+    "market": "AU",
+    "currency": "AUD",
+    "product_url": "https://www.petbarn.com.au/p/royal-canin-feline-indoor-cat-food",
+    "expected_brand": "ROYAL CANIN",
+    "expected_pack_size_g": 2000,
+    "expected_canonical_slug": "royal-canin-indoor-adult-2000g",
+    "notes": "Live parser confirms 2kg variant on the controlled Royal Canin Indoor page."
+  },
+  {
+    "retailer": "petbarn",
+    "market": "AU",
+    "currency": "AUD",
+    "product_url": "https://www.petbarn.com.au/p/royal-canin-feline-indoor-cat-food",
+    "expected_brand": "ROYAL CANIN",
+    "expected_pack_size_g": 4000,
+    "expected_canonical_slug": "royal-canin-indoor-adult-4000g",
+    "notes": "Manual Petbarn pilot URL approved for 4kg variant validation."
+  },
+  {
+    "retailer": "petbarn",
+    "market": "AU",
+    "currency": "AUD",
+    "product_url": "https://www.petbarn.com.au/p/royal-canin-feline-indoor-cat-food",
+    "expected_brand": "ROYAL CANIN",
+    "expected_pack_size_g": 10000,
+    "expected_canonical_slug": "royal-canin-indoor-adult-10000g",
+    "notes": "Live parser confirms 10kg variant on the controlled Royal Canin Indoor page."
+  },
+  {
+    "retailer": "petbarn",
+    "market": "AU",
+    "currency": "AUD",
+    "product_url": "https://www.petbarn.com.au/p/royal-canin-feline-in-out-fit-cat-food",
+    "expected_brand": "ROYAL CANIN",
+    "expected_pack_size_g": 2000,
+    "expected_canonical_slug": "royal-canin-fit-adult-2000g",
+    "notes": "Live parser confirms 2kg variant on the controlled Royal Canin Fit page."
+  },
+  {
+    "retailer": "petbarn",
+    "market": "AU",
+    "currency": "AUD",
+    "product_url": "https://www.petbarn.com.au/p/royal-canin-feline-in-out-fit-cat-food",
+    "expected_brand": "ROYAL CANIN",
+    "expected_pack_size_g": 4000,
+    "expected_canonical_slug": "royal-canin-fit-adult-4000g",
+    "notes": "Manual Petbarn pilot URL approved for 4kg variant validation."
+  },
+  {
+    "retailer": "petbarn",
+    "market": "AU",
+    "currency": "AUD",
+    "product_url": "https://www.petbarn.com.au/p/royal-canin-feline-light-cat-food",
+    "expected_brand": "ROYAL CANIN",
+    "expected_pack_size_g": 1500,
+    "expected_canonical_slug": "royal-canin-light-weight-care-adult-1500g",
+    "notes": "Live parser confirms 1.5kg variant on the controlled Royal Canin Light Weight page."
+  },
+  {
+    "retailer": "petbarn",
+    "market": "AU",
+    "currency": "AUD",
+    "product_url": "https://www.petbarn.com.au/p/royal-canin-feline-light-cat-food",
+    "expected_brand": "ROYAL CANIN",
+    "expected_pack_size_g": 3000,
+    "expected_canonical_slug": "royal-canin-light-weight-care-adult-3000g",
+    "notes": "Live parser confirms 3kg variant on the controlled Royal Canin Light Weight page."
+  },
+  {
+    "retailer": "petbarn",
+    "market": "AU",
+    "currency": "AUD",
+    "product_url": "https://www.petbarn.com.au/p/science-diet-feline-adult-indoor-cat-food",
+    "expected_brand": "Hill's Science Diet",
+    "expected_pack_size_g": 2000,
+    "expected_canonical_slug": "hills-science-diet-indoor-adult-2000g",
+    "notes": "Live parser confirms 2kg variant on the controlled Hill's Indoor page."
+  },
+  {
+    "retailer": "petbarn",
+    "market": "AU",
+    "currency": "AUD",
+    "product_url": "https://www.petbarn.com.au/p/science-diet-feline-adult-indoor-cat-food",
+    "expected_brand": "Hill's Science Diet",
+    "expected_pack_size_g": 4000,
+    "expected_canonical_slug": "hills-science-diet-indoor-adult-4000g",
+    "notes": "Manual Petbarn pilot URL approved for 4kg variant validation."
+  },
+  {
+    "retailer": "petbarn",
+    "market": "AU",
+    "currency": "AUD",
+    "product_url": "https://www.petbarn.com.au/p/hill-s-science-diet-sensitive-stomach-skin-adult-cat-food",
+    "expected_brand": "Hill's Science Diet",
+    "expected_pack_size_g": 3170,
+    "expected_canonical_slug": "hills-science-diet-sensitive-stomach-skin-adult-chicken-3170g",
+    "notes": "Manual Petbarn pilot URL approved for 3.17kg variant validation."
+  },
+  {
+    "retailer": "petbarn",
+    "market": "AU",
+    "currency": "AUD",
+    "product_url": "https://www.petbarn.com.au/p/black-hawk-healthy-benefits-indoor-chickn-adult-cat-food",
+    "expected_brand": "Black Hawk",
+    "expected_pack_size_g": 2000,
+    "expected_canonical_slug": "black-hawk-indoor-chicken-rice-2000g",
+    "notes": "Live parser confirms 2kg variant on the controlled Black Hawk Indoor page."
+  },
+  {
+    "retailer": "petbarn",
+    "market": "AU",
+    "currency": "AUD",
+    "product_url": "https://www.petbarn.com.au/p/black-hawk-healthy-benefits-indoor-chickn-adult-cat-food",
+    "expected_brand": "Black Hawk",
+    "expected_pack_size_g": 4000,
+    "expected_canonical_slug": "black-hawk-indoor-chicken-rice-4000g",
+    "notes": "Live parser confirms 4kg variant on the controlled Black Hawk Indoor page."
+  },
+  {
+    "retailer": "petbarn",
+    "market": "AU",
+    "currency": "AUD",
+    "product_url": "https://www.petbarn.com.au/p/black-hawk-healthy-benefits-indoor-chickn-adult-cat-food",
+    "expected_brand": "Black Hawk",
+    "expected_pack_size_g": 8000,
+    "expected_canonical_slug": "black-hawk-indoor-chicken-rice-8000g",
+    "notes": "Live parser confirms 8kg variant on the controlled Black Hawk Indoor page."
+  },
+  {
+    "retailer": "petbarn",
+    "market": "AU",
+    "currency": "AUD",
+    "product_url": "https://www.petbarn.com.au/p/black-hawk-original-chicken-adult-cat-food",
+    "expected_brand": "Black Hawk",
+    "expected_pack_size_g": 2000,
+    "expected_canonical_slug": "black-hawk-original-chicken-2000g",
+    "notes": "Live parser confirms 2kg variant on the controlled Black Hawk Original Chicken page."
+  },
+  {
+    "retailer": "petbarn",
+    "market": "AU",
+    "currency": "AUD",
+    "product_url": "https://www.petbarn.com.au/p/black-hawk-original-chicken-adult-cat-food",
+    "expected_brand": "Black Hawk",
+    "expected_pack_size_g": 4000,
+    "expected_canonical_slug": "black-hawk-original-chicken-4000g",
+    "notes": "Live parser confirms 4kg variant on the controlled Black Hawk Original Chicken page."
+  },
+  {
+    "retailer": "petbarn",
+    "market": "AU",
+    "currency": "AUD",
+    "product_url": "https://www.petbarn.com.au/p/black-hawk-original-chicken-adult-cat-food",
+    "expected_brand": "Black Hawk",
+    "expected_pack_size_g": 12000,
+    "expected_canonical_slug": "black-hawk-original-chicken-12000g",
+    "notes": "Live parser confirms 12kg variant on the controlled Black Hawk Original Chicken page."
+  }
+]

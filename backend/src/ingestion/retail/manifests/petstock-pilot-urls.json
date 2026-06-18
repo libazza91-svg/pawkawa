@@ -1,0 +1,162 @@
+[
+  {
+    "retailer": "petstock",
+    "market": "AU",
+    "currency": "AUD",
+    "product_url": "https://www.petstock.com.au/products/royal-canin-indoor-adult-dry-cat-food",
+    "expected_brand": "Royal Canin",
+    "expected_pack_size_g": 2000,
+    "expected_canonical_slug": "royal-canin-indoor-adult-2000g",
+    "notes": "Live parser confirms 2kg variant on the controlled Royal Canin Indoor page."
+  },
+  {
+    "retailer": "petstock",
+    "market": "AU",
+    "currency": "AUD",
+    "product_url": "https://www.petstock.com.au/products/royal-canin-indoor-adult-dry-cat-food",
+    "expected_brand": "Royal Canin",
+    "expected_pack_size_g": 4000,
+    "expected_canonical_slug": "royal-canin-indoor-adult-4000g",
+    "notes": "Known canonical product and prior pilot match."
+  },
+  {
+    "retailer": "petstock",
+    "market": "AU",
+    "currency": "AUD",
+    "product_url": "https://www.petstock.com.au/products/royal-canin-indoor-adult-dry-cat-food",
+    "expected_brand": "Royal Canin",
+    "expected_pack_size_g": 10000,
+    "expected_canonical_slug": "royal-canin-indoor-adult-10000g",
+    "notes": "Live parser confirms 10kg variant on the controlled Royal Canin Indoor page."
+  },
+  {
+    "retailer": "petstock",
+    "market": "AU",
+    "currency": "AUD",
+    "product_url": "https://www.petstock.com.au/products/royal-canin-fit-adult-dry-cat-food",
+    "expected_brand": "Royal Canin",
+    "expected_pack_size_g": 2000,
+    "expected_canonical_slug": "royal-canin-fit-adult-2000g",
+    "notes": "Fit page is stable and exposes 2kg for exact overlap."
+  },
+  {
+    "retailer": "petstock",
+    "market": "AU",
+    "currency": "AUD",
+    "product_url": "https://www.petstock.com.au/products/royal-canin-fit-adult-dry-cat-food",
+    "expected_brand": "Royal Canin",
+    "expected_pack_size_g": 4000,
+    "expected_canonical_slug": "royal-canin-fit-adult-4000g",
+    "notes": "Existing proven overlap SKU."
+  },
+  {
+    "retailer": "petstock",
+    "market": "AU",
+    "currency": "AUD",
+    "product_url": "https://www.petstock.com.au/products/royal-canin-light-weight-care-adult-dry-cat-food",
+    "expected_brand": "Royal Canin",
+    "expected_pack_size_g": 1500,
+    "expected_canonical_slug": "royal-canin-light-weight-care-adult-1500g",
+    "notes": "Live parser confirms 1.5kg variant on the controlled Light Weight page."
+  },
+  {
+    "retailer": "petstock",
+    "market": "AU",
+    "currency": "AUD",
+    "product_url": "https://www.petstock.com.au/products/royal-canin-light-weight-care-adult-dry-cat-food",
+    "expected_brand": "Royal Canin",
+    "expected_pack_size_g": 3000,
+    "expected_canonical_slug": "royal-canin-light-weight-care-adult-3000g",
+    "notes": "Existing canonical product, now paired for Petbarn overlap."
+  },
+  {
+    "retailer": "petstock",
+    "market": "AU",
+    "currency": "AUD",
+    "product_url": "https://www.petstock.com.au/products/hills-science-diet-indoor-adult-dry-cat-food",
+    "expected_brand": "Hill's Science Diet",
+    "expected_pack_size_g": 2000,
+    "expected_canonical_slug": "hills-science-diet-indoor-adult-2000g",
+    "notes": "Indoor page is stable and exposes 2kg for exact overlap."
+  },
+  {
+    "retailer": "petstock",
+    "market": "AU",
+    "currency": "AUD",
+    "product_url": "https://www.petstock.com.au/products/hills-science-diet-indoor-adult-dry-cat-food",
+    "expected_brand": "Hill's Science Diet",
+    "expected_pack_size_g": 4000,
+    "expected_canonical_slug": "hills-science-diet-indoor-adult-4000g",
+    "notes": "Existing proven overlap SKU."
+  },
+  {
+    "retailer": "petstock",
+    "market": "AU",
+    "currency": "AUD",
+    "product_url": "https://www.petstock.com.au/products/hills-science-diet-sensitive-stomach-skin-adult-chicken-dry-cat-food",
+    "expected_brand": "Hill's Science Diet",
+    "expected_pack_size_g": 3170,
+    "expected_canonical_slug": "hills-science-diet-sensitive-stomach-skin-adult-chicken-3170g",
+    "notes": "Existing proven overlap SKU."
+  },
+  {
+    "retailer": "petstock",
+    "market": "AU",
+    "currency": "AUD",
+    "product_url": "https://www.petstock.com.au/products/black-hawk-healthy-benefits-indoor-chicken-cat-food",
+    "expected_brand": "Black Hawk",
+    "expected_pack_size_g": 2000,
+    "expected_canonical_slug": "black-hawk-indoor-chicken-rice-2000g",
+    "notes": "Live parser confirms 2kg variant on the controlled Black Hawk Indoor page."
+  },
+  {
+    "retailer": "petstock",
+    "market": "AU",
+    "currency": "AUD",
+    "product_url": "https://www.petstock.com.au/products/black-hawk-healthy-benefits-indoor-chicken-cat-food",
+    "expected_brand": "Black Hawk",
+    "expected_pack_size_g": 4000,
+    "expected_canonical_slug": "black-hawk-indoor-chicken-rice-4000g",
+    "notes": "Live parser confirms 4kg variant on the controlled Black Hawk Indoor page."
+  },
+  {
+    "retailer": "petstock",
+    "market": "AU",
+    "currency": "AUD",
+    "product_url": "https://www.petstock.com.au/products/black-hawk-healthy-benefits-indoor-chicken-cat-food",
+    "expected_brand": "Black Hawk",
+    "expected_pack_size_g": 8000,
+    "expected_canonical_slug": "black-hawk-indoor-chicken-rice-8000g",
+    "notes": "Live parser confirms 8kg variant on the controlled Black Hawk Indoor page."
+  },
+  {
+    "retailer": "petstock",
+    "market": "AU",
+    "currency": "AUD",
+    "product_url": "https://www.petstock.com.au/products/black-hawk-original-chicken-cat-food",
+    "expected_brand": "Black Hawk",
+    "expected_pack_size_g": 2000,
+    "expected_canonical_slug": "black-hawk-original-chicken-2000g",
+    "notes": "Existing canonical product, now paired for Petbarn overlap."
+  },
+  {
+    "retailer": "petstock",
+    "market": "AU",
+    "currency": "AUD",
+    "product_url": "https://www.petstock.com.au/products/black-hawk-original-chicken-cat-food",
+    "expected_brand": "Black Hawk",
+    "expected_pack_size_g": 4000,
+    "expected_canonical_slug": "black-hawk-original-chicken-4000g",
+    "notes": "Live parser confirms 4kg variant on the controlled Black Hawk Original Chicken page."
+  },
+  {
+    "retailer": "petstock",
+    "market": "AU",
+    "currency": "AUD",
+    "product_url": "https://www.petstock.com.au/products/black-hawk-original-chicken-cat-food",
+    "expected_brand": "Black Hawk",
+    "expected_pack_size_g": 12000,
+    "expected_canonical_slug": "black-hawk-original-chicken-12000g",
+    "notes": "Live parser confirms 12kg variant on the controlled Black Hawk Original Chicken page."
+  }
+]

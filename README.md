@@ -13,15 +13,17 @@ This repository contains the current frontend prototype and backend API for veri
 
 ## Current Sprint
 
-`Stabilization Sprint` is the active release-readiness sprint.
+`Sprint 2.0 — DB-backed Retail Offers` is the active implementation sprint.
 
 Focus:
 
-- Backend build stability
-- Unified frontend/backend API contract
-- Shared rules registry as the single rule source
-- Real compare flow through backend APIs
-- Documentation and repo hygiene for team review
+- DB-backed `retail_offers`
+- DB-backed `price_snapshots`
+- Repository abstraction for price comparison data
+- Idempotent fixture-to-DB backfill
+- Conservative effective price calculation
+- AU / NZ separation at repository level
+- Public price API response shape stability
 
 Explicitly paused:
 
@@ -31,6 +33,9 @@ Explicitly paused:
 - SEO generators
 - Affiliate features
 - More visual decoration work
+- Product discovery expansion
+- Frontend redesign
+- New connectors and scraping logic
 
 ## Current Status
 
@@ -45,12 +50,32 @@ Completed in the current branch:
 - `/api/compare` supports real product selection via `product_ids` or `product_slugs`
 - `/api/compare/recommend` uses the shared rules layer
 - Local git repository has been initialized for reliable review and diffing
+- Sprint 1.6 domain layer is under `/Users/barryli/Desktop/PetFoodCompare/backend/src/domain`
+- Sprint 1.7 verified product API is under `/Users/barryli/Desktop/PetFoodCompare/backend/src/verified-products`
+- Sprint 1.8/2.0 price comparison core is under `/Users/barryli/Desktop/PetFoodCompare/backend/src/price-comparison`
+- `GET /api/verified-products`
+- `GET /api/verified-products/:slug`
+- `GET /api/verified-products/:slug/compare-ready`
+- `GET /api/markets`
+- `GET /api/search/products`
+- `GET /api/products/:slug/offers`
+- `GET /api/price-comparison/:slug/offers`
+- `GET /api/price-comparison/:slug`
+- Retail offer backfill command: `cd /Users/barryli/Desktop/PetFoodCompare/backend && npm run db:backfill:retail-offers`
 
 Current runtime note:
 
 - The backend is resilient when PostgreSQL is unavailable.
 - `GET /api/products`
 - `GET /api/products/search`
+- `GET /api/verified-products`
+- `GET /api/verified-products/:slug`
+- `GET /api/verified-products/:slug/compare-ready`
+- `GET /api/markets`
+- `GET /api/search/products`
+- `GET /api/products/:slug/offers`
+- `GET /api/price-comparison/:slug/offers`
+- `GET /api/price-comparison/:slug`
 - `POST /api/compare`
 - `POST /api/compare/recommend`
 
@@ -65,6 +90,20 @@ cd /Users/barryli/Desktop/PetFoodCompare/backend
 npm install
 npm run dev
 ```
+
+Database setup:
+
+```bash
+cd /Users/barryli/Desktop/PetFoodCompare/backend
+npm run db:migrate
+npm run db:backfill:retail-offers
+```
+
+The active schema source of truth is the Drizzle integer schema under `/Users/barryli/Desktop/PetFoodCompare/backend/src/db/schema`. Ordered SQL migrations live under `/Users/barryli/Desktop/PetFoodCompare/backend/src/db/migrations`.
+
+The old UUID-style schema is preserved only as `/Users/barryli/Desktop/PetFoodCompare/backend/schema.legacy-uuid.sql` and must not be used for current migrations.
+
+Do not commit `backend/.env`, `DATABASE_URL`, or Supabase credentials.
 
 Checks:
 
@@ -109,15 +148,63 @@ Default local URLs:
 - PostgreSQL-first data layer
 - Shared rules registry under `/Users/barryli/Desktop/PetFoodCompare/backend/src/rules`
 - Intelligence services under `/Users/barryli/Desktop/PetFoodCompare/backend/src/intelligence`
+- Verified product service facade under `/Users/barryli/Desktop/PetFoodCompare/backend/src/verified-products`
+- Price comparison services under `/Users/barryli/Desktop/PetFoodCompare/backend/src/price-comparison`
+- Retail offer DB documentation under `/Users/barryli/Desktop/PetFoodCompare/docs/retail-offer-db-v1.md`
 
 ### Shared Domain Direction
 
-These capabilities are now expected to reuse the same rules source:
+These capabilities are now expected to reuse the same decision model:
 
 - Product insight generation
 - Suitability scoring
 - Compare recommendation logic
 - Future search/recommendation assistant layers
+
+Decision path:
+
+```text
+NeedProfile -> Decision Model -> SuitabilityResult -> API response
+```
+
+The MVP need profiles are CAT-only:
+
+- `INDOOR_CAT`
+- `SENSITIVE_STOMACH`
+- `WEIGHT_CONTROL`
+- `SENIOR_SUPPORT`
+- `RECOVERY_SUPPORT`
+- `KITTEN_GROWTH`
+- `EVERYDAY_ADULT`
+
+Medical safety boundary:
+
+- Pawkawa scores food suitability for comparison.
+- Pawkawa does not diagnose, treat, cure, prevent disease, or replace veterinary advice.
+- Recovery support always requires veterinary guidance.
+
+### Price Comparison Core
+
+The primary MVP journey is now:
+
+```text
+Exact product search -> Canonical product match -> Market-specific retailer offers -> Best price / unit price / stock / promotion comparison
+```
+
+Market separation is enforced at offer level:
+
+- AU offers use `market=AU` and `currency=AUD`
+- NZ offers use `market=NZ` and `currency=NZD`
+- AU and NZ offers are never mixed in the same lowest-price calculation
+- User-selected market should override any future IP-based default
+
+Effective price is conservative:
+
+```text
+effective_price = min(base_price, valid unconditional sale_price)
+```
+
+Member, coupon, minimum-spend, and other conditional discounts are exposed separately and are not silently used as the best price.
 
 ## Git Workflow
 
@@ -141,6 +228,11 @@ GitHub publishing should use a dedicated standalone repository under the user's 
 - Backend compare routes: `/Users/barryli/Desktop/PetFoodCompare/backend/src/routes/compare.ts`
 - Backend intelligence routes: `/Users/barryli/Desktop/PetFoodCompare/backend/src/routes/intelligence.ts`
 - Frontend integration surface: `/Users/barryli/Desktop/PetFoodCompare/frontend/src/App.tsx`
+- Verified product API V1 docs: `/Users/barryli/Desktop/PetFoodCompare/docs/verified-product-api-v1.md`
+- Price comparison core docs: `/Users/barryli/Desktop/PetFoodCompare/docs/price-comparison-core-v1.md`
+- Database baseline docs: `/Users/barryli/Desktop/PetFoodCompare/docs/database-baseline-v1.md`
+- Market region model docs: `/Users/barryli/Desktop/PetFoodCompare/docs/market-region-model.md`
+- Canonical matching docs: `/Users/barryli/Desktop/PetFoodCompare/docs/canonical-product-matching-v1.md`
 - Frontend architecture notes: `/Users/barryli/Desktop/PetFoodCompare/frontend/FRONTEND_ARCHITECTURE.md`
 
 ## Remaining Risks

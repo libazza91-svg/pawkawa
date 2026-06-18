@@ -70,18 +70,27 @@ export function ComparePage({
 
   return (
     <main className="page-stack">
-      <section className="compare-hero">
-        <div>
+      <section className="compare-journal-hero">
+        <div className="compare-journal-copy">
           <p className="eyebrow">Compare Foods</p>
-          <h1>See the clearest differences first.</h1>
-          <p className="body-copy">Pick a few foods and Pawkawa summarizes the practical differences before showing the full data table.</p>
+          <h1>What matters most for your pet today?</h1>
+          <p className="body-copy">Pawkawa starts with the practical answer first, then opens the detailed evidence only when you need it.</p>
+          <button className="primary-button" onClick={() => navigate('/search')} type="button">
+            Search and add product
+          </button>
         </div>
-        <button className="primary-button" onClick={() => navigate('/search')} type="button">
-          Search and add product
-        </button>
+        <div className="compare-mascot-card">
+          <div className="compare-mascot-slot">
+            <img alt="Compare mascot placeholder" src="https://placehold.co/260x220/f5ecda/6a5d50?text=Compare+Mascot" />
+          </div>
+          <div className="compare-mascot-note">
+            <strong>Pawkawa is comparing for you.</strong>
+            <span>Higher protein, lower cost, and stronger verification are pulled forward first.</span>
+          </div>
+        </div>
       </section>
 
-      <section className="panel">
+      <section className="panel compare-selection-card">
         <div className="summary-strip">
           <span>{compareSlugs.length}/4 selected</span>
           <span>Highest protein: {highestProtein ? highestProtein.product_name : 'None'}</span>
@@ -98,15 +107,27 @@ export function ComparePage({
         {unavailableCompareSlugs.length > 0 && <p className="muted">Some compare selections are still mock-only and not available in the backend dataset yet.</p>}
       </section>
 
-      <section className="insight-grid">
+      <section className="insight-grid compare-story-grid">
         <article className="panel">
-          <SectionHeader eyebrow="Difference Highlights" title="Fast read" />
-          <ul className="plain-list">
-            <li>{highestProtein ? `${highestProtein.product_name} has the highest protein.` : 'Add backend products to calculate highest protein.'}</li>
-            <li>{lowestPrice ? `${lowestPrice.product_name} has the lowest unit price.` : 'Add backend products to calculate lowest price/kg.'}</li>
-            <li>{highestConfidence ? `${highestConfidence.product_name} has the strongest source verification.` : 'Add backend products to calculate confidence.'}</li>
-            <li>{highestConfidence ? `${highestConfidence.product_name} is currently the best verified product in this comparison.` : 'No best verified product yet.'}</li>
-          </ul>
+          <SectionHeader eyebrow="What matters most?" title="Quick comparison read" />
+          <div className="what-matters-grid">
+            <div className="matter-card">
+              <span>Higher Protein</span>
+              <strong>{highestProtein ? highestProtein.product_name : 'Waiting for products'}</strong>
+            </div>
+            <div className="matter-card">
+              <span>Lower Cost</span>
+              <strong>{lowestPrice ? lowestPrice.product_name : 'Waiting for products'}</strong>
+            </div>
+            <div className="matter-card">
+              <span>Better Verification</span>
+              <strong>{highestConfidence ? highestConfidence.product_name : 'Waiting for products'}</strong>
+            </div>
+            <div className="matter-card">
+              <span>Best quick fit</span>
+              <strong>{compareRecommendations?.recommendations[0]?.product_name || 'Waiting for rule read'}</strong>
+            </div>
+          </div>
           {compareRecommendations && (
             <div className="tag-cloud">
               {compareRecommendations.recommendations.slice(0, 4).map((item) => (

@@ -34,7 +34,7 @@ ADD COLUMN IF NOT EXISTS last_checked TIMESTAMPTZ,
 ADD COLUMN IF NOT EXISTS pack_size_g INT,
 ADD COLUMN IF NOT EXISTS verification_status VARCHAR(20) NOT NULL DEFAULT 'unverified'
     CHECK (verification_status IN ('verified', 'review_required', 'unverified')),
-ADD COLUMN IF NOT EXISTS verified_against_price_id UUID REFERENCES product_prices(price_id);
+ADD COLUMN IF NOT EXISTS verified_against_price_id INTEGER REFERENCES product_prices(id);
 
 COMMENT ON COLUMN product_prices.source_url IS '零售商产品页面 URL';
 COMMENT ON COLUMN product_prices.last_checked IS '价格最后检查时间';

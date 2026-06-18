@@ -1,7 +1,7 @@
 import type { Product, VerificationGrade } from '../data';
 import { getPrimaryPrice } from '../data';
 
-type RouteName = 'landing' | 'search' | 'product' | 'compare' | 'brand';
+type RouteName = 'landing' | 'search' | 'product' | 'price' | 'compare' | 'brand' | 'learn' | 'about';
 
 const compareFields = [
   ['Brand', (product: Product) => product.brand],
@@ -134,15 +134,22 @@ export function SectionHeader({ eyebrow, title }: { eyebrow: string; title: stri
 export function AppHeader({ route, navigate }: { route: RouteName; navigate: (path: string) => void }) {
   const links: Array<[RouteName, string, string]> = [
     ['landing', '/', 'Home'],
-    ['search', '/search', 'Search'],
-    ['compare', '/compare', 'Compare']
+    ['search', '/search', 'Find Prices'],
+    ['compare', '/compare', 'Compare Foods'],
+    ['learn', '/learn', 'Learn'],
+    ['about', '/about', 'About']
   ];
 
   return (
     <header className="app-header">
       <button className="brand-lockup" onClick={() => navigate('/')} type="button">
-        <span>Pawkawa</span>
-        <small>Trusted Pet Food Intelligence</small>
+        <span className="brand-mark" aria-hidden="true">
+          <span />
+        </span>
+        <span className="brand-copy">
+          <strong>Pawkawa</strong>
+          <small>Trusted Pet Food Intelligence</small>
+        </span>
       </button>
       <nav className="view-tabs" aria-label="Primary navigation">
         {links.map(([name, path, label]) => (
@@ -151,6 +158,9 @@ export function AppHeader({ route, navigate }: { route: RouteName; navigate: (pa
           </button>
         ))}
       </nav>
+      <div className="header-tools">
+        <span className="locale-pill">AU</span>
+      </div>
     </header>
   );
 }

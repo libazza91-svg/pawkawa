@@ -1,5 +1,5 @@
 import { PetProfileInput, RecommendationConstraint, RecommendationContextResult, VerifiedProduct } from './types';
-import { verifiedProducts } from './product-insight-engine';
+import { verifiedProducts } from '../verified-products/catalog';
 import { buildProfileConstraints, buildRecommendationContextFromRules } from '../rules';
 
 /**

@@ -1,4 +1,17 @@
 -- ============================================================
+-- DEPRECATED — legacy UUID schema.
+--
+-- Do not use this file for current migrations.
+-- Current source of truth is the Drizzle integer schema under:
+--   backend/src/db/schema/*
+--
+-- Active migrations are ordered SQL files under:
+--   backend/src/db/migrations/*.sql
+--
+-- This file is preserved only as historical reference.
+-- ============================================================
+
+-- ============================================================
 -- 澳新宠物食品对比平台 - 数据库 Schema v0.1
 -- 启动日期: 2026-06-13
 -- 数据库: PostgreSQL 16+
@@ -143,6 +156,59 @@ CREATE TABLE sources (
 );
 
 CREATE INDEX idx_sources_product ON sources (product_id);
+
+-- ============================================================
+-- 6A. 零售商产品映射表
+-- ============================================================
+CREATE TABLE retailer_product_mappings (
+    mapping_id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    product_id          UUID REFERENCES products(product_id) ON DELETE SET NULL,
+    retailer            VARCHAR(200) NOT NULL,
+    retailer_product_id VARCHAR(200) NOT NULL,
+    product_key         TEXT NOT NULL,
+    product_name        TEXT NOT NULL,
+    brand_name          VARCHAR(200) NOT NULL,
+    species             VARCHAR(20) NOT NULL,
+    life_stage          VARCHAR(50),
+    pack_size           VARCHAR(80) NOT NULL,
+    pack_size_g         INT,
+    price_aud           NUMERIC(7,2),
+    source_url          TEXT NOT NULL,
+    source_type         VARCHAR(50) NOT NULL,
+    image_url           TEXT,
+    market_availability VARCHAR(20) NOT NULL,
+    metadata            JSONB DEFAULT '{}',
+    captured_at         TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE UNIQUE INDEX idx_retailer_product_mapping_unique
+ON retailer_product_mappings (retailer, retailer_product_id);
+
+CREATE INDEX idx_retailer_product_mapping_product_key
+ON retailer_product_mappings (product_key);
+
+-- ============================================================
+-- 6B. 产品图片元数据表
+-- ============================================================
+CREATE TABLE product_images (
+    image_id       UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    product_id     UUID REFERENCES products(product_id) ON DELETE SET NULL,
+    image_url      TEXT NOT NULL,
+    source_url     TEXT NOT NULL,
+    source_type    VARCHAR(50) NOT NULL,
+    retailer       VARCHAR(200),
+    alt_text       TEXT,
+    width          INT,
+    height         INT,
+    metadata       JSONB DEFAULT '{}',
+    captured_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE UNIQUE INDEX idx_product_images_source_image
+ON product_images (source_url, image_url);
+
+CREATE INDEX idx_product_images_product
+ON product_images (product_id);
 
 -- ============================================================
 -- 7. 健康规则表

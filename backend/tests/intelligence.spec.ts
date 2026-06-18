@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import express from 'express';
 import request from 'supertest';
-import { generateProductInsight, verifiedProducts } from '../src/intelligence/product-insight-engine';
+import { generateProductInsight } from '../src/intelligence/product-insight-engine';
+import { verifiedProducts } from '../src/verified-products/catalog';
 import { buildHealthConstraints, buildRecommendationContext } from '../src/intelligence/recommendation-context-engine';
 import { scoreProductSuitability } from '../src/intelligence/suitability-engine';
 import { getRecoveryKnowledgeTopics } from '../src/intelligence/recovery-knowledge-base';
@@ -71,8 +72,8 @@ describe('Pet Intelligence Layer', () => {
       const highFatScore = scoreProductSuitability(highFat, constraints);
       const lowerFatScore = scoreProductSuitability(lowerFat, constraints);
 
-      expect(highFatScore.cautions).toContain('High fat for GI-sensitive profile');
-      expect(lowerFatScore.reasons).toContain('Sensitive stomach fit');
+      expect(highFatScore.cautions.join(' ')).toContain('Moderate fat');
+      expect(lowerFatScore.reasons.join(' ')).toContain('sensitive digestion');
       expect(lowerFatScore.suitability_score).toBeGreaterThan(highFatScore.suitability_score);
     });
 

@@ -6,7 +6,7 @@ import { products, brands, productNutrition, productIngredients, productPrices }
 import { buildRecommendationContext } from '../intelligence/recommendation-context-engine';
 import { PetProfileInput, VerifiedProduct } from '../intelligence/types';
 import { slugifyProductName, toConfidencePercent, toVerificationGrade } from '../lib/product-slug';
-import { verifiedProducts } from '../intelligence/product-insight-engine';
+import { verifiedProducts } from '../verified-products/catalog';
 import { sendError, sendSuccess } from '../middleware/response';
 
 export const compareRouter = Router();
@@ -342,7 +342,7 @@ compareRouter.post('/', async (req: Request, res: Response) => {
 // POST /api/compare/recommend — Health-aware comparison ranking
 compareRouter.post('/recommend', async (req: Request, res: Response) => {
   try {
-    const { product_ids, product_slugs, species, age_years, breed, health_conditions, vet_prescription_required } = req.body;
+    const { product_ids, product_slugs, species, age_years, breed, need_codes, health_conditions, vet_prescription_required } = req.body;
     if (!(await checkConnection())) {
       const fallbackProducts = resolveFallbackProducts(product_ids, product_slugs);
       if (fallbackProducts.length < 2) {
@@ -353,6 +353,7 @@ compareRouter.post('/recommend', async (req: Request, res: Response) => {
         species,
         age_years: typeof age_years === 'number' ? age_years : 3,
         breed: typeof breed === 'string' ? breed : undefined,
+        need_codes: Array.isArray(need_codes) ? need_codes : undefined,
         health_conditions: health_conditions || [],
         vet_prescription_required: vet_prescription_required || false,
       };
@@ -420,6 +421,7 @@ compareRouter.post('/recommend', async (req: Request, res: Response) => {
       species,
       age_years: typeof age_years === 'number' ? age_years : 3,
       breed: typeof breed === 'string' ? breed : undefined,
+      need_codes: Array.isArray(need_codes) ? need_codes : undefined,
       health_conditions: health_conditions || [],
       vet_prescription_required: vet_prescription_required || false,
     };

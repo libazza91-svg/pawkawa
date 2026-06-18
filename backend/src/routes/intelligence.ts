@@ -1,7 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { z } from 'zod';
-import { findVerifiedProduct } from '../intelligence/product-insight-engine';
-import { generateProductIntelligenceV1 } from '../rules/suitability/suitability-engine';
+import { findVerifiedProduct, generateProductInsight } from '../intelligence/product-insight-engine';
 import { buildRecommendationContext } from '../intelligence/recommendation-context-engine';
 import { getRecoveryKnowledgeTopics } from '../intelligence/recovery-knowledge-base';
 import { sendError, sendSuccess } from '../middleware/response';
@@ -12,6 +11,9 @@ const contextInputSchema = z.object({
   species: z.enum(['CAT', 'DOG']),
   age_years: z.number().min(0).max(40),
   breed: z.string().trim().optional(),
+  need_codes: z
+    .array(z.enum(['INDOOR_CAT', 'SENSITIVE_STOMACH', 'WEIGHT_CONTROL', 'SENIOR_SUPPORT', 'RECOVERY_SUPPORT', 'KITTEN_GROWTH', 'EVERYDAY_ADULT']))
+    .optional(),
   health_conditions: z
     .array(z.enum(['GI_SENSITIVE', 'IBD_OR_CHRONIC_GI', 'POST_SURGERY', 'HEART_RISK', 'KIDNEY_SUPPORT', 'URINARY_SUPPORT']))
     .default([]),
@@ -25,7 +27,7 @@ intelligenceRouter.get('/product/:id', (req: Request, res: Response) => {
     return;
   }
 
-  sendSuccess(res, generateProductIntelligenceV1(product));
+  sendSuccess(res, generateProductInsight(product));
 });
 
 intelligenceRouter.post('/context', (req: Request, res: Response) => {

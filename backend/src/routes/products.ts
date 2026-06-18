@@ -7,7 +7,9 @@ import { sendSuccess, sendError } from '../middleware/response';
 import { ZodError } from 'zod';
 import { slugifyProductName, toConfidencePercent, toVerificationGrade } from '../lib/product-slug';
 import { checkConnection } from '../db/client';
-import { verifiedProducts } from '../intelligence/product-insight-engine';
+import { verifiedProducts } from '../verified-products/catalog';
+import { getProductOffers } from '../price-comparison/service';
+import { isMarketRegion, parseMarket } from '../price-comparison/markets';
 
 export const productsRouter = Router();
 
@@ -209,6 +211,26 @@ productsRouter.get(
       items: items.map(serializeProductListItem),
       pagination: { page, pageSize, total },
     });
+  })
+);
+
+// ── GET /api/products/:slug/offers — Price-first retailer offers ───
+productsRouter.get(
+  '/:slug/offers',
+  asyncHandler(async (req: Request, res: Response) => {
+    const rawMarket = req.query.market;
+    if (rawMarket !== undefined && !isMarketRegion(rawMarket)) {
+      sendError(res, 'INVALID_MARKET', 'market must be AU or NZ', 400);
+      return;
+    }
+
+    const result = await getProductOffers(req.params.slug, parseMarket(rawMarket));
+    if (!result) {
+      sendError(res, 'PRODUCT_NOT_FOUND', 'Product not found', 404);
+      return;
+    }
+
+    sendSuccess(res, result);
   })
 );
 

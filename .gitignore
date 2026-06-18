@@ -4,7 +4,12 @@ coverage/
 .DS_Store
 .env
 .env.*
+!.env.example
+!backend/.env.example
+!frontend/.env.example
 *.log
+build/
+.vite/
 backend/dist/
 backend/coverage/
 frontend/dist/

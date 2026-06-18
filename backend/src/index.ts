@@ -9,6 +9,11 @@ import { healthRouter } from './routes/health';
 import { importRouter } from './routes/import';
 import { metricsRouter } from './routes/metrics';
 import { intelligenceRouter } from './routes/intelligence';
+import { discoveryRouter } from './routes/discovery';
+import { verifiedProductsRouter } from './routes/verified-products';
+import { marketsRouter } from './routes/markets';
+import { searchRouter } from './routes/search';
+import { priceComparisonRouter } from './routes/price-comparison';
 import { errorHandler } from './middleware/errorHandler';
 import { swaggerSpec } from './swagger';
 
@@ -30,6 +35,11 @@ app.use('/api/compare', compareRouter);
 app.use('/api/import', importRouter);
 app.use('/api/metrics', metricsRouter);
 app.use('/api/intelligence', intelligenceRouter);
+app.use('/api/discovery', discoveryRouter);
+app.use('/api/verified-products', verifiedProductsRouter);
+app.use('/api/markets', marketsRouter);
+app.use('/api/search', searchRouter);
+app.use('/api/price-comparison', priceComparisonRouter);
 
 // ── Global error handler (must be after all routes) ────────────────
 app.use(errorHandler);

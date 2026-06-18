@@ -10,8 +10,12 @@
     "lint": "eslint src/",
     "test": "vitest run",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "tsx src/db/migrate.ts",
+    "db:migrate": "tsx -r dotenv/config src/db/migrate.ts",
     "db:seed": "tsx src/db/seed.ts",
+    "db:backfill:retail-offers": "tsx -r dotenv/config src/scripts/backfill-retail-offers.ts",
+    "report:offer-coverage": "tsx -r dotenv/config src/scripts/report-offer-coverage.ts",
+    "ingest:petstock-pilot": "tsx -r dotenv/config src/scripts/ingest-petstock-pilot.ts",
+    "ingest:petbarn-pilot": "tsx -r dotenv/config src/scripts/ingest-petbarn-pilot.ts",
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {

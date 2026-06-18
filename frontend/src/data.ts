@@ -43,6 +43,7 @@ export type Product = {
   controversialIngredients: string[];
   suitability: string[];
   prices: PriceSource[];
+  primaryImageUrl?: string;
 };
 
 export type Brand = {
@@ -222,8 +223,8 @@ export const products: Product[] = [
   }
 ];
 
-export const speciesOptions: Array<'All Species' | Species> = ['All Species', 'Cat', 'Dog'];
-export const lifeStageOptions: Array<'All Life Stages' | LifeStage> = ['All Life Stages', 'Kitten', 'Puppy', 'Adult', 'Senior'];
+export const speciesOptions: Array<'All Species' | Species> = ['All Species', 'Cat'];
+export const lifeStageOptions: Array<'All Life Stages' | LifeStage> = ['All Life Stages', 'Kitten', 'Adult', 'Senior'];
 export const gradeOptions: Array<'All Grades' | VerificationGrade> = ['All Grades', 'GOLD', 'SILVER', 'BRONZE', 'UNVERIFIED'];
 
 export function getAverageConfidence(items: Product[]) {
