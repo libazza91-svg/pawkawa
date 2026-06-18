@@ -75,11 +75,17 @@ function printSummary(report: ReturnType<typeof buildOfferCoverageAuditReport>) 
   console.log(`Petstock offers: ${summary.petstock_offer_count}`);
   console.log(`Petbarn offers: ${summary.petbarn_offer_count}`);
   console.log(`Multi-retailer products: ${summary.multi_retailer_product_count}`);
+  console.log(`Real-only multi-retailer products: ${summary.real_only_multi_retailer_product_count}`);
+  console.log(`Mixed-source multi-retailer products: ${summary.mixed_source_multi_retailer_product_count}`);
   console.log(`Stale offers: ${summary.stale_offer_count}`);
   console.log(`Missing last_checked: ${summary.missing_last_checked_count}`);
   console.log(`Homepage candidates: ${summary.homepage_candidate_count}`);
   console.log(`Source metadata available: ${summary.source_metadata_available}`);
-  console.log(`Unknown source offers: ${summary.unknown_source_count}`);
+  console.log(`Unknown source offers: ${summary.unknown_source_offer_count}`);
+  console.log(`Orphan offers: ${summary.orphan_offer_count}`);
+  console.log(`Orphan product slugs: ${summary.orphan_product_slugs.join(', ') || 'none'}`);
+  console.log(`Products where fixture is best price: ${summary.products_where_fixture_is_best_price.join(', ') || 'none'}`);
+  console.log(`Products with Pet Circle fixture: ${summary.products_with_pet_circle_fixture.join(', ') || 'none'}`);
   console.log(`Real ingestion offers: ${summary.real_ingestion_offer_count}`);
   console.log(`Fixture offers: ${summary.fixture_offer_count}`);
   console.log(`Seed offers: ${summary.seed_offer_count}`);

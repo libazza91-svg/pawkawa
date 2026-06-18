@@ -304,4 +304,11 @@ export const rawFixtureOffers: RetailOfferInput[] = [
   },
 ];
 
-export const fixtureRetailOffers: RetailOffer[] = rawFixtureOffers.map((offer) => calculateEffectivePrice(offer));
+export const fixtureRetailOffers: RetailOffer[] = rawFixtureOffers.map((offer) =>
+  calculateEffectivePrice({
+    ...offer,
+    metadata: {
+      source: 'fixture_in_memory_v1',
+    },
+  }),
+);

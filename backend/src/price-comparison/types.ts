@@ -36,6 +36,7 @@ export interface RetailOfferInput {
   shipping_threshold?: number;
   last_checked_at: string;
   primary_image_url?: string;
+  metadata?: Record<string, unknown>;
 }
 
 export interface RetailOffer extends RetailOfferInput {

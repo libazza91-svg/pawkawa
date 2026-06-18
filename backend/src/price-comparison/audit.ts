@@ -2,13 +2,7 @@ import { canonicalProducts } from './fixture-data';
 import { CanonicalProduct, MarketRegion, StockStatus } from './types';
 
 export type OfferCoverageStatus = 'NO_OFFERS' | 'LIMITED' | 'BASIC' | 'GOOD';
-export type OfferSourceType =
-  | 'petstock_ingestion_pilot_v1'
-  | 'petbarn_ingestion_pilot_v1'
-  | 'fixture'
-  | 'seed'
-  | 'demo'
-  | 'unknown';
+export type OfferSourceType = 'real_ingestion' | 'fixture' | 'seed' | 'demo' | 'unknown';
 export type OfferCoverageWarning =
   | 'NO_OFFERS'
   | 'ONLY_ONE_RETAILER'
@@ -28,6 +22,16 @@ export interface AuditRetailOfferRow {
   stock_status: StockStatus | string;
   last_checked_at: Date | null | string;
   metadata?: Record<string, unknown> | null;
+}
+
+export interface OrphanOfferAudit {
+  product_slug: string;
+  retailer_slug: string;
+  retailer_name: string;
+  market: MarketRegion;
+  source_type: OfferSourceType;
+  metadata_source?: string;
+  effective_price?: number;
 }
 
 export interface ProductCoverageAudit {
@@ -59,11 +63,18 @@ export interface OfferCoverageAuditSummary {
   petstock_offer_count: number;
   petbarn_offer_count: number;
   multi_retailer_product_count: number;
+  real_only_multi_retailer_product_count: number;
+  mixed_source_multi_retailer_product_count: number;
   stale_offer_count: number;
   missing_last_checked_count: number;
   homepage_candidate_count: number;
   source_metadata_available: boolean;
+  unknown_source_offer_count: number;
   unknown_source_count: number;
+  orphan_offer_count: number;
+  orphan_product_slugs: string[];
+  products_where_fixture_is_best_price: string[];
+  products_with_pet_circle_fixture: string[];
   source_breakdown: Record<OfferSourceType, number>;
   db_offer_count: number;
   real_ingestion_offer_count: number;
@@ -77,6 +88,7 @@ export interface OfferCoverageAuditReport {
   market: MarketRegion;
   summary: OfferCoverageAuditSummary;
   products: ProductCoverageAudit[];
+  orphan_offers: OrphanOfferAudit[];
 }
 
 const STALE_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
@@ -90,7 +102,7 @@ function asDate(value: Date | null | string | undefined): Date | null {
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
-function rawSourceValue(metadata?: Record<string, unknown> | null): string | null {
+export function rawSourceValue(metadata?: Record<string, unknown> | null): string | null {
   if (!metadata || typeof metadata !== 'object') return null;
   const source = metadata.source;
   return typeof source === 'string' && source.trim().length > 0 ? source.trim() : null;
@@ -99,12 +111,21 @@ function rawSourceValue(metadata?: Record<string, unknown> | null): string | nul
 export function classifyOfferSource(metadata?: Record<string, unknown> | null): OfferSourceType {
   const raw = rawSourceValue(metadata)?.toLowerCase();
   if (!raw) return 'unknown';
-  if (raw === 'petstock_ingestion_pilot_v1') return 'petstock_ingestion_pilot_v1';
-  if (raw === 'petbarn_ingestion_pilot_v1') return 'petbarn_ingestion_pilot_v1';
-  if (raw === 'fixture_backfill_v1' || raw.includes('fixture')) return 'fixture';
-  if (raw.includes('seed')) return 'seed';
-  if (raw.includes('demo')) return 'demo';
+  if (raw === 'petstock_ingestion_pilot_v1') return 'real_ingestion';
+  if (raw === 'petbarn_ingestion_pilot_v1') return 'real_ingestion';
+  if (raw === 'fixture_backfill_v1' || raw === 'fixture_in_memory_v1' || raw === 'fixture' || raw.includes('fixture')) return 'fixture';
+  if (raw.startsWith('seed') || raw.includes('seed')) return 'seed';
+  if (raw.startsWith('demo') || raw.includes('demo')) return 'demo';
   return 'unknown';
+}
+
+export function isRealIngestionOffer(offer: { metadata?: Record<string, unknown> | null }): boolean {
+  return classifyOfferSource(offer.metadata) === 'real_ingestion';
+}
+
+export function isFixtureLikeOffer(offer: { metadata?: Record<string, unknown> | null }): boolean {
+  const source = classifyOfferSource(offer.metadata);
+  return source === 'fixture' || source === 'seed' || source === 'demo';
 }
 
 export function coverageStatusForRetailerCount(retailerCount: number): OfferCoverageStatus {
@@ -158,7 +179,15 @@ function productWarnings(
 }
 
 function hasRealIngestionSource(sourceTypes: OfferSourceType[]): boolean {
-  return sourceTypes.some((sourceType) => sourceType === 'petstock_ingestion_pilot_v1' || sourceType === 'petbarn_ingestion_pilot_v1');
+  return sourceTypes.some((sourceType) => sourceType === 'real_ingestion');
+}
+
+function realRetailerCount(offers: AuditRetailOfferRow[]): number {
+  return new Set(offers.filter(isRealIngestionOffer).map((offer) => offer.retailer_slug)).size;
+}
+
+function hasPetCircleFixture(offers: AuditRetailOfferRow[]): boolean {
+  return offers.some((offer) => offer.retailer_slug === 'pet-circle' && classifyOfferSource(offer.metadata) === 'fixture');
 }
 
 export function buildOfferCoverageAuditReport(
@@ -168,6 +197,7 @@ export function buildOfferCoverageAuditReport(
   const market = options.market ?? 'AU';
   const now = options.now ?? new Date();
   const catalog = options.catalog ?? canonicalProducts.filter((product) => product.species === 'CAT');
+  const catalogSlugs = new Set(catalog.map((product) => product.slug));
 
   const marketOffers = offers.filter((offer) => offer.market === market);
   const offersByProduct = new Map<string, AuditRetailOfferRow[]>();
@@ -187,7 +217,10 @@ export function buildOfferCoverageAuditReport(
       const bestOffer = bestBuyableOffer(productOffers);
       const sourceTypes = [...new Set(productOffers.map((offer) => classifyOfferSource(offer.metadata)))];
       const lastChecked = latestCheckedAt(productOffers);
-      const homepageCandidate = productOffers.length > 0 && Boolean(bestOffer?.effective_price !== null && hasInStockOffer(productOffers));
+      const homepageCandidate =
+        productOffers.length > 0 &&
+        Boolean(bestOffer?.effective_price !== null && hasInStockOffer(productOffers)) &&
+        hasRealIngestionSource(sourceTypes);
 
       return {
         product_slug: product.slug,
@@ -213,8 +246,7 @@ export function buildOfferCoverageAuditReport(
     });
 
   const sourceBreakdown: Record<OfferSourceType, number> = {
-    petstock_ingestion_pilot_v1: 0,
-    petbarn_ingestion_pilot_v1: 0,
+    real_ingestion: 0,
     fixture: 0,
     seed: 0,
     demo: 0,
@@ -237,6 +269,31 @@ export function buildOfferCoverageAuditReport(
     }
   }
 
+  const orphanOffers: OrphanOfferAudit[] = marketOffers
+    .filter((offer) => !catalogSlugs.has(offer.product_slug))
+    .map((offer) => ({
+      product_slug: offer.product_slug,
+      retailer_slug: offer.retailer_slug,
+      retailer_name: offer.retailer_name,
+      market: offer.market,
+      source_type: classifyOfferSource(offer.metadata),
+      metadata_source: rawSourceValue(offer.metadata) ?? undefined,
+      effective_price: offer.effective_price ?? undefined,
+    }))
+    .sort((left, right) => left.product_slug.localeCompare(right.product_slug) || left.retailer_slug.localeCompare(right.retailer_slug));
+
+  const productsWhereFixtureIsBestPrice = products
+    .filter((product) => {
+      const productOffers = offersByProduct.get(product.product_slug) ?? [];
+      const best = bestBuyableOffer(productOffers);
+      return best ? isFixtureLikeOffer(best) : false;
+    })
+    .map((product) => product.product_slug);
+
+  const productsWithPetCircleFixture = products
+    .filter((product) => hasPetCircleFixture(offersByProduct.get(product.product_slug) ?? []))
+    .map((product) => product.product_slug);
+
   const summary: OfferCoverageAuditSummary = {
     canonical_products_total: catalog.length,
     products_with_any_offer: products.filter((product) => product.offer_count > 0).length,
@@ -251,14 +308,28 @@ export function buildOfferCoverageAuditReport(
     petstock_offer_count: marketOffers.filter((offer) => offer.retailer_slug === 'petstock').length,
     petbarn_offer_count: marketOffers.filter((offer) => offer.retailer_slug === 'petbarn').length,
     multi_retailer_product_count: products.filter((product) => product.retailer_count >= 2).length,
+    real_only_multi_retailer_product_count: products.filter((product) => {
+      const productOffers = offersByProduct.get(product.product_slug) ?? [];
+      return realRetailerCount(productOffers) >= 2 && productOffers.every(isRealIngestionOffer);
+    }).length,
+    mixed_source_multi_retailer_product_count: products.filter((product) => {
+      const productOffers = offersByProduct.get(product.product_slug) ?? [];
+      const sources = new Set(productOffers.map((offer) => classifyOfferSource(offer.metadata)));
+      return product.retailer_count >= 2 && sources.size > 1;
+    }).length,
     stale_offer_count: staleOfferCount,
     missing_last_checked_count: missingLastCheckedCount,
     homepage_candidate_count: products.filter((product) => product.homepage_candidate).length,
     source_metadata_available: sourceMetadataAvailable,
+    unknown_source_offer_count: sourceBreakdown.unknown,
     unknown_source_count: sourceBreakdown.unknown,
+    orphan_offer_count: orphanOffers.length,
+    orphan_product_slugs: [...new Set(orphanOffers.map((offer) => offer.product_slug))].sort(),
+    products_where_fixture_is_best_price: productsWhereFixtureIsBestPrice,
+    products_with_pet_circle_fixture: productsWithPetCircleFixture,
     source_breakdown: sourceBreakdown,
     db_offer_count: marketOffers.length,
-    real_ingestion_offer_count: sourceBreakdown.petstock_ingestion_pilot_v1 + sourceBreakdown.petbarn_ingestion_pilot_v1,
+    real_ingestion_offer_count: sourceBreakdown.real_ingestion,
     fixture_offer_count: sourceBreakdown.fixture,
     seed_offer_count: sourceBreakdown.seed,
     demo_offer_count: sourceBreakdown.demo,
@@ -269,5 +340,6 @@ export function buildOfferCoverageAuditReport(
     market,
     summary,
     products,
+    orphan_offers: orphanOffers,
   };
 }

@@ -161,6 +161,20 @@ const petbarnManifestItem: PetbarnPilotManifestItem = {
 
 const tempDirs: string[] = [];
 
+async function withFixtureFallback<T>(fn: () => Promise<T>): Promise<T> {
+  const original = process.env.PRICE_COMPARISON_FIXTURE_FALLBACK;
+  process.env.PRICE_COMPARISON_FIXTURE_FALLBACK = 'true';
+  try {
+    return await fn();
+  } finally {
+    if (original === undefined) {
+      delete process.env.PRICE_COMPARISON_FIXTURE_FALLBACK;
+    } else {
+      process.env.PRICE_COMPARISON_FIXTURE_FALLBACK = original;
+    }
+  }
+}
+
 function makeParsedOffer(overrides: Partial<ParsedRetailOffer> = {}): ParsedRetailOffer {
   return {
     retailer_name: 'Petstock',
@@ -797,7 +811,7 @@ describe('Retailer ingestion pilot', () => {
   });
 
   it('keeps search api response shape unchanged', async () => {
-    const response = await request(app).get('/api/search/products?q=royal canin&market=AU');
+    const response = await withFixtureFallback(() => request(app).get('/api/search/products?q=royal canin&market=AU'));
     expect(response.status).toBe(200);
     expect(Array.isArray(response.body.data.items)).toBe(true);
     expect(response.body.data.items[0]).toEqual(
@@ -811,7 +825,7 @@ describe('Retailer ingestion pilot', () => {
   });
 
   it('keeps price comparison api response shape unchanged', async () => {
-    const response = await request(app).get('/api/price-comparison/royal-canin-indoor-adult-4000g?market=AU');
+    const response = await withFixtureFallback(() => request(app).get('/api/price-comparison/royal-canin-indoor-adult-4000g?market=AU'));
     expect(response.status).toBe(200);
     expect(response.body.data).toEqual(
       expect.objectContaining({
@@ -824,7 +838,7 @@ describe('Retailer ingestion pilot', () => {
   });
 
   it('keeps product offers api response shape unchanged', async () => {
-    const response = await request(app).get('/api/products/royal-canin-indoor-adult-4000g/offers?market=AU');
+    const response = await withFixtureFallback(() => request(app).get('/api/products/royal-canin-indoor-adult-4000g/offers?market=AU'));
     expect(response.status).toBe(200);
     expect(response.body.data).toEqual(
       expect.objectContaining({

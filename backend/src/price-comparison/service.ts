@@ -1,6 +1,7 @@
 import { verifiedProducts } from '../verified-products/catalog';
+import { isRealIngestionOffer } from './audit';
 import { DbPriceComparisonRepository } from './db-repository';
-import { FallbackPriceComparisonRepository } from './fallback-repository';
+import { FallbackPriceComparisonRepository, fixtureFallbackEnabled } from './fallback-repository';
 import { fixturePriceComparisonRepository } from './fixture-repository';
 import { DEFAULT_MARKET, currencyForMarket, marketConfigs } from './markets';
 import { PriceComparisonRepository } from './repository';
@@ -25,6 +26,11 @@ function lowestUnitOffer(offers: RetailOffer[]): RetailOffer | null {
   return buyableOffers(offers).sort((a, b) => a.unit_price_per_kg - b.unit_price_per_kg)[0] ?? null;
 }
 
+function publicVisibleOffers(offers: RetailOffer[]): RetailOffer[] {
+  if (fixtureFallbackEnabled()) return offers;
+  return offers.filter(isRealIngestionOffer);
+}
+
 function textMatches(product: CanonicalProduct, query: string): boolean {
   const haystack = `${product.product_name} ${product.brand_name} ${product.formula_tokens.join(' ')} ${product.flavour_tokens.join(' ')}`.toLowerCase();
   return query
@@ -43,7 +49,7 @@ export class PriceComparisonService {
 
     const results = await Promise.all(
       products.map(async (product) => {
-        const offers = await this.repository.listOffersForProduct(product.slug, market);
+        const offers = publicVisibleOffers(await this.repository.listOffersForProduct(product.slug, market));
         const best = bestOffer(offers);
         const lowestUnit = lowestUnitOffer(offers);
         return {
@@ -82,14 +88,14 @@ export class PriceComparisonService {
       product,
       market,
       currency: currencyForMarket(market),
-      offers: await this.repository.listOffersForProduct(product.slug, market),
+      offers: publicVisibleOffers(await this.repository.listOffersForProduct(product.slug, market)),
     };
   }
 
   async getPriceComparison(slug: string, market: MarketRegion = DEFAULT_MARKET): Promise<PriceComparisonResponse | null> {
     const product = await this.repository.findCanonicalProduct(slug);
     if (!product) return null;
-    const offers = await this.repository.listOffersForProduct(product.slug, market);
+    const offers = publicVisibleOffers(await this.repository.listOffersForProduct(product.slug, market));
     const best = bestOffer(offers);
     const lowestUnit = lowestUnitOffer(offers);
     const checkedTimes = offers.map((offer) => offer.last_checked_at).sort();

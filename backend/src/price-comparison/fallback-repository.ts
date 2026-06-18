@@ -1,10 +1,20 @@
 import { PriceComparisonRepository } from './repository';
 import { CanonicalProduct, MarketRegion, RetailOffer } from './types';
 
-function fixtureFallbackEnabled(): boolean {
-  if (process.env.PRICE_COMPARISON_FIXTURE_FALLBACK === 'true') return true;
-  if (process.env.PRICE_COMPARISON_FIXTURE_FALLBACK === 'false') return false;
-  return process.env.NODE_ENV !== 'production';
+let warnedAboutFixtureFallback = false;
+
+export function fixtureFallbackEnabled(): boolean {
+  return process.env.PRICE_COMPARISON_FIXTURE_FALLBACK === 'true';
+}
+
+function warnIfUnsafeFixtureFallbackEnabled(): void {
+  if (!fixtureFallbackEnabled() || warnedAboutFixtureFallback) return;
+  const nodeEnv = process.env.NODE_ENV;
+  const isSafeLocalContext = nodeEnv === 'test' || nodeEnv === 'development' || !nodeEnv;
+  if (!isSafeLocalContext) {
+    console.warn('WARNING: Fixture fallback is enabled. Do not use this mode for staging/public price results.');
+    warnedAboutFixtureFallback = true;
+  }
 }
 
 export class FallbackPriceComparisonRepository implements PriceComparisonRepository {
@@ -42,6 +52,7 @@ export class FallbackPriceComparisonRepository implements PriceComparisonReposit
     fallbackRead: () => Promise<RetailOffer[]>,
     label: string,
   ): Promise<RetailOffer[]> {
+    warnIfUnsafeFixtureFallbackEnabled();
     try {
       const rows = await primaryRead();
       if (rows.length > 0 || !fixtureFallbackEnabled()) return rows;

@@ -72,6 +72,7 @@ function hydrateRetailOffer(row: RetailOfferRow, product: CanonicalProduct): Ret
     shipping_threshold: numberOrUndefined(row.shipping_threshold),
     last_checked_at: isoString(row.last_checked_at),
     primary_image_url: product.primary_image_url,
+    metadata: (row.metadata ?? undefined) as Record<string, unknown> | undefined,
   };
 }
 

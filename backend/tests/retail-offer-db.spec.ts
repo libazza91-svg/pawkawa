@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { describe, expect, it, vi } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { backfillRetailOffers } from '../src/scripts/backfill-retail-offers';
 import { fixtureRetailOffers } from '../src/price-comparison/fixture-data';
 import { FixturePriceComparisonRepository } from '../src/price-comparison/fixture-repository';
@@ -106,6 +106,20 @@ class ThrowingRepository extends FixturePriceComparisonRepository {
 }
 
 describe('DB-backed retail offer stabilization', () => {
+  const originalFixtureFallback = process.env.PRICE_COMPARISON_FIXTURE_FALLBACK;
+
+  beforeAll(() => {
+    process.env.PRICE_COMPARISON_FIXTURE_FALLBACK = 'true';
+  });
+
+  afterAll(() => {
+    if (originalFixtureFallback === undefined) {
+      delete process.env.PRICE_COMPARISON_FIXTURE_FALLBACK;
+    } else {
+      process.env.PRICE_COMPARISON_FIXTURE_FALLBACK = originalFixtureFallback;
+    }
+  });
+
   it('declares a unique index for current retail offers', () => {
     const migration = fs.readFileSync(path.resolve(__dirname, '../src/db/migrations/005_add_price_comparison_core.sql'), 'utf8');
     expect(migration).toContain('idx_retail_offers_unique_current_offer');

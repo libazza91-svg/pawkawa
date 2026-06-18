@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import express from 'express';
 import request from 'supertest';
 import { calculateEffectivePrice } from '../src/price-comparison/effective-price';
@@ -41,6 +41,19 @@ const baseOffer = {
 
 describe('Price Comparison Core', () => {
   const app = createApp();
+  const originalFixtureFallback = process.env.PRICE_COMPARISON_FIXTURE_FALLBACK;
+
+  beforeAll(() => {
+    process.env.PRICE_COMPARISON_FIXTURE_FALLBACK = 'true';
+  });
+
+  afterAll(() => {
+    if (originalFixtureFallback === undefined) {
+      delete process.env.PRICE_COMPARISON_FIXTURE_FALLBACK;
+    } else {
+      process.env.PRICE_COMPARISON_FIXTURE_FALLBACK = originalFixtureFallback;
+    }
+  });
 
   it('defines AU and NZ market regions', () => {
     expect(isMarketRegion('AU')).toBe(true);
