@@ -15,6 +15,7 @@
     "db:backfill:retail-offers": "tsx -r dotenv/config src/scripts/backfill-retail-offers.ts",
     "report:offer-coverage": "tsx -r dotenv/config src/scripts/report-offer-coverage.ts",
     "cleanup:price-source-hygiene": "tsx -r dotenv/config src/scripts/cleanup-price-source-hygiene.ts",
+    "gate:staging-readiness": "tsx -r dotenv/config src/scripts/gate-staging-readiness.ts",
     "ingest:petstock-pilot": "tsx -r dotenv/config src/scripts/ingest-petstock-pilot.ts",
     "ingest:petbarn-pilot": "tsx -r dotenv/config src/scripts/ingest-petbarn-pilot.ts",
     "db:studio": "drizzle-kit studio"

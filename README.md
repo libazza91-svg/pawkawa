@@ -13,16 +13,15 @@ This repository contains the current frontend prototype and backend API for veri
 
 ## Current Sprint
 
-`Sprint 2.0 — DB-backed Retail Offers` is the active implementation sprint.
+`Sprint 2.8 — MVP Staging Readiness & Data Integrity Gate` is the active implementation sprint.
 
 Focus:
 
-- DB-backed `retail_offers`
-- DB-backed `price_snapshots`
-- Repository abstraction for price comparison data
-- Idempotent fixture-to-DB backfill
-- Conservative effective price calculation
-- AU / NZ separation at repository level
+- Controlled staging demo readiness
+- Source hygiene and fixture contamination checks
+- Demo product whitelist
+- Read-only data integrity gate
+- Orphan row warning policy
 - Public price API response shape stability
 
 Explicitly paused:
@@ -36,6 +35,8 @@ Explicitly paused:
 - Product discovery expansion
 - Frontend redesign
 - New connectors and scraping logic
+- DB schema changes
+- Cleanup execution
 
 ## Current Status
 
@@ -62,6 +63,9 @@ Completed in the current branch:
 - `GET /api/price-comparison/:slug/offers`
 - `GET /api/price-comparison/:slug`
 - Retail offer backfill command: `cd /Users/barryli/Desktop/PetFoodCompare/backend && npm run db:backfill:retail-offers`
+- Source hygiene report command: `cd /Users/barryli/Desktop/PetFoodCompare/backend && npm run report:offer-coverage`
+- Source hygiene dry-run command: `cd /Users/barryli/Desktop/PetFoodCompare/backend && npm run cleanup:price-source-hygiene`
+- Staging readiness gate command: `cd /Users/barryli/Desktop/PetFoodCompare/backend && npm run gate:staging-readiness`
 
 Current runtime note:
 
@@ -111,7 +115,12 @@ Checks:
 npm run build
 npx tsc --noEmit
 npm test
+npm run report:offer-coverage
+npm run cleanup:price-source-hygiene
+npm run gate:staging-readiness
 ```
+
+For staging/public demo, `PRICE_COMPARISON_FIXTURE_FALLBACK` must not be `true`. The cleanup command above is a dry-run only; do not run `npm run cleanup:price-source-hygiene -- --execute` unless a later approved cleanup sprint explicitly authorizes it.
 
 ### Frontend
 
