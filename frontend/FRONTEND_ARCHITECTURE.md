@@ -1,6 +1,15 @@
 # Pawkawa Frontend Architecture
 
-This frontend is the current Vite + React review surface for Pawkawa, a trusted pet food intelligence platform for Australia and New Zealand.
+This frontend is the current Vite + React review surface for Pawkawa. Pawkawa is currently an AU-first cat food price comparison MVP focused on tracked retailer offers.
+
+Current public MVP positioning:
+
+- AU cat food price comparison is the active scope.
+- Petstock and Petbarn are the current tracked retailer sources.
+- NZ is future scope and may appear as coming later, but it is not current active coverage.
+- `Find Prices` is the primary MVP path.
+- `Product Compare` is secondary product context.
+- Nutrition and product context are secondary and must not be framed as medical advice.
 
 ## Main Locations
 
@@ -16,11 +25,11 @@ This frontend is the current Vite + React review surface for Pawkawa, a trusted 
 
 ## Implemented Routes
 
-- `/`: Landing page with hero, trust highlights, search entry, featured verified products, and how-it-works.
-- `/search`: Product search with keyword, brand, species, life stage, verification grade, and price range filters.
+- `/`: Landing page with AU cat food price-search hero, tracked price examples, and secondary trust/context entry points.
+- `/search`: Primary Find Prices route for exact cat food search and tracked retailer offer summaries.
 - `/price/[slug]`: Price-first product comparison page with best price, retailer offers, conditional price notes, stock status, and secondary nutrition/suitability context.
-- `/product/[slug]`: Product detail profile with nutrition cards, verification panel, ingredients, prices, nutrition table, suitability tags, and disclaimer.
-- `/compare`: Comparison page for 2-4 products with selector, comparison table, difference highlights, ingredient comparison, and rule-based explanation copy.
+- `/product/[slug]`: Legacy product detail profile with nutrition cards, verification panel, ingredients, prices, nutrition table, suitability tags, and disclaimer.
+- `/compare`: Secondary Product Compare page for 2-4 products with selector, comparison table, difference highlights, ingredient comparison, and rule-based explanation copy.
 - `/brand/[slug]`: Brand profile with brand header, product list, and data quality summary.
 - `/learn`: Editorial knowledge surface for explaining price-check behavior, content standards, and future education principles.
 - `/about`: Trust and methodology page for information sources, comparison rules, and confidence testing principles.
@@ -42,11 +51,11 @@ The prototype uses a small History API router inside `App.tsx` instead of adding
 
 ## UX Principle
 
-The UI uses progressive disclosure: everyday users see simple actions, plain-language verdicts, and the most important nutrition, price, and trust signals first. Technical evidence stays available, but should never dominate the initial reading path.
+The UI uses progressive disclosure: everyday users should see exact product search, tracked retailer prices, unit price, stock and coverage first. Nutrition, suitability and evidence remain available as secondary context, but should never dominate the initial buying-price path or imply medical advice.
 
 ## Backend Intelligence Layer
 
-Sprint 1.4B moved business logic out of React. The frontend should render backend-owned intelligence outputs and should not recreate nutrition interpretation rules locally.
+Sprint 1.4B moved business logic out of React. This layer remains a future decision-assistant direction, not the primary public MVP surface. The frontend should render backend-owned intelligence outputs and should not recreate nutrition interpretation rules locally.
 
 - Backend product insight engine: `/Users/barryli/Desktop/PetFoodCompare/backend/src/intelligence/product-insight-engine.ts`
 - Backend recovery knowledge base: `/Users/barryli/Desktop/PetFoodCompare/backend/src/intelligence/recovery-knowledge-base.ts`
@@ -73,12 +82,12 @@ The backend returns suitability scoring, constraints, recommendations, and warni
 
 ## Verified Product API V1
 
-Sprint 1.7 adds a stable product data outlet for frontend cards, search results, product detail pages, compare selectors, and need-first browsing.
+Sprint 1.7 adds a stable product data outlet for frontend cards, search results, product detail pages, and compare selectors. Need-first browsing is future direction and should not overtake the current price-first MVP.
 
 - Product list and detail rendering should prefer `/api/verified-products`.
 - The frontend keeps `data.ts` fixtures only as fallback display data and compatibility scaffolding.
 - Product cards should render `quick_verdict`, `strengths`, `best_for`, `considerations`, `confidence`, `trust_grade`, pricing, and image metadata from backend responses.
-- Product detail pages should use backend sections for verdict, suitability, nutrition, ingredients, retail offers, evidence refs, image metadata, and disclaimer flags.
+- Product detail pages should use backend sections for verdict, suitability, nutrition, ingredients, retail offers, evidence refs, image metadata, and disclaimer flags, with price context kept primary in public MVP routes.
 - The frontend must not duplicate product insight or suitability scoring rules.
 
 Contract docs:
@@ -100,7 +109,7 @@ Sprint 1.9 makes price comparison visible in the frontend without a full redesig
 Sprint 1.9B clarifies the first impression:
 
 - Homepage headline should communicate cat food price comparison, not general pet intelligence.
-- Navigation labels use `Find Prices` and `Compare Foods` to separate retailer price comparison from food-to-food comparison.
+- Navigation labels use `Find Prices` and `Product Compare` to separate the primary retailer price path from secondary food-to-food context.
 - Price result cards prioritize product image/fallback, best available price, unit price, best retailer, offer count, and market/currency.
 - Retail offer rows show a simpler first layer: retailer, best available price, unit price, stock, deal notes, and buy action.
 - Member and coupon prices remain conditional and are not styled as guaranteed best prices.
@@ -118,7 +127,14 @@ Sprint 2.3 improves price comparison MVP readiness without changing the API cont
 - Low-data states are shown explicitly for no-offer and single-retailer products.
 - Trust wording stays restrained: price pages should explain that prices are based on currently tracked retailers and conditional deals are shown separately.
 - Homepage no longer mixes retailer result cards directly into the hero search block; price matches are shown in a separate section below the hero.
-- Homepage no longer uses nutrition/product-context cards as the main continuation path; instead it points users toward Compare Foods, Learn, and About.
+- Homepage no longer uses nutrition/product-context cards as the main continuation path; instead it points users toward Product Compare, Learn, and About after price checking.
+
+Sprint 3.0 tightens public MVP positioning:
+
+- `Find Prices` is the primary MVP path.
+- `Product Compare` is presented as a secondary context tool, not the main buying decision path.
+- Learn and About copy explain tracked retailers, conditional prices, source hygiene, and coverage limitations without implying whole-market coverage.
+- Public-facing copy should use restrained claims such as `best price found from tracked retailers` and avoid `cheapest in Australia`.
 
 ## Future I18n Plan
 
@@ -162,7 +178,7 @@ The compare page has been partially stabilized around real backend APIs.
 - Product selection should come from backend product lists, not hardcoded mock ids.
 - The compare selector now prefers `/api/verified-products` list data.
 - Frontend compare state now prefers `product_slugs`.
-- Compare tables and recommendation panels should be rendered from API responses, not recomputed in React.
+- Compare tables and rule-based context panels should be rendered from API responses, not recomputed in React.
 - Mock fixtures may still exist for UI scaffolding, but they should be treated as fallback display data only.
 
 ## Known Architecture Risks

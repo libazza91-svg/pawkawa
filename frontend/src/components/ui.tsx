@@ -135,7 +135,7 @@ export function AppHeader({ route, navigate }: { route: RouteName; navigate: (pa
   const links: Array<[RouteName, string, string]> = [
     ['landing', '/', 'Home'],
     ['search', '/search', 'Find Prices'],
-    ['compare', '/compare', 'Compare Foods'],
+    ['compare', '/compare', 'Product Compare'],
     ['learn', '/learn', 'Learn'],
     ['about', '/about', 'About']
   ];
@@ -144,11 +144,11 @@ export function AppHeader({ route, navigate }: { route: RouteName; navigate: (pa
     <header className="app-header">
       <button className="brand-lockup" onClick={() => navigate('/')} type="button">
         <span className="brand-mark" aria-hidden="true">
-          <span />
+          <img alt="" src="/logo.png" />
         </span>
         <span className="brand-copy">
           <strong>Pawkawa</strong>
-          <small>Trusted Pet Food Intelligence</small>
+          <small>Cat Food Price Checks</small>
         </span>
       </button>
       <nav className="view-tabs" aria-label="Primary navigation">

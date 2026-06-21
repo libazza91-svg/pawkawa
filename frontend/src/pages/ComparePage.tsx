@@ -70,24 +70,36 @@ export function ComparePage({
 
   return (
     <main className="page-stack">
-      <section className="compare-journal-hero">
-        <div className="compare-journal-copy">
-          <p className="eyebrow">Compare Foods</p>
-          <h1>What matters most for your pet today?</h1>
-          <p className="body-copy">Pawkawa starts with the practical answer first, then opens the detailed evidence only when you need it.</p>
+      <section className="hero-journal compare-hero-journal">
+        <div className="hero-copy-stack compare-copy-stack">
+          <p className="eyebrow">Secondary Tool</p>
+          <h1>
+            <span>Compare product context</span>
+            <span>after checking prices.</span>
+          </h1>
+          <p className="hero-copy">Price checking is the primary MVP path. Use this experimental view when you want nutrition, ingredient and confidence context side by side.</p>
           <button className="primary-button" onClick={() => navigate('/search')} type="button">
-            Search and add product
+            Find prices first
           </button>
         </div>
-        <div className="compare-mascot-card">
-          <div className="compare-mascot-slot">
-            <img alt="Compare mascot placeholder" src="https://placehold.co/260x220/f5ecda/6a5d50?text=Compare+Mascot" />
-          </div>
-          <div className="compare-mascot-note">
-            <strong>Pawkawa is comparing for you.</strong>
-            <span>Higher protein, lower cost, and stronger verification are pulled forward first.</span>
+        <div className="hero-illustration-card compare-illustration-card">
+          <div className="hero-illustration-stage">
+            <div className="hero-mascot-bubble compare-mascot-bubble">
+              <strong>Compare after price checks.</strong>
+              <span>Use Product Compare after checking tracked retailer prices when you want nutrition, ingredient and confidence context side by side.</span>
+            </div>
+            <div className="hero-illustration-placeholder compare-illustration-placeholder">
+              <img alt="Pawkawa compare mascot illustration" src="/reference/pawkawa-compare-mascot.png" />
+            </div>
           </div>
         </div>
+      </section>
+
+      <section className="panel">
+        <SectionHeader eyebrow="MVP Positioning" title="This is not the main price-check path." />
+        <p className="body-copy">
+          For public MVP, start with Find Prices. Product Compare remains a supporting context tool for users who want to inspect nutrition, ingredient and confidence differences after they know where the product can be bought.
+        </p>
       </section>
 
       <section className="panel compare-selection-card">

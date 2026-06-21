@@ -55,9 +55,9 @@ const defaultFilters: Filters = {
 
 const homeNextSteps = [
   {
-    title: 'Compare foods side by side',
-    note: 'Move to Compare Foods when you want to judge ingredients, nutrition and confidence between products.',
-    actionLabel: 'Open Compare Foods',
+    title: 'Compare product context',
+    note: 'Use Product Compare after price checking when you want to review nutrition, ingredients and confidence side by side.',
+    actionLabel: 'Open Product Compare',
     href: '/compare'
   },
   {
@@ -75,48 +75,73 @@ const homeNextSteps = [
 ] as const;
 
 const priceSearchExamples = ['Royal Canin Indoor 4kg', 'Black Hawk Indoor Chicken', 'Ziwi Peak cat food'] as const;
+const homepagePreviewSlugs = [
+  'royal-canin-indoor-adult-4000g',
+  'black-hawk-indoor-chicken-rice-2000g',
+  'hills-science-diet-indoor-adult-4000g'
+] as const;
 
 const trustReasons = [
   {
-    title: 'Multiple source verification',
-    body: 'We cross-check official brand pages, retailer listings, and normalized ingredient records before we show a verdict.'
+    title: 'Tracked retailer pricing',
+    body: 'We compare offers from retailers currently connected to the MVP and label coverage so you know how much of the market is represented.'
   },
   {
-    title: 'Conclusion first, evidence second',
-    body: 'Pet parents get the quick answer first, then the numbers, ingredients, and source detail when they want to go deeper.'
+    title: 'Conditional prices stay separate',
+    body: 'Member, coupon and minimum-spend prices are shown as conditions, not treated as guaranteed best price.'
   },
   {
-    title: 'Built for Australian households',
-    body: 'Pricing, availability, and product framing stay local so the recommendations feel practical instead of generic.'
+    title: 'AU-first and source-gated',
+    body: 'Public pages rely on AU tracked retailer data and source hygiene checks before a product is used in demos or ranking.'
   }
 ] as const;
 
 const learnTopics = [
   {
-    title: 'How we build a usable price check',
-    body: 'We start with exact product matching, then group retailer offers under one canonical cat food so you can compare price, stock and unit cost without reading duplicate listings.'
+    title: 'How a price check is built',
+    body: 'Pawkawa starts with an exact cat food product, then groups matching retailer offers under the same canonical product so you can compare price, stock and unit cost.'
   },
   {
-    title: 'Why we do not overclaim',
-    body: 'Pawkawa shows the best price found from tracked retailers, not the entire internet. Membership, coupon and minimum-spend offers stay visibly conditional so the page stays honest.'
+    title: 'What tracked retailers means',
+    body: 'Tracked retailers are sources currently connected, checked and allowed into public ranking. This is different from claiming full coverage of every Australian store.'
   },
   {
-    title: 'How learning content should grow',
-    body: 'Future guides should be written from multiple source categories, checked for agreement, and then rewritten into plain language rather than copied from a single brand or knowledge base.'
+    title: 'Why source freshness matters',
+    body: 'Prices, stock and promotions can change quickly. Last-checked labels and coverage notes help you decide whether a result is current enough to trust.'
+  },
+  {
+    title: 'Why member and coupon prices are separate',
+    body: 'A lower price is only comparable when every shopper can use it. Membership, coupon and minimum-spend prices are shown as conditional context, not as the main winning price.'
+  },
+  {
+    title: 'How coverage labels work',
+    body: 'Coverage labels describe how many tracked retailers currently have offers for the product. Limited coverage is still shown honestly, but it should not be mistaken for whole-market coverage.'
+  },
+  {
+    title: 'What Pawkawa does not claim yet',
+    body: 'Pawkawa does not claim to be the cheapest in Australia, does not replace retailer checkout pages, and does not provide veterinary treatment advice.'
   }
 ] as const;
 
 const aboutMethodSections = [
   {
-    title: 'Information sources',
+    title: 'AU-first scope',
     points: [
-      'Official brand product pages for formula identity and product positioning.',
-      'Retailer product pages for live price, stock status, pack size and promotion context.',
-      'Structured product records for normalization, canonical matching and evidence linking.'
+      'The current MVP focuses on Australian cat food price comparison.',
+      'New Zealand support is planned structurally, but should stay disabled until NZ retailer data is separately validated.',
+      'Dog food and medical recommendation workflows are outside the current public MVP boundary.'
     ]
   },
   {
-    title: 'How we compare',
+    title: 'Current tracked retailers',
+    points: [
+      'Petstock and Petbarn controlled ingestion are the current real retailer sources.',
+      'Retailer offers are only public-ready when product identity, pack size, market, currency and source URL are clear.',
+      'Feed candidates and fixtures must not appear as normal tracked retailers in public price ranking.'
+    ]
+  },
+  {
+    title: 'How price comparison works',
     points: [
       'We compare the exact product first, including brand, formula wording and pack size.',
       'We separate unconditional effective price from membership, coupon and minimum-spend pricing.',
@@ -124,16 +149,24 @@ const aboutMethodSections = [
     ]
   },
   {
-    title: 'How confidence is tested',
+    title: 'Source hygiene policy',
     points: [
-      'Confidence should rise when product identity, pricing fields and source agreement are clear.',
+      'Fixture offers are development data and should not influence public price ranking.',
+      'Orphan rows stay quarantined until a product decision is made.',
+      'Source hygiene reports and staging gates should run before controlled demos or public releases.'
+    ]
+  },
+  {
+    title: 'Coverage limitations',
+    points: [
+      'Pawkawa can say best price found from tracked retailers, not cheapest in Australia.',
       'Confidence should fall when pack size, formula wording or offer conditions are ambiguous.',
-      'Pages should present conclusion first, but every important claim should still map back to supporting source records.'
+      'Every important price claim should map back to a retailer source record.'
     ]
   }
 ] as const;
 
-const mascotStatuses = ['Checking sources', 'Comparing nutrition', 'Updating prices', 'Ensuring accuracy'] as const;
+const mascotStatuses = ['Checking sources', 'Checking tracked offers', 'Updating prices', 'Separating member deals'] as const;
 
 const productPlaceholderImages: Record<string, string> = {
   'ziwi-peak-air-dried-mackerel-lamb': 'https://placehold.co/320x420/f3ead9/5f6d57?text=Ziwi+Peak',
@@ -230,6 +263,19 @@ function toProductFromVerified(item: VerifiedProductListItem, detail?: VerifiedP
 function formatMoney(value: number | null | undefined, currency: string) {
   if (value === null || value === undefined) return '-';
   return `${currency} $${value.toFixed(2)}`;
+}
+
+function isPlaceholderImageUrl(value?: string) {
+  return !value || value.includes('placehold.co');
+}
+
+function getRetailOfferImageUrl(offers: RetailOffer[]) {
+  for (const offer of offers as Array<RetailOffer & { metadata?: { image_url?: string } }>) {
+    if (offer.metadata?.image_url) return offer.metadata.image_url;
+    if (offer.primary_image_url && !isPlaceholderImageUrl(offer.primary_image_url)) return offer.primary_image_url;
+  }
+
+  return undefined;
 }
 
 function formatPackSize(sizeG: number) {
@@ -383,11 +429,20 @@ function ProductImageFallback({ imageUrl, productName, brandName }: { imageUrl?:
   );
 }
 
-function PriceSummaryCard({ result, onOpen }: { result: PriceSearchResult; onOpen: (slug: string) => void }) {
+function PriceSummaryCard({
+  result,
+  onOpen,
+  variant = 'default'
+}: {
+  result: PriceSearchResult;
+  onOpen: (slug: string) => void;
+  variant?: 'default' | 'compact';
+}) {
   const coverage = getCoverageStatus(result.offer_count);
+  const isCompact = variant === 'compact';
 
   return (
-    <article className="price-result-card">
+    <article className={`price-result-card ${isCompact ? 'compact' : ''}`}>
       <div className="price-result-image">
         <ProductImageFallback brandName={result.brand_name} imageUrl={result.primary_image_url} productName={result.product_name} />
       </div>
@@ -398,31 +453,38 @@ function PriceSummaryCard({ result, onOpen }: { result: PriceSearchResult; onOpe
         </div>
         <h3>{result.product_name}</h3>
         <p className="brand-name">{result.brand_name}</p>
-        <div className="primary-price-read">
+        <div className={`primary-price-read ${isCompact ? 'compact' : ''}`}>
           <small>From price</small>
           <strong>{formatMoney(result.lowest_effective_price, result.currency)}</strong>
           <span>{result.best_retailer ? `Best at ${result.best_retailer}` : 'No active offer yet'}</span>
         </div>
-        <div className="price-summary-grid compact-price-summary">
-          <span>
-            <small>Tracked retailers</small>
-            <strong>{getTrackedRetailersLabel(result.offer_count)}</strong>
-          </span>
-          <span>
-            <small>Coverage</small>
-            <strong>{coverage.shortLabel}</strong>
-          </span>
-          <span>
-            <small>Best retailer</small>
-            <strong>{result.best_retailer || 'No active offer yet'}</strong>
-          </span>
-          <span>
-            <small>Unit price</small>
-            <strong>{result.lowest_unit_price_per_kg ? `${formatMoney(result.lowest_unit_price_per_kg, result.currency)} / kg` : '-'}</strong>
-          </span>
-        </div>
+        {isCompact ? (
+          <div className="price-card-tags">
+            <span>{getTrackedRetailersLabel(result.offer_count)}</span>
+            <span>{result.lowest_unit_price_per_kg ? `${formatMoney(result.lowest_unit_price_per_kg, result.currency)} / kg` : 'Unit price unavailable'}</span>
+          </div>
+        ) : (
+          <div className="price-summary-grid compact-price-summary">
+            <span>
+              <small>Tracked retailers</small>
+              <strong>{getTrackedRetailersLabel(result.offer_count)}</strong>
+            </span>
+            <span>
+              <small>Coverage</small>
+              <strong>{coverage.shortLabel}</strong>
+            </span>
+            <span>
+              <small>Best retailer</small>
+              <strong>{result.best_retailer || 'No active offer yet'}</strong>
+            </span>
+            <span>
+              <small>Unit price</small>
+              <strong>{result.lowest_unit_price_per_kg ? `${formatMoney(result.lowest_unit_price_per_kg, result.currency)} / kg` : '-'}</strong>
+            </span>
+          </div>
+        )}
         {result.offer_count <= 1 && <p className="coverage-note">{coverage.detail}</p>}
-        <button className="primary-button" onClick={() => onOpen(result.slug)} type="button">
+        <button className={isCompact ? 'secondary-button compact-card-cta' : 'primary-button'} onClick={() => onOpen(result.slug)} type="button">
           View retailer prices
         </button>
       </div>
@@ -434,12 +496,14 @@ function PriceSearchResults({
   results,
   loading,
   error,
-  onOpen
+  onOpen,
+  variant = 'default'
 }: {
   results: PriceSearchResult[];
   loading: boolean;
   error: string | null;
   onOpen: (slug: string) => void;
+  variant?: 'default' | 'compact';
 }) {
   if (loading) return <p className="muted">Checking retailer prices...</p>;
   if (error) return <p className="disclaimer">{error}</p>;
@@ -448,9 +512,9 @@ function PriceSearchResults({
   }
 
   return (
-    <div className="price-results-grid">
+    <div className={`price-results-grid ${variant === 'compact' ? 'compact' : ''}`}>
       {results.map((result) => (
-        <PriceSummaryCard key={result.slug} result={result} onOpen={onOpen} />
+        <PriceSummaryCard key={result.slug} onOpen={onOpen} result={result} variant={variant} />
       ))}
     </div>
   );
@@ -594,9 +658,9 @@ function LandingPage({
   markets,
   selectedMarket,
   setSelectedMarket,
-  priceResults,
-  priceSearchLoading,
-  priceSearchError,
+  homepagePreviewResults,
+  homepagePreviewLoading,
+  homepagePreviewError,
   insightsByProductId,
   contextDemo,
   compareIds,
@@ -609,16 +673,16 @@ function LandingPage({
   markets: MarketConfig[];
   selectedMarket: MarketRegion;
   setSelectedMarket: (market: MarketRegion) => void;
-  priceResults: PriceSearchResult[];
-  priceSearchLoading: boolean;
-  priceSearchError: string | null;
+  homepagePreviewResults: PriceSearchResult[];
+  homepagePreviewLoading: boolean;
+  homepagePreviewError: string | null;
   insightsByProductId: Record<string, ProductInsight>;
   contextDemo: RecommendationContext | null;
   compareIds: string[];
   onAddCompare: (slug: string) => void;
   navigate: (path: string) => void;
 }) {
-  const homepagePricePreviewResults = [...priceResults]
+  const homepagePricePreviewResults = [...homepagePreviewResults]
     .filter((result) => result.offer_count > 0)
     .sort((left, right) => {
       if (right.offer_count !== left.offer_count) return right.offer_count - left.offer_count;
@@ -627,18 +691,18 @@ function LandingPage({
       }
       return left.product_name.localeCompare(right.product_name);
     })
-    .slice(0, 2);
+    .slice(0, 3);
 
   return (
     <main className="page-stack landing-page">
       <section className="hero-journal">
         <div className="hero-copy-stack">
-          <p className="eyebrow">Trusted Pet Food Intelligence</p>
+          <p className="eyebrow">AU Cat Food Price Checks</p>
           <h1>
             <span>Compare Cat Food Prices</span>
             <span>in Australia</span>
           </h1>
-          <p className="hero-copy">Find the best retailer price for the exact cat food you already buy.</p>
+          <p className="hero-copy">Find the best retailer price we currently track for the exact cat food you already buy.</p>
           <MarketSelector markets={markets} selectedMarket={selectedMarket} onSelect={setSelectedMarket} />
           <ProductSearchBox
             keyword={filters.keyword}
@@ -676,10 +740,11 @@ function LandingPage({
             <p className="body-copy">Examples from currently tracked retailers.</p>
             {homepagePricePreviewResults.length > 0 ? (
               <PriceSearchResults
-                error={priceSearchError}
-                loading={priceSearchLoading}
+                error={homepagePreviewError}
+                loading={homepagePreviewLoading}
                 onOpen={(slug) => navigate(`/price/${slug}`)}
                 results={homepagePricePreviewResults}
+                variant="compact"
               />
             ) : (
               <div className="homepage-price-fallback">
@@ -696,7 +761,7 @@ function LandingPage({
             <div className="section-heading">
               <p className="eyebrow">After Price Checks</p>
               <h2>Choose your next step instead of guessing where to go.</h2>
-              <p className="body-copy">The home page should not push half-finished comparison or nutrition entry points. These actions send you to the right place on purpose.</p>
+              <p className="body-copy">Once you know where to buy, these secondary sections explain product context, source methods and comparison caveats without pretending coverage is complete.</p>
             </div>
             <div className="need-tile-grid">
               {homeNextSteps.map((step) => (
@@ -714,8 +779,7 @@ function LandingPage({
         <aside className="landing-side-column">
           <section className="mascot-status-card">
             <div className="section-heading compact">
-              <p className="eyebrow">Pawkawa is working...</p>
-              <h3>Warm, visible system activity</h3>
+              <h3 className="working-title">Pawkawa is working...</h3>
             </div>
             <div className="mascot-status-layout">
               <div className="mascot-doodle-slot">
@@ -744,7 +808,7 @@ function LandingPage({
               ))}
             </div>
             <div className="trust-cat-footer">
-              <img alt="Footer cat placeholder" src="https://placehold.co/220x120/f7efdf/6a5d50?text=Cat+Footer" />
+              <img alt="Pawkawa cat with pink heart doodles" src="/reference/pawkawa-footer-cat-hearts.png" />
             </div>
           </section>
         </aside>
@@ -756,28 +820,38 @@ function LandingPage({
 function LearnPage({ navigate }: { navigate: (path: string) => void }) {
   return (
     <main className="page-stack">
-      <section className="detail-header">
-        <button className="secondary-button" onClick={() => navigate('/')} type="button">
-          Back to Home
-        </button>
-        <div>
+      <section className="hero-journal learn-journal">
+        <div className="hero-copy-stack learn-copy-stack">
+          <button className="secondary-button support-back-button" onClick={() => navigate('/')} type="button">
+            Back to Home
+          </button>
           <p className="eyebrow">Learn</p>
-          <h1>Understand how Pawkawa explains price checks and product context.</h1>
-          <p className="body-copy">This section should become a carefully written knowledge layer built from cross-checked sources, not copied from one retailer, one brand or one pet blog.</p>
+          <h1>
+            <span>Understand how Pawkawa</span>
+            <span>explains price checks</span>
+          </h1>
+          <p className="hero-copy">Cross-check first. Learn pages explain how tracked price checks, offer rules and source limits work before broader claims.</p>
+        </div>
+        <div className="hero-illustration-card learn-illustration-card">
+          <div className="hero-illustration-stage">
+            <div className="hero-illustration-placeholder learn-illustration-placeholder">
+              <img alt="Pawkawa learn mascot illustration" src="/reference/pawkawa-learn-mascot.png" />
+            </div>
+          </div>
         </div>
       </section>
 
       <section className="two-column">
         {learnTopics.map((topic) => (
           <article className="panel" key={topic.title}>
-            <SectionHeader eyebrow="Learning Topic" title={topic.title} />
+            <SectionHeader eyebrow="Price Check Guide" title={topic.title} />
             <p className="body-copy">{topic.body}</p>
           </article>
         ))}
       </section>
 
       <section className="panel">
-        <SectionHeader eyebrow="Content Standard" title="What should happen before Learn content is published" />
+        <SectionHeader eyebrow="Content Standard" title="How future Learn articles should be published" />
         <ul className="plain-list">
           <li>Collect information from more than one source category, not a single article.</li>
           <li>Check for agreement across retailers, brand pages and general pet guidance sources.</li>
@@ -792,14 +866,18 @@ function LearnPage({ navigate }: { navigate: (path: string) => void }) {
 function AboutPage({ navigate }: { navigate: (path: string) => void }) {
   return (
     <main className="page-stack">
-      <section className="detail-header">
-        <button className="secondary-button" onClick={() => navigate('/')} type="button">
-          Back to Home
-        </button>
-        <div>
+      <section className="support-hero support-hero-compact">
+        <div className="support-hero-copy">
+          <button className="secondary-button support-back-button" onClick={() => navigate('/')} type="button">
+            Back to Home
+          </button>
           <p className="eyebrow">About</p>
-          <h1>How Pawkawa builds trust around price, comparison and confidence.</h1>
-          <p className="body-copy">Before asking users to trust the numbers, we need to show where the information comes from, how offer comparison works, and why confidence changes when the evidence changes.</p>
+          <h1>How Pawkawa keeps price comparison honest.</h1>
+          <p className="body-copy">Pawkawa is AU-first and compares currently tracked retailer offers. We show limits, conditions and source freshness so users can understand what the result does and does not cover.</p>
+        </div>
+        <div className="support-hero-note about-hero-note">
+          <strong>AU-first. Tracked retailers only.</strong>
+          <span>About should explain sources, confidence rules, conditional price handling and where current coverage still stops.</span>
         </div>
       </section>
 
@@ -818,7 +896,7 @@ function AboutPage({ navigate }: { navigate: (path: string) => void }) {
 
       <section className="panel">
         <SectionHeader eyebrow="Confidence Principle" title="Why restrained wording improves credibility" />
-        <p className="body-copy">Pawkawa should say `best price found from tracked retailers`, not `cheapest in Australia`. It should show conditional prices separately, mark limited coverage honestly, and make it clear when a product page is based on a small number of current retailer checks.</p>
+        <p className="body-copy">Pawkawa should describe the best price found from tracked retailers, not claim to know the cheapest price in Australia. Conditional prices stay separate, limited coverage is visible, and every product page should make clear how many current retailer checks support the result.</p>
       </section>
     </main>
   );
@@ -859,7 +937,7 @@ function SearchPage({
         <div className="section-heading">
           <p className="eyebrow">Search</p>
           <h1>Find the exact cat food, then compare retailer prices.</h1>
-          <p className="body-copy">Pawkawa groups retailer listings under one product so you can check price, stock, promotions and unit cost first.</p>
+          <p className="body-copy">Pawkawa groups tracked retailer listings under one product so you can check price, stock, promotions and unit cost first.</p>
         </div>
         <MarketSelector markets={markets} selectedMarket={selectedMarket} onSelect={setSelectedMarket} />
         <div className="filter-grid">
@@ -885,7 +963,7 @@ function SearchPage({
           </label>
         </div>
         <details className="advanced-panel">
-          <summary>Advanced filters</summary>
+          <summary>Optional filters</summary>
           <div className="filter-grid">
             <label className="field">
               <span>Brand</span>
@@ -919,16 +997,16 @@ function SearchPage({
         <div className="search-intro-card">
           <div>
             <p className="eyebrow">Price-first Search</p>
-            <h2>Compare where to buy before reading the nutrition table.</h2>
-            <p className="body-copy">Search results now come from canonical products and retailer offer summaries.</p>
+            <h2>Start with the exact product, then compare tracked offers.</h2>
+            <p className="body-copy">Results prioritize current offer price, unit price, stock and retailer coverage. Nutrition context stays secondary.</p>
           </div>
           <div className="search-illustration-slot">
-            <span>Search companion slot</span>
-            <small>Mascot / shelf / notebook illustration area</small>
+            <span>Tracked source status</span>
+            <small>Petstock + Petbarn are live in the MVP. More retailers need QA before public claims.</small>
           </div>
         </div>
         <section className="panel price-search-panel">
-          <SectionHeader eyebrow="Retailer Price Matches" title="Best buying options for this market" />
+          <SectionHeader eyebrow="Tracked Retailer Offers" title="Available offers we currently track" />
           <PriceSearchResults
             error={priceSearchError}
             loading={priceSearchLoading}
@@ -938,7 +1016,7 @@ function SearchPage({
         </section>
 
         <div className="summary-strip">
-          <span>Secondary product context: {results.length} products</span>
+          <span>Product context below: {results.length} products</span>
           <span>Average confidence {getAverageConfidence(results)}%</span>
           <span>{results.filter((product) => product.verificationGrade !== 'UNVERIFIED').length} verified products</span>
         </div>
@@ -1334,6 +1412,9 @@ export default function App() {
   const [priceResults, setPriceResults] = useState<PriceSearchResult[]>([]);
   const [priceSearchLoading, setPriceSearchLoading] = useState(false);
   const [priceSearchError, setPriceSearchError] = useState<string | null>(null);
+  const [homepagePreviewResults, setHomepagePreviewResults] = useState<PriceSearchResult[]>([]);
+  const [homepagePreviewLoading, setHomepagePreviewLoading] = useState(false);
+  const [homepagePreviewError, setHomepagePreviewError] = useState<string | null>(null);
   const [priceDetailsByKey, setPriceDetailsByKey] = useState<Record<string, PriceComparisonResponse>>({});
   const [priceDetailLoading, setPriceDetailLoading] = useState(false);
   const [priceDetailError, setPriceDetailError] = useState<string | null>(null);
@@ -1348,6 +1429,18 @@ export default function App() {
     const onPopState = () => setRoute(parseRoute(window.location.pathname));
     window.addEventListener('popstate', onPopState);
     return () => window.removeEventListener('popstate', onPopState);
+  }, []);
+
+  useEffect(() => {
+    const onPageShow = (event: PageTransitionEvent) => {
+      const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
+      if (event.persisted || navigation?.type === 'back_forward') {
+        window.location.reload();
+      }
+    };
+
+    window.addEventListener('pageshow', onPageShow);
+    return () => window.removeEventListener('pageshow', onPageShow);
   }, []);
 
   useEffect(() => {
@@ -1454,6 +1547,58 @@ export default function App() {
   useEffect(() => {
     const selectedMarketConfig = markets.find((market) => market.market === selectedMarket);
     if (selectedMarketConfig && !selectedMarketConfig.enabled) {
+      setHomepagePreviewResults([]);
+      setHomepagePreviewError(`${selectedMarket} pricing is coming soon.`);
+      setHomepagePreviewLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    setHomepagePreviewLoading(true);
+    setHomepagePreviewError(null);
+
+    Promise.allSettled(
+      homepagePreviewSlugs.map((slug) => readApi<PriceComparisonResponse>(`/api/price-comparison/${slug}?market=${selectedMarket}`))
+    )
+      .then((responses) => {
+        if (cancelled) return;
+
+        const items = responses
+          .filter((response): response is PromiseFulfilledResult<PriceComparisonResponse> => response.status === 'fulfilled')
+          .map(({ value }) => ({
+            product_id: value.product.product_id,
+            slug: value.product.slug,
+            product_name: value.product.product_name,
+            brand_name: value.product.brand_name,
+            primary_image_url: getRetailOfferImageUrl(value.offers) || value.product.primary_image_url,
+            pack_sizes: [value.product.pack_size_g],
+            lowest_effective_price: value.best_price_today,
+            lowest_unit_price_per_kg: value.lowest_unit_price_per_kg,
+            best_retailer: value.best_retailer,
+            offer_count: value.offer_count,
+            market: value.market,
+            currency: value.currency
+          }))
+          .filter((item) => item.offer_count > 0);
+
+        setHomepagePreviewResults(items);
+        setHomepagePreviewLoading(false);
+      })
+      .catch((error) => {
+        console.warn(error);
+        if (cancelled) return;
+        setHomepagePreviewError('Homepage price previews are not available right now.');
+        setHomepagePreviewLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [markets, selectedMarket]);
+
+  useEffect(() => {
+    const selectedMarketConfig = markets.find((market) => market.market === selectedMarket);
+    if (selectedMarketConfig && !selectedMarketConfig.enabled) {
       setPriceResults([]);
       setPriceSearchError(`${selectedMarket} pricing is coming soon.`);
       setPriceSearchLoading(false);
@@ -1488,11 +1633,6 @@ export default function App() {
   useEffect(() => {
     if (route.name !== 'price' || !route.slug) return;
     const key = `${selectedMarket}:${route.slug}`;
-    if (priceDetailsByKey[key]) {
-      setPriceDetailError(null);
-      setPriceDetailLoading(false);
-      return;
-    }
 
     const selectedMarketConfig = markets.find((market) => market.market === selectedMarket);
     if (selectedMarketConfig && !selectedMarketConfig.enabled) {
@@ -1502,7 +1642,7 @@ export default function App() {
     }
 
     let cancelled = false;
-    setPriceDetailLoading(true);
+    setPriceDetailLoading(!priceDetailsByKey[key]);
     setPriceDetailError(null);
 
     readApi<PriceComparisonResponse>(`/api/price-comparison/${route.slug}?market=${selectedMarket}`)
@@ -1609,7 +1749,7 @@ export default function App() {
   return (
     <div className="app-shell">
       <AppHeader navigate={navigate} route={route.name} />
-      {route.name === 'landing' && <LandingPage catalogProducts={catalogProducts} compareIds={compareSlugs} contextDemo={contextDemo} filters={filters} insightsByProductId={insightsByProductId} markets={markets} navigate={navigate} onAddCompare={addCompare} priceResults={priceResults} priceSearchError={priceSearchError} priceSearchLoading={priceSearchLoading} selectedMarket={selectedMarket} setFilters={setFilters} setSelectedMarket={setSelectedMarket} />}
+      {route.name === 'landing' && <LandingPage catalogProducts={catalogProducts} compareIds={compareSlugs} contextDemo={contextDemo} filters={filters} homepagePreviewError={homepagePreviewError} homepagePreviewLoading={homepagePreviewLoading} homepagePreviewResults={homepagePreviewResults} insightsByProductId={insightsByProductId} markets={markets} navigate={navigate} onAddCompare={addCompare} selectedMarket={selectedMarket} setFilters={setFilters} setSelectedMarket={setSelectedMarket} />}
       {route.name === 'search' && <SearchPage compareIds={compareSlugs} filters={filters} insightsByProductId={insightsByProductId} markets={markets} navigate={navigate} onAddCompare={addCompare} priceResults={priceResults} priceSearchError={priceSearchError} priceSearchLoading={priceSearchLoading} results={results} selectedMarket={selectedMarket} setFilters={setFilters} setSelectedMarket={setSelectedMarket} />}
       {route.name === 'compare' && <ComparePage compareCatalog={compareCatalog} compareData={compareData} compareError={compareError} compareLoading={compareLoading} compareRecommendations={compareRecommendations} compareSlugs={compareSlugs} navigate={navigate} onAddCompare={addCompare} unavailableCompareSlugs={unavailableCompareSlugs} />}
       {route.name === 'price' && <PriceDetailPage detail={currentPriceDetail} error={priceDetailError} loading={priceDetailLoading || (!currentPriceDetail && !priceDetailError)} markets={markets} navigate={navigate} selectedMarket={selectedMarket} setSelectedMarket={setSelectedMarket} />}
