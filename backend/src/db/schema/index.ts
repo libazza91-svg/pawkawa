@@ -1,4 +1,7 @@
 export { brands } from './brands';
+export { adminUsers } from './admin_users';
+export { adminSessions } from './admin_sessions';
+export { adminAuditLogs } from './admin_audit_logs';
 export { products } from './products';
 export { productNutrition } from './product_nutrition';
 export { productIngredients } from './product_ingredients';

@@ -1,0 +1,9 @@
+export const ADMIN_SESSION_COOKIE_NAME = 'pawkawa_admin_session';
+export const ADMIN_SESSION_DURATION_MS = 1000 * 60 * 60 * 24 * 7;
+export const ADMIN_ROLE = 'admin';
+export const ADMIN_STATUS_ACTIVE = 'active';
+export const ADMIN_STATUS_DISABLED = 'disabled';
+export const ADMIN_INVALID_CREDENTIALS_MESSAGE = 'Invalid email or password';
+export const ADMIN_PASSWORD_MIN_LENGTH = 12;
+export const ADMIN_LOGIN_MAX_ATTEMPTS = 5;
+export const ADMIN_LOGIN_WINDOW_MS = 1000 * 60 * 10;
