@@ -1,4 +1,7 @@
 import { ParsedRetailOffer } from '../types';
+import { detectPriceBasis, extractConditionalFlags, normalizePackSizeToG, parseOfferShape } from './offer-shape';
+
+export { normalizePackSizeToG } from './offer-shape';
 
 function htmlDecode(value: string): string {
   return value
@@ -7,17 +10,6 @@ function htmlDecode(value: string): string {
     .replace(/&amp;/g, '&')
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>');
-}
-
-export function normalizePackSizeToG(value: string | number | undefined): number | null {
-  if (typeof value === 'number' && Number.isFinite(value) && value > 0) return Math.round(value * 1000);
-  if (!value) return null;
-  const text = String(value).toLowerCase().replace(/\s+/g, '');
-  const kg = text.match(/(\d+(?:\.\d+)?)kg/);
-  if (kg) return Math.round(Number(kg[1]) * 1000);
-  const grams = text.match(/(\d+(?:\.\d+)?)g/);
-  if (grams) return Math.round(Number(grams[1]));
-  return null;
 }
 
 export function parseMoney(value: unknown): number | undefined {
@@ -78,12 +70,26 @@ function parseVariantOffersFromNextData(nextData: any, productUrl: string, captu
 
   return product.variants.flatMap((variant: any) => {
     const size = variant?.selectedOptions?.find((option: any) => String(option?.name ?? '').toLowerCase() === 'size')?.value;
-    const packSizeG = normalizePackSizeToG(size ?? variant?.dimension?.weight);
+    const offerShape = parseOfferShape(size ?? variant?.dimension?.weight);
+    const packSizeG = offerShape.pack_size_g;
     const basePrice = parseMoney(variant?.price);
     if (!packSizeG || !basePrice) return [];
     const stock = variant?.inStockInNetwork === false || variant?.quantityAvailable === 0 ? 'OUT_OF_STOCK' : 'IN_STOCK';
-    const discountPercent = product.sellingPlans?.[0]?.adjustmentPercentage;
-    const promotionText = discountPercent ? `${discountPercent}% subscription discount available` : undefined;
+    const salePrice = parseMoney(variant?.discount?.discountPrice);
+    const hasUnconditionalSale = salePrice !== undefined && salePrice < basePrice;
+    const saleDescription = typeof variant?.discount?.description === 'string' ? variant.discount.description.trim() : undefined;
+    const repeatDeliveryPercent = product.sellingPlans?.[0]?.adjustmentPercentage;
+    const promotionParts = [
+      hasUnconditionalSale ? saleDescription || 'Sale price available' : undefined,
+      repeatDeliveryPercent ? `${repeatDeliveryPercent}% subscription discount available via repeat delivery` : undefined,
+    ].filter((value): value is string => Boolean(value));
+    const promotionText = promotionParts.length > 0 ? promotionParts.join(' · ') : undefined;
+    const promotionType =
+      hasUnconditionalSale ? 'SALE' : promotionText ? 'OTHER' : undefined;
+    const conditionalFlags = extractConditionalFlags([
+      hasUnconditionalSale ? undefined : saleDescription,
+      repeatDeliveryPercent ? `${repeatDeliveryPercent}% subscription discount available via repeat delivery` : undefined,
+    ]);
 
     return [
       {
@@ -95,15 +101,22 @@ function parseVariantOffersFromNextData(nextData: any, productUrl: string, captu
         product_name: product.title,
         pack_size_g: packSizeG,
         base_price: basePrice,
+        sale_price: hasUnconditionalSale ? salePrice : undefined,
         member_price: undefined,
         coupon_price: undefined,
         promotion_text: promotionText,
-        promotion_type: promotionText ? 'OTHER' : undefined,
+        promotion_type: promotionType,
         stock_status: stock,
         image_url: firstImage(product, variant, jsonLdProduct),
         captured_at: capturedAt,
         market: 'AU',
         currency: 'AUD',
+        offer_type: offerShape.offer_type,
+        price_basis: detectPriceBasis(saleDescription),
+        single_pack_size_g: offerShape.single_pack_size_g,
+        unit_count: offerShape.unit_count,
+        total_pack_size_g: offerShape.total_pack_size_g,
+        conditional_flags: conditionalFlags.length > 0 ? conditionalFlags : undefined,
       } satisfies ParsedRetailOffer,
     ];
   });
@@ -113,7 +126,8 @@ function parseJsonLdOffers(html: string, productUrl: string, capturedAt: string)
   return extractJsonLdProducts(html).flatMap((product) => {
     const offers = Array.isArray(product.offers) ? product.offers : product.offers ? [product.offers] : [];
     return offers.flatMap((offer: any) => {
-      const packSizeG = normalizePackSizeToG(offer.url) ?? normalizePackSizeToG(product.name);
+      const offerShape = parseOfferShape(offer.url ?? product.name);
+      const packSizeG = offerShape.pack_size_g;
       const basePrice = parseMoney(offer.price);
       if (!packSizeG || !basePrice) return [];
       return [
@@ -131,6 +145,11 @@ function parseJsonLdOffers(html: string, productUrl: string, capturedAt: string)
           captured_at: capturedAt,
           market: 'AU',
           currency: 'AUD',
+          offer_type: offerShape.offer_type,
+          price_basis: detectPriceBasis(String(offer.description ?? '')),
+          single_pack_size_g: offerShape.single_pack_size_g,
+          unit_count: offerShape.unit_count,
+          total_pack_size_g: offerShape.total_pack_size_g,
         } satisfies ParsedRetailOffer,
       ];
     });

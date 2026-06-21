@@ -5,6 +5,7 @@ import request from 'supertest';
 import { afterEach, describe, expect, it } from 'vitest';
 import app from '../src/index';
 import { loadPetbarnManifest, loadPetstockManifest } from '../src/ingestion/retail/manifest';
+import { detectOfferType, parseOfferShape } from '../src/ingestion/retail/parsers/offer-shape';
 import { parsePetbarnProductPage } from '../src/ingestion/retail/parsers/petbarn-parser';
 import { normalizePackSizeToG, parseMoney, parsePetstockProductPage } from '../src/ingestion/retail/parsers/petstock-parser';
 import { collectDbCoverage, parsePetstockPilotCliArgs, runPetstockPilot } from '../src/ingestion/retail/petstock-pilot';
@@ -137,6 +138,15 @@ const petbarnHtmlFallback = `
     <span>Add to cart</span>
   </button>
 </body>
+</html>`;
+
+const petbarnBundleHtml = `
+<html>
+<head>
+<title>Royal Canin Indoor Adult Cat Food Bundle 2kg x 2 | Petbarn</title>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"ProductGroup","name":"Royal Canin Indoor Adult Cat Food Bundle","url":"https://www.petbarn.com.au/p/bundle-544","hasVariant":[{"@type":"Product","sku":"bundle-544","name":"Royal Canin Indoor Adult Cat Food 2kg x 2","url":"https://www.petbarn.com.au/p/bundle-544","image":"https://cdn.example/petbarn-bundle.jpg","brand":{"@type":"Brand","name":"ROYAL CANIN"},"size":"2kg x 2","offers":{"@type":"Offer","url":"https://www.petbarn.com.au/p/bundle-544","priceCurrency":"AUD","price":"97.99","availability":"https://schema.org/InStock","priceSpecification":[{"@type":"UnitPriceSpecification","priceCurrency":"AUD","price":"48.45","referenceQuantity":"PER BAG"},{"@type":"UnitPriceSpecification","priceCurrency":"AUD","price":"96.90","validForMemberTier":{"@type":"MemberProgramTier","@id":"https://www.petbarn.com.au/w/loyalty-program"}}]}}]}</script>
+</head>
+<body>Repeat Delivery available. $48.45 PER BAG</body>
 </html>`;
 
 const manifestItem: PetstockPilotManifestItem = {
@@ -290,6 +300,51 @@ describe('Retailer ingestion pilot', () => {
     expect(normalizePackSizeToG(2.035)).toBe(2035);
   });
 
+  it('parses multipack offer shape when pack size is written as 2kg x 2', () => {
+    expect(parseOfferShape('2kg x 2')).toEqual(
+      expect.objectContaining({
+        pack_size_g: 4000,
+        single_pack_size_g: 2000,
+        unit_count: 2,
+        total_pack_size_g: 4000,
+        offer_type: 'multi_pack',
+      }),
+    );
+  });
+
+  it('parses multipack offer shape when pack size is written as 2 x 2kg', () => {
+    expect(parseOfferShape('2 x 2kg')).toEqual(
+      expect.objectContaining({
+        pack_size_g: 4000,
+        single_pack_size_g: 2000,
+        unit_count: 2,
+        total_pack_size_g: 4000,
+        offer_type: 'multi_pack',
+      }),
+    );
+  });
+
+  it('parses carton offer shape when pack size is written as 400g x 12', () => {
+    expect(parseOfferShape('400g x 12')).toEqual(
+      expect.objectContaining({
+        pack_size_g: 4800,
+        single_pack_size_g: 400,
+        unit_count: 12,
+        total_pack_size_g: 4800,
+        offer_type: 'multi_pack',
+      }),
+    );
+  });
+
+  it('detects bundle offer type from bundle URL', () => {
+    expect(
+      detectOfferType({
+        productUrl: 'https://www.petbarn.com.au/p/bundle-544',
+        title: 'Royal Canin Indoor Adult Cat Food 2kg x 2',
+      }),
+    ).toBe('bundle');
+  });
+
   it('parses base price strings', () => {
     expect(parseMoney('AUD $74.99')).toBe(74.99);
   });
@@ -319,6 +374,16 @@ describe('Retailer ingestion pilot', () => {
   it('preserves promotion text from selling plans', () => {
     const [offer] = parsePetstockProductPage(petstockHtml, manifestItem.product_url);
     expect(offer.promotion_text).toContain('subscription discount');
+  });
+
+  it('captures repeat-delivery as a conditional flag without changing effective price', async () => {
+    const client = new InMemoryOfferClient();
+    const [offer] = parsePetstockProductPage(petstockHtml, manifestItem.product_url);
+    await writeMatchedRetailOffer(offer, client as any);
+    const metadata = JSON.parse(String([...client.offers.values()][0].metadata));
+    expect(metadata.conditional_flags).toContain('repeat_delivery');
+    const written = [...client.offers.values()][0] as RetailOffer;
+    expect(written.effective_price).toBe(74.99);
   });
 
   it('falls back to JSON-LD when app state is missing', () => {
@@ -517,6 +582,32 @@ describe('Retailer ingestion pilot', () => {
     );
   });
 
+  it('parses Petbarn single-pack offers with explicit shape metadata', () => {
+    const offers = parsePetbarnProductPage(petbarnHtml, petbarnManifestItem.product_url, '2026-06-16T00:00:00.000Z');
+    expect(offers[1]).toEqual(
+      expect.objectContaining({
+        offer_type: 'single_pack',
+        single_pack_size_g: 4000,
+        unit_count: 1,
+        total_pack_size_g: 4000,
+      }),
+    );
+  });
+
+  it('flags Petbarn bundle pages as unsupported bundle or multipack offers', () => {
+    const offers = parsePetbarnProductPage(petbarnBundleHtml, 'https://www.petbarn.com.au/p/bundle-544', '2026-06-16T00:00:00.000Z');
+    expect(offers).toHaveLength(1);
+    expect(offers[0]).toEqual(
+      expect.objectContaining({
+        offer_type: 'bundle',
+        single_pack_size_g: 2000,
+        unit_count: 2,
+        total_pack_size_g: 4000,
+        unsupported_reason: 'unsupported_bundle_or_multipack',
+      }),
+    );
+  });
+
   it('falls back to Petbarn HTML when JSON-LD is missing', () => {
     const offers = parsePetbarnProductPage(petbarnHtmlFallback, petbarnManifestItem.product_url, '2026-06-16T00:00:00.000Z');
     expect(offers).toHaveLength(1);
@@ -538,6 +629,27 @@ describe('Retailer ingestion pilot', () => {
     expect(report.canonical_slug).toBe('royal-canin-indoor-adult-4000g');
     const metadata = JSON.parse(String([...client.offers.values()][0].metadata));
     expect(metadata.source).toBe('petbarn_ingestion_pilot_v1');
+  });
+
+  it('keeps Petbarn member pricing conditional and out of the ordinary effective price', async () => {
+    const client = new InMemoryOfferClient();
+    const [offer] = parsePetbarnProductPage(petbarnHtml, petbarnManifestItem.product_url, '2026-06-16T00:00:00.000Z')
+      .filter((item) => item.pack_size_g === 4000);
+    await writeMatchedRetailOffer(offer, client as any);
+    const written = [...client.offers.values()][0] as RetailOffer;
+    const metadata = JSON.parse(String([...client.offers.values()][0].metadata));
+    expect(written.effective_price).toBe(97.99);
+    expect(metadata.conditional_flags).toContain('member_price');
+  });
+
+  it('skips unsupported Petbarn bundle or multipack offers before canonical matching', async () => {
+    const client = new InMemoryOfferClient();
+    const [offer] = parsePetbarnProductPage(petbarnBundleHtml, 'https://www.petbarn.com.au/p/bundle-544', '2026-06-16T00:00:00.000Z');
+    const report = await writeMatchedRetailOffer(offer, client as any);
+    expect(report.status).toBe('SKIPPED');
+    expect(report.message).toContain('Unsupported bundle or multipack');
+    expect(client.offers.size).toBe(0);
+    expect(client.snapshots.size).toBe(0);
   });
 
   it('supports Petstock and Petbarn offers for the same canonical slug', async () => {

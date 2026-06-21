@@ -90,6 +90,10 @@ function printSummary(report: ReturnType<typeof buildOfferCoverageAuditReport>) 
   console.log(`Fixture offers: ${summary.fixture_offer_count}`);
   console.log(`Seed offers: ${summary.seed_offer_count}`);
   console.log(`Demo offers: ${summary.demo_offer_count}`);
+  console.log(`Single-pack offers: ${summary.single_pack_offer_count}`);
+  console.log(`Bundle/multipack offers in DB: ${summary.bundle_or_multipack_offer_count}`);
+  console.log(`Conditional-program offers: ${summary.conditional_program_offer_count}`);
+  console.log(`Unknown offer shape count: ${summary.unknown_offer_shape_count}`);
   console.log(`Source breakdown: ${JSON.stringify(summary.source_breakdown)}`);
   console.log('JSON report follows:');
   console.log(JSON.stringify(report, null, 2));

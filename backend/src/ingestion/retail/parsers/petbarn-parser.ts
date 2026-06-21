@@ -1,4 +1,11 @@
 import { ParsedRetailOffer } from '../types';
+import {
+  detectOfferType,
+  detectPriceBasis,
+  extractConditionalFlags,
+  normalizePackSizeToG,
+  parseOfferShape,
+} from './offer-shape';
 
 function htmlDecode(value: string): string {
   return value
@@ -7,17 +14,6 @@ function htmlDecode(value: string): string {
     .replace(/&amp;/g, '&')
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>');
-}
-
-function normalizePackSizeToG(value: string | number | undefined): number | null {
-  if (typeof value === 'number' && Number.isFinite(value) && value > 0) return Math.round(value * 1000);
-  if (!value) return null;
-  const text = String(value).toLowerCase().replace(/\s+/g, '');
-  const kg = text.match(/(\d+(?:\.\d+)?)kg/);
-  if (kg) return Math.round(Number(kg[1]) * 1000);
-  const grams = text.match(/(\d+(?:\.\d+)?)g/);
-  if (grams) return Math.round(Number(grams[1]));
-  return null;
 }
 
 function parseMoney(value: unknown): number | undefined {
@@ -74,11 +70,31 @@ function buildOfferFromVariant(
   capturedAt: string,
 ): ParsedRetailOffer | null {
   const offer = Array.isArray(variant?.offers) ? variant.offers[0] : variant?.offers;
-  const packSizeG = normalizePackSizeToG(variant?.size ?? variant?.name);
+  const offerShape = parseOfferShape(variant?.size ?? variant?.name);
+  const offerType = detectOfferType({
+    productUrl: String(offer?.url ?? variant?.url ?? productUrl),
+    title: variant?.name,
+    variantName: variant?.name,
+    sizeText: variant?.size,
+  });
+  const packSizeG = offerShape.pack_size_g;
   const basePrice = parseMoney(offer?.price);
   if (!packSizeG || !basePrice) return null;
 
   const memberPrice = extractMemberPrice(offer?.priceSpecification);
+  const productUrlValue = String(offer?.url ?? variant?.url ?? productUrl);
+  const priceDisplayText = [
+    variant?.name,
+    variant?.size,
+    Array.isArray(offer?.priceSpecification) ? JSON.stringify(offer.priceSpecification) : undefined,
+  ]
+    .filter(Boolean)
+    .join(' ');
+  const conditionalFlags = extractConditionalFlags([
+    memberPrice && memberPrice < basePrice ? 'member price available' : undefined,
+    priceDisplayText,
+  ]);
+  const unsupportedReason = offerType === 'bundle' || offerType === 'multi_pack' ? 'unsupported_bundle_or_multipack' : undefined;
   const brandName =
     typeof variant?.brand === 'object'
       ? String(variant.brand?.name ?? '').trim()
@@ -88,7 +104,7 @@ function buildOfferFromVariant(
   return {
     retailer_name: 'Petbarn',
     retailer_slug: 'petbarn',
-    product_url: String(offer?.url ?? variant?.url ?? productUrl),
+    product_url: productUrlValue,
     retailer_product_title: String(variant?.name ?? productName).trim(),
     brand_name: brandName,
     product_name: productName,
@@ -102,6 +118,13 @@ function buildOfferFromVariant(
     captured_at: capturedAt,
     market: 'AU',
     currency: 'AUD',
+    offer_type: offerType,
+    price_basis: detectPriceBasis(priceDisplayText),
+    single_pack_size_g: offerShape.single_pack_size_g,
+    unit_count: offerShape.unit_count,
+    total_pack_size_g: offerShape.total_pack_size_g,
+    conditional_flags: conditionalFlags.length > 0 ? conditionalFlags : undefined,
+    unsupported_reason: unsupportedReason,
   };
 }
 
@@ -139,7 +162,14 @@ function parseHtmlFallback(html: string, productUrl: string, capturedAt: string)
   const imageMatch = html.match(/<link rel="preload" as="image" href="([^"]+)"/i);
   const sizeMatch = html.match(/([0-9]+(?:\.[0-9]+)?)\s*(kg|g)\b/i);
   const basePrice = parseMoney(priceMatch?.[1]);
-  const packSizeG = normalizePackSizeToG(sizeMatch?.[0]);
+  const offerShape = parseOfferShape(sizeMatch?.[0]);
+  const offerType = detectOfferType({
+    productUrl,
+    title: titleMatch?.[1],
+    variantName: productNameMatch?.[1],
+    sizeText: sizeMatch?.[0],
+  });
+  const packSizeG = offerShape.pack_size_g;
   if (!titleMatch || !productNameMatch || !productBrandMatch || !basePrice || !packSizeG) {
     return [];
   }
@@ -163,6 +193,12 @@ function parseHtmlFallback(html: string, productUrl: string, capturedAt: string)
       captured_at: capturedAt,
       market: 'AU',
       currency: 'AUD',
+      offer_type: offerType,
+      price_basis: detectPriceBasis(html),
+      single_pack_size_g: offerShape.single_pack_size_g,
+      unit_count: offerShape.unit_count,
+      total_pack_size_g: offerShape.total_pack_size_g,
+      unsupported_reason: offerType === 'bundle' || offerType === 'multi_pack' ? 'unsupported_bundle_or_multipack' : undefined,
     },
   ];
 }

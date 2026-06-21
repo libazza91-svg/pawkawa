@@ -34,6 +34,15 @@ export interface FetchResult {
   contentType?: string;
 }
 
+export type RetailOfferType = 'single_pack' | 'multi_pack' | 'bundle' | 'unknown';
+export type RetailPriceBasis = 'total' | 'per_bag' | 'per_unit' | 'unknown';
+export type RetailConditionalFlag =
+  | 'member_price'
+  | 'repeat_delivery'
+  | 'coupon'
+  | 'minimum_spend'
+  | 'unknown_condition';
+
 export interface ParsedRetailOffer {
   retailer_name: string;
   retailer_slug: string;
@@ -53,6 +62,13 @@ export interface ParsedRetailOffer {
   captured_at: string;
   market: 'AU';
   currency: 'AUD';
+  offer_type?: RetailOfferType;
+  price_basis?: RetailPriceBasis;
+  single_pack_size_g?: number;
+  unit_count?: number;
+  total_pack_size_g?: number;
+  conditional_flags?: RetailConditionalFlag[];
+  unsupported_reason?: string;
 }
 
 export interface PetstockPilotManifestItem {

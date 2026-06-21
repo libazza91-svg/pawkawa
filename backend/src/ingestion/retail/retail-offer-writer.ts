@@ -18,7 +18,18 @@ function metadataFor(parsed: ParsedRetailOffer, matchConfidence: number) {
     source_type: 'retailer',
     retailer_name: parsed.retailer_name,
     match_confidence: matchConfidence,
+    offer_type: parsed.offer_type,
+    price_basis: parsed.price_basis,
+    single_pack_size_g: parsed.single_pack_size_g,
+    unit_count: parsed.unit_count,
+    total_pack_size_g: parsed.total_pack_size_g,
+    conditional_flags: parsed.conditional_flags,
+    unsupported_reason: parsed.unsupported_reason,
   };
+}
+
+function isUnsupportedComparableShape(parsed: ParsedRetailOffer): boolean {
+  return parsed.offer_type === 'bundle' || parsed.offer_type === 'multi_pack' || Boolean(parsed.unsupported_reason);
 }
 
 export function buildRetailOfferFromParsed(parsed: ParsedRetailOffer, canonicalSlug: string): RetailOffer {
@@ -81,6 +92,27 @@ export async function writeMatchedRetailOffer(
       offer_written: false,
       snapshot_written: false,
       message: 'Stock status unknown',
+      parsed,
+    };
+  }
+
+  if (isUnsupportedComparableShape(parsed)) {
+    return {
+      status: 'SKIPPED',
+      product_url: parsed.product_url,
+      retailer_slug: parsed.retailer_slug,
+      retailer_product_title: parsed.retailer_product_title,
+      parsed_brand: parsed.brand_name,
+      parsed_pack_size_g: parsed.pack_size_g,
+      parsed_price: parsed.base_price,
+      parsed_successfully: true,
+      canonical_matched: false,
+      offer_written: false,
+      snapshot_written: false,
+      match_warnings: [
+        `Offer shape ${parsed.offer_type ?? 'unknown'} is excluded from ordinary single-pack price ranking`,
+      ],
+      message: 'Unsupported bundle or multipack offer excluded from ordinary ranking',
       parsed,
     };
   }

@@ -1,8 +1,8 @@
 # Pawkawa
 
-Trusted Pet Food Intelligence for Australia and New Zealand.
+AU-first cat food price comparison MVP for tracked retailer offers.
 
-This repository contains the current frontend prototype and backend API for verified pet food search, product intelligence, and product comparison.
+This repository contains the current frontend and backend API for exact cat food search, tracked AU retailer price comparison, and secondary product context. Petstock and Petbarn are the current tracked retailer sources; NZ and broader pet intelligence workflows are future scope.
 
 ## Workspace Map
 
@@ -13,16 +13,16 @@ This repository contains the current frontend prototype and backend API for veri
 
 ## Current Sprint
 
-`Sprint 2.8 — MVP Staging Readiness & Data Integrity Gate` is the active implementation sprint.
+`Sprint 3.0 — Public MVP Readiness Fixes` is the active cleanup sprint.
 
 Focus:
 
-- Controlled staging demo readiness
-- Source hygiene and fixture contamination checks
-- Demo product whitelist
-- Read-only data integrity gate
-- Orphan row warning policy
-- Public price API response shape stability
+- AU cat food price-comparison positioning
+- `Find Prices` as the primary MVP path
+- `Product Compare` as secondary product context
+- Restrained public copy and claims
+- Source hygiene and fixture contamination visibility
+- Orphan row warning policy without deletion or canonicalization
 
 Explicitly paused:
 

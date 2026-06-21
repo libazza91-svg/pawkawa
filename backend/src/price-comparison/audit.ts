@@ -81,6 +81,10 @@ export interface OfferCoverageAuditSummary {
   fixture_offer_count: number;
   seed_offer_count: number;
   demo_offer_count: number;
+  single_pack_offer_count: number;
+  bundle_or_multipack_offer_count: number;
+  conditional_program_offer_count: number;
+  unknown_offer_shape_count: number;
 }
 
 export interface OfferCoverageAuditReport {
@@ -190,6 +194,18 @@ function hasPetCircleFixture(offers: AuditRetailOfferRow[]): boolean {
   return offers.some((offer) => offer.retailer_slug === 'pet-circle' && classifyOfferSource(offer.metadata) === 'fixture');
 }
 
+function metadataStringValue(metadata: Record<string, unknown> | null | undefined, key: string): string | null {
+  if (!metadata || typeof metadata !== 'object') return null;
+  const value = metadata[key];
+  return typeof value === 'string' && value.trim().length > 0 ? value : null;
+}
+
+function metadataArrayValue(metadata: Record<string, unknown> | null | undefined, key: string): string[] {
+  if (!metadata || typeof metadata !== 'object') return [];
+  const value = metadata[key];
+  return Array.isArray(value) ? value.filter((entry): entry is string => typeof entry === 'string' && entry.length > 0) : [];
+}
+
 export function buildOfferCoverageAuditReport(
   offers: AuditRetailOfferRow[],
   options: { market?: MarketRegion; now?: Date; catalog?: CanonicalProduct[] } = {},
@@ -256,6 +272,10 @@ export function buildOfferCoverageAuditReport(
   let staleOfferCount = 0;
   let missingLastCheckedCount = 0;
   let sourceMetadataAvailable = false;
+  let singlePackOfferCount = 0;
+  let bundleOrMultipackOfferCount = 0;
+  let conditionalProgramOfferCount = 0;
+  let unknownOfferShapeCount = 0;
 
   for (const offer of marketOffers) {
     const sourceType = classifyOfferSource(offer.metadata);
@@ -266,6 +286,20 @@ export function buildOfferCoverageAuditReport(
       missingLastCheckedCount += 1;
     } else if (isStale(checkedAt, now)) {
       staleOfferCount += 1;
+    }
+
+    const offerType = metadataStringValue(offer.metadata, 'offer_type');
+    if (offerType === 'single_pack') {
+      singlePackOfferCount += 1;
+    } else if (offerType === 'bundle' || offerType === 'multi_pack') {
+      bundleOrMultipackOfferCount += 1;
+    } else if (offerType === null) {
+      unknownOfferShapeCount += 1;
+    }
+
+    const conditionalFlags = metadataArrayValue(offer.metadata, 'conditional_flags');
+    if (conditionalFlags.length > 0) {
+      conditionalProgramOfferCount += 1;
     }
   }
 
@@ -333,6 +367,10 @@ export function buildOfferCoverageAuditReport(
     fixture_offer_count: sourceBreakdown.fixture,
     seed_offer_count: sourceBreakdown.seed,
     demo_offer_count: sourceBreakdown.demo,
+    single_pack_offer_count: singlePackOfferCount,
+    bundle_or_multipack_offer_count: bundleOrMultipackOfferCount,
+    conditional_program_offer_count: conditionalProgramOfferCount,
+    unknown_offer_shape_count: unknownOfferShapeCount,
   };
 
   return {
