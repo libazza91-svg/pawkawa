@@ -1,6 +1,6 @@
 import type { LifeStage, Product, Species, VerificationGrade } from './data';
 
-export type RouteName = 'landing' | 'search' | 'product' | 'price' | 'compare' | 'brand' | 'learn' | 'about';
+export type RouteName = 'landing' | 'search' | 'product' | 'price' | 'compare' | 'brand' | 'learn' | 'about' | 'admin' | 'adminLogin';
 
 export type RouteState = {
   name: RouteName;

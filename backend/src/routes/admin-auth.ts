@@ -6,6 +6,7 @@ import {
 } from '../admin/constants';
 import { assertAdminLoginAllowed, clearAdminLoginFailures, registerAdminLoginFailure } from '../admin/login-rate-limit';
 import { authenticateAdminCredentials, createAdminSession, assertGenericAdminLoginFailure, revokeAdminSession } from '../admin/auth';
+import { createAdminCsrfToken } from '../admin/csrf';
 import { clearAdminSessionCookie, setAdminSessionCookie } from '../admin/cookies';
 import { requireAdminAuth } from '../middleware/admin-auth';
 import { sendError, sendSuccess } from '../middleware/response';
@@ -74,5 +75,17 @@ adminAuthRouter.get(
   requireAdminAuth,
   asyncHandler(async (req: Request, res: Response) => {
     sendSuccess(res, { user: req.adminUser });
+  }),
+);
+
+adminAuthRouter.get(
+  '/csrf',
+  requireAdminAuth,
+  asyncHandler(async (req: Request, res: Response) => {
+    const csrfToken = createAdminCsrfToken({
+      sessionId: req.adminSession!.id,
+      adminUserId: req.adminUser!.id,
+    });
+    sendSuccess(res, { csrf_token: csrfToken });
   }),
 );

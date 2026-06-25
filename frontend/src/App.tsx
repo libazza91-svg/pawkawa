@@ -29,6 +29,8 @@ import type {
   VerifiedProductListResponse
 } from './app-types';
 import { readApi } from './api';
+import { AdminAppShell } from './admin/AdminAppShell';
+import { AdminLoginPage } from './admin/AdminLoginPage';
 import { LivingCat } from './components/LivingCat';
 import {
   AppHeader,
@@ -1745,6 +1747,14 @@ export default function App() {
   const currentProduct = route.name === 'product' ? catalogProducts.find((product) => product.slug === route.slug) : undefined;
   const currentPriceDetail = route.name === 'price' && route.slug ? priceDetailsByKey[`${selectedMarket}:${route.slug}`] || null : null;
   const unavailableCompareSlugs = compareSlugs.filter((slug) => !compareCatalog.some((product) => product.slug === slug));
+
+  if (route.name === 'adminLogin') {
+    return <AdminLoginPage navigate={navigate} />;
+  }
+
+  if (route.name === 'admin') {
+    return <AdminAppShell navigate={navigate} />;
+  }
 
   return (
     <div className="app-shell">

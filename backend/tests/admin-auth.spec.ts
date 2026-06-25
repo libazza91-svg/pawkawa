@@ -61,6 +61,7 @@ describe('Admin auth foundation', () => {
 
     const { adminAuthRouter } = await import('../src/routes/admin-auth');
     const { requireAdminAuth } = await import('../src/middleware/admin-auth');
+    const { requireAdminCsrf } = await import('../src/middleware/admin-csrf');
     const { createAdminUser, hashAdminSessionToken } = await import('../src/admin/auth');
     const { resetAdminLoginRateLimitForTests } = await import('../src/admin/login-rate-limit');
 
@@ -70,6 +71,9 @@ describe('Admin auth foundation', () => {
     app.use(express.json());
     app.use('/api/admin/auth', adminAuthRouter);
     app.get('/api/admin/protected', requireAdminAuth, (_req, res) => {
+      res.status(200).json({ ok: true });
+    });
+    app.post('/api/admin/protected-write', requireAdminAuth, requireAdminCsrf, (_req, res) => {
       res.status(200).json({ ok: true });
     });
 
@@ -179,6 +183,67 @@ describe('Admin auth foundation', () => {
 
     expect(me.status).toBe(200);
     expect(me.body.data.user.email).toBe('admin@example.com');
+  });
+
+  it('csrf endpoint rejects missing session', async () => {
+    const { app } = await setupApp();
+    const res = await request(app).get('/api/admin/auth/csrf');
+    expect(res.status).toBe(401);
+    expect(res.body.error.code).toBe('ADMIN_UNAUTHORIZED');
+  });
+
+  it('csrf endpoint returns token for a valid admin session', async () => {
+    const { app, createAdminUser } = await setupApp();
+    await createAdminUser({
+      email: 'admin@example.com',
+      name: 'Barry',
+      password: 'super-secure-password',
+    });
+
+    const login = await request(app).post('/api/admin/auth/login').send({
+      email: 'admin@example.com',
+      password: 'super-secure-password',
+    });
+
+    const sessionCookie = extractSessionCookie(login.headers['set-cookie']);
+    const csrf = await request(app).get('/api/admin/auth/csrf').set('Cookie', sessionCookie);
+
+    expect(csrf.status).toBe(200);
+    expect(csrf.body.data.csrf_token).toMatch(/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/);
+  });
+
+  it('admin csrf middleware rejects missing or invalid token and accepts a valid token', async () => {
+    const { app, createAdminUser } = await setupApp();
+    await createAdminUser({
+      email: 'admin@example.com',
+      name: 'Barry',
+      password: 'super-secure-password',
+    });
+
+    const login = await request(app).post('/api/admin/auth/login').send({
+      email: 'admin@example.com',
+      password: 'super-secure-password',
+    });
+
+    const sessionCookie = extractSessionCookie(login.headers['set-cookie']);
+
+    const missing = await request(app).post('/api/admin/protected-write').set('Cookie', sessionCookie);
+    expect(missing.status).toBe(403);
+    expect(missing.body.error.code).toBe('ADMIN_CSRF_INVALID');
+
+    const invalid = await request(app)
+      .post('/api/admin/protected-write')
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', 'invalid-token');
+    expect(invalid.status).toBe(403);
+    expect(invalid.body.error.code).toBe('ADMIN_CSRF_INVALID');
+
+    const csrf = await request(app).get('/api/admin/auth/csrf').set('Cookie', sessionCookie);
+    const valid = await request(app)
+      .post('/api/admin/protected-write')
+      .set('Cookie', sessionCookie)
+      .set('X-CSRF-Token', csrf.body.data.csrf_token);
+    expect(valid.status).toBe(200);
   });
 
   it('me rejects missing session', async () => {

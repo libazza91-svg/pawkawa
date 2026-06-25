@@ -259,6 +259,223 @@ a {
   gap: 22px;
 }
 
+.admin-auth-page,
+.admin-page {
+  min-height: 100vh;
+  width: min(1180px, calc(100% - 28px));
+  margin: 0 auto;
+  padding: 26px 0 48px;
+}
+
+.admin-auth-page {
+  display: grid;
+  place-items: center;
+}
+
+.admin-login-panel,
+.admin-topbar,
+.admin-layout,
+.admin-loading-panel {
+  border: 1px solid rgba(217, 164, 65, 0.24);
+  border-radius: 24px;
+  background: rgba(255, 252, 246, 0.94);
+  box-shadow: var(--shadow);
+}
+
+.admin-login-panel {
+  display: grid;
+  gap: 26px;
+  width: min(520px, 100%);
+  padding: 28px;
+}
+
+.admin-brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.admin-brand-lockup strong {
+  display: block;
+  font-family: 'Patrick Hand', cursive;
+  font-size: 2rem;
+  font-weight: 400;
+  color: var(--forest);
+}
+
+.admin-brand-lockup span {
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.admin-login-copy {
+  display: grid;
+  gap: 8px;
+}
+
+.admin-login-copy h1,
+.admin-dashboard-shell h1 {
+  margin: 0;
+  max-width: 760px;
+  font-family: 'Patrick Hand', cursive;
+  font-size: clamp(2.4rem, 5vw, 4.3rem);
+  font-weight: 400;
+  line-height: 0.98;
+  letter-spacing: 0;
+}
+
+.admin-login-copy p,
+.admin-dashboard-shell p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 1.02rem;
+  line-height: 1.65;
+}
+
+.admin-login-form {
+  display: grid;
+  gap: 16px;
+}
+
+.admin-login-form label {
+  display: grid;
+  gap: 8px;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.admin-login-form input {
+  min-height: 52px;
+  width: 100%;
+  border: 1px solid var(--line-strong);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--ink);
+  padding: 0 16px;
+}
+
+.admin-login-form input:focus {
+  border-color: rgba(79, 124, 94, 0.55);
+  box-shadow: 0 0 0 4px rgba(79, 124, 94, 0.12);
+  outline: none;
+}
+
+.admin-form-error {
+  margin: 0;
+  border: 1px solid rgba(178, 78, 62, 0.24);
+  border-radius: 14px;
+  background: rgba(178, 78, 62, 0.08);
+  color: #8d3a2f;
+  padding: 12px 14px;
+  font-weight: 800;
+}
+
+.admin-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 18px;
+  padding: 16px 18px;
+}
+
+.admin-user-chip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-user-chip span,
+.admin-user-chip small {
+  display: block;
+  text-align: right;
+}
+
+.admin-user-chip span {
+  font-weight: 900;
+}
+
+.admin-user-chip small {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.admin-layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  min-height: 520px;
+  overflow: hidden;
+}
+
+.admin-sidebar {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  border-right: 1px solid var(--line);
+  background: rgba(237, 230, 216, 0.38);
+  padding: 18px;
+}
+
+.admin-sidebar button {
+  min-height: 44px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--muted);
+  padding: 0 14px;
+  text-align: left;
+  font-weight: 900;
+}
+
+.admin-sidebar button.active {
+  border-color: rgba(79, 124, 94, 0.22);
+  background: #fff;
+  color: var(--forest);
+  opacity: 1;
+}
+
+.admin-dashboard-shell {
+  display: grid;
+  align-content: start;
+  gap: 18px;
+  padding: 32px;
+}
+
+.admin-status-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 12px;
+}
+
+.admin-status-grid span,
+.admin-loading-panel {
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(248, 245, 238, 0.72);
+  padding: 18px;
+}
+
+.admin-status-grid small {
+  display: block;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.admin-status-grid strong {
+  display: block;
+  margin-top: 6px;
+  color: var(--ink);
+  font-size: 1.2rem;
+}
+
+.admin-loading-panel {
+  margin-top: 120px;
+  color: var(--muted);
+  font-weight: 900;
+  text-align: center;
+}
+
 .page-stack > section > .body-copy,
 .page-stack > section .section-heading .body-copy {
   max-width: 68ch;
@@ -2306,5 +2523,37 @@ h3 {
 
   .market-selector button {
     flex: 1 1 100%;
+  }
+
+  .admin-auth-page,
+  .admin-page {
+    width: min(100% - 18px, 1180px);
+    padding-top: 10px;
+  }
+
+  .admin-topbar,
+  .admin-user-chip {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-user-chip span,
+  .admin-user-chip small {
+    text-align: left;
+  }
+
+  .admin-layout,
+  .admin-status-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-sidebar {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .admin-dashboard-shell,
+  .admin-login-panel {
+    padding: 18px;
   }
 }
