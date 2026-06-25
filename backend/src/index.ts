@@ -15,6 +15,7 @@ import { marketsRouter } from './routes/markets';
 import { searchRouter } from './routes/search';
 import { priceComparisonRouter } from './routes/price-comparison';
 import { adminAuthRouter } from './routes/admin-auth';
+import { adminReadonlyRouter } from './routes/admin-readonly';
 import { errorHandler } from './middleware/errorHandler';
 import { swaggerSpec } from './swagger';
 
@@ -42,6 +43,7 @@ app.use('/api/markets', marketsRouter);
 app.use('/api/search', searchRouter);
 app.use('/api/price-comparison', priceComparisonRouter);
 app.use('/api/admin/auth', adminAuthRouter);
+app.use('/api/admin', adminReadonlyRouter);
 
 // ── Global error handler (must be after all routes) ────────────────
 app.use(errorHandler);

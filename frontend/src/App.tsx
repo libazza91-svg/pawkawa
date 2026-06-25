@@ -1753,7 +1753,7 @@ export default function App() {
   }
 
   if (route.name === 'admin') {
-    return <AdminAppShell navigate={navigate} />;
+    return <AdminAppShell navigate={navigate} view={route.slug} />;
   }
 
   return (
