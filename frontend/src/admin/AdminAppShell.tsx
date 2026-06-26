@@ -1,16 +1,22 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
 import {
+  createAdminImage,
+  createAdminOfferOverride,
   createAdminDictionaryTerm,
   createAdminSource,
   getAdminAuditLog,
   getAdminCsrfToken,
   getAdminDashboard,
   getAdminDictionary,
+  getAdminImages,
   getAdminOffers,
+  getAdminOfferOverrides,
   getAdminProducts,
   getAdminSources,
   getCurrentAdmin,
   logoutAdmin,
+  patchAdminImage,
+  patchAdminOfferOverride,
   patchAdminDictionaryTerm,
   patchAdminProduct,
   patchAdminSource,
@@ -18,19 +24,22 @@ import {
   type AdminDashboardResponse,
   type AdminDictionaryCategory,
   type AdminDictionaryItem,
+  type AdminImageItem,
   type AdminOfferItem,
+  type AdminOfferOverrideItem,
   type AdminProductItem,
   type AdminSourceItem,
   type AdminUser,
 } from './api';
 
-type AdminView = 'dashboard' | 'products' | 'offers' | 'sources' | 'dictionary' | 'audit';
+type AdminView = 'dashboard' | 'products' | 'offers' | 'sources' | 'images' | 'dictionary' | 'audit';
 
 const adminSections: Array<{ key: AdminView; label: string; path: string }> = [
   { key: 'dashboard', label: 'Dashboard', path: '/admin' },
   { key: 'products', label: 'Products', path: '/admin/products' },
   { key: 'offers', label: 'Offers', path: '/admin/offers' },
   { key: 'sources', label: 'Sources', path: '/admin/sources' },
+  { key: 'images', label: 'Images', path: '/admin/images' },
   { key: 'dictionary', label: 'Dictionary', path: '/admin/dictionary' },
   { key: 'audit', label: 'Audit', path: '/admin/audit' },
 ];
@@ -48,7 +57,7 @@ const dictionaryCategories: AdminDictionaryCategory[] = [
 ];
 
 function normalizeAdminView(value?: string): AdminView {
-  if (value === 'products' || value === 'offers' || value === 'sources' || value === 'dictionary' || value === 'audit') return value;
+  if (value === 'products' || value === 'offers' || value === 'sources' || value === 'images' || value === 'dictionary' || value === 'audit') return value;
   return 'dashboard';
 }
 
@@ -75,6 +84,17 @@ function parseOptionalInteger(value: string) {
   if (!trimmed) return null;
   const parsed = Number(trimmed);
   return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
+}
+
+function parseOptionalDecimal(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  const parsed = Number(trimmed);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+}
+
+function parseConditionalFlagsInput(value: string) {
+  return Array.from(new Set(value.split(',').map((item) => item.trim()).filter(Boolean)));
 }
 
 function AdminEmptyState({ label }: { label: string }) {
@@ -914,7 +934,244 @@ function AdminDictionaryView({
   );
 }
 
-function AdminOffersView({ items }: { items: AdminOfferItem[] }) {
+function AdminOffersView({
+  items,
+  overrides,
+  products,
+  sources,
+  csrfToken,
+  onSaved,
+}: {
+  items: AdminOfferItem[];
+  overrides: AdminOfferOverrideItem[];
+  products: AdminProductItem[];
+  sources: AdminSourceItem[];
+  csrfToken: string;
+  onSaved: () => Promise<void>;
+}) {
+  const [selectedOverrideId, setSelectedOverrideId] = useState<number | null>(null);
+  const [createForm, setCreateForm] = useState({
+    product_id: products[0]?.product_id?.toString() ?? '',
+    product_slug: '',
+    retailer_name: '',
+    retailer_slug: '',
+    source_id: '',
+    source_url: '',
+    market: 'AU',
+    currency: 'AUD',
+    base_price: '',
+    sale_price: '',
+    member_price: '',
+    subscription_price: '',
+    coupon_price: '',
+    minimum_spend: '',
+    stock_status: 'IN_STOCK',
+    pack_size_g: '',
+    unit_count: '1',
+    total_pack_size_g: '',
+    offer_type: 'single_pack',
+    price_basis: 'total',
+    conditional_flags: '',
+    reason: '',
+    notes: '',
+    is_active: true,
+  });
+  const [editForm, setEditForm] = useState({
+    product_id: '',
+    product_slug: '',
+    retailer_name: '',
+    retailer_slug: '',
+    source_id: '',
+    source_url: '',
+    market: 'AU',
+    currency: 'AUD',
+    base_price: '',
+    sale_price: '',
+    member_price: '',
+    subscription_price: '',
+    coupon_price: '',
+    minimum_spend: '',
+    stock_status: 'IN_STOCK',
+    pack_size_g: '',
+    unit_count: '1',
+    total_pack_size_g: '',
+    offer_type: 'single_pack',
+    price_basis: 'total',
+    conditional_flags: '',
+    reason: '',
+    notes: '',
+    is_active: true,
+  });
+  const [createSubmitting, setCreateSubmitting] = useState(false);
+  const [editSubmitting, setEditSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!products.length) return;
+    setCreateForm((current) => ({
+      ...current,
+      product_id: current.product_id || String(products[0].product_id),
+    }));
+  }, [products]);
+
+  useEffect(() => {
+    if (!overrides.length) {
+      setSelectedOverrideId(null);
+      return;
+    }
+
+    if (!selectedOverrideId || !overrides.some((item) => item.id === selectedOverrideId)) {
+      setSelectedOverrideId(overrides[0].id);
+    }
+  }, [overrides, selectedOverrideId]);
+
+  useEffect(() => {
+    const selected = overrides.find((item) => item.id === selectedOverrideId);
+    if (!selected) return;
+
+    setEditForm({
+      product_id: selected.product_id ? String(selected.product_id) : '',
+      product_slug: selected.product_slug ?? '',
+      retailer_name: selected.retailer_name,
+      retailer_slug: selected.retailer_slug,
+      source_id: selected.source_id ? String(selected.source_id) : '',
+      source_url: selected.source_url,
+      market: selected.market,
+      currency: selected.currency,
+      base_price: selected.base_price ? String(selected.base_price) : '',
+      sale_price: selected.sale_price ? String(selected.sale_price) : '',
+      member_price: selected.member_price ? String(selected.member_price) : '',
+      subscription_price: selected.subscription_price ? String(selected.subscription_price) : '',
+      coupon_price: selected.coupon_price ? String(selected.coupon_price) : '',
+      minimum_spend: selected.minimum_spend ? String(selected.minimum_spend) : '',
+      stock_status: selected.stock_status,
+      pack_size_g: String(selected.pack_size_g),
+      unit_count: String(selected.unit_count),
+      total_pack_size_g: selected.total_pack_size_g ? String(selected.total_pack_size_g) : '',
+      offer_type: selected.offer_type,
+      price_basis: selected.price_basis,
+      conditional_flags: selected.conditional_flags.join(', '),
+      reason: selected.reason,
+      notes: selected.notes ?? '',
+      is_active: selected.is_active,
+    });
+    setError(null);
+    setSuccess(null);
+  }, [overrides, selectedOverrideId]);
+
+  async function handleCreate(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setCreateSubmitting(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      await createAdminOfferOverride(
+        {
+          product_id: createForm.product_id ? Number(createForm.product_id) : null,
+          product_slug: normalizeTextInput(createForm.product_slug),
+          retailer_name: createForm.retailer_name.trim(),
+          retailer_slug: createForm.retailer_slug.trim(),
+          source_id: createForm.source_id ? Number(createForm.source_id) : null,
+          source_url: createForm.source_url.trim(),
+          market: createForm.market.trim(),
+          currency: createForm.currency.trim(),
+          base_price: parseOptionalDecimal(createForm.base_price),
+          sale_price: parseOptionalDecimal(createForm.sale_price),
+          member_price: parseOptionalDecimal(createForm.member_price),
+          subscription_price: parseOptionalDecimal(createForm.subscription_price),
+          coupon_price: parseOptionalDecimal(createForm.coupon_price),
+          minimum_spend: parseOptionalDecimal(createForm.minimum_spend),
+          stock_status: createForm.stock_status.trim(),
+          pack_size_g: Number(createForm.pack_size_g),
+          unit_count: Number(createForm.unit_count || 1),
+          total_pack_size_g: parseOptionalInteger(createForm.total_pack_size_g),
+          offer_type: createForm.offer_type.trim(),
+          price_basis: createForm.price_basis.trim(),
+          conditional_flags: parseConditionalFlagsInput(createForm.conditional_flags),
+          reason: createForm.reason.trim(),
+          notes: normalizeTextInput(createForm.notes),
+          is_active: createForm.is_active,
+        },
+        csrfToken,
+      );
+      await onSaved();
+      setCreateForm((current) => ({
+        ...current,
+        product_slug: '',
+        retailer_name: '',
+        retailer_slug: '',
+        source_id: '',
+        source_url: '',
+        base_price: '',
+        sale_price: '',
+        member_price: '',
+        subscription_price: '',
+        coupon_price: '',
+        minimum_spend: '',
+        pack_size_g: '',
+        total_pack_size_g: '',
+        conditional_flags: '',
+        reason: '',
+        notes: '',
+      }));
+      setSuccess('Manual override created.');
+    } catch (submitError) {
+      setError(submitError instanceof Error ? submitError.message : 'Manual override creation failed.');
+    } finally {
+      setCreateSubmitting(false);
+    }
+  }
+
+  async function handleEdit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!selectedOverrideId) return;
+
+    setEditSubmitting(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      await patchAdminOfferOverride(
+        selectedOverrideId,
+        {
+          product_id: editForm.product_id ? Number(editForm.product_id) : null,
+          product_slug: normalizeTextInput(editForm.product_slug),
+          retailer_name: editForm.retailer_name.trim(),
+          retailer_slug: editForm.retailer_slug.trim(),
+          source_id: editForm.source_id ? Number(editForm.source_id) : null,
+          source_url: editForm.source_url.trim(),
+          market: editForm.market.trim(),
+          currency: editForm.currency.trim(),
+          base_price: parseOptionalDecimal(editForm.base_price),
+          sale_price: parseOptionalDecimal(editForm.sale_price),
+          member_price: parseOptionalDecimal(editForm.member_price),
+          subscription_price: parseOptionalDecimal(editForm.subscription_price),
+          coupon_price: parseOptionalDecimal(editForm.coupon_price),
+          minimum_spend: parseOptionalDecimal(editForm.minimum_spend),
+          stock_status: editForm.stock_status.trim(),
+          pack_size_g: Number(editForm.pack_size_g),
+          unit_count: Number(editForm.unit_count || 1),
+          total_pack_size_g: parseOptionalInteger(editForm.total_pack_size_g),
+          offer_type: editForm.offer_type.trim(),
+          price_basis: editForm.price_basis.trim(),
+          conditional_flags: parseConditionalFlagsInput(editForm.conditional_flags),
+          reason: editForm.reason.trim(),
+          notes: normalizeTextInput(editForm.notes),
+          is_active: editForm.is_active,
+        },
+        csrfToken,
+      );
+      await onSaved();
+      setSuccess('Manual override updated.');
+    } catch (submitError) {
+      setError(submitError instanceof Error ? submitError.message : 'Manual override update failed.');
+    } finally {
+      setEditSubmitting(false);
+    }
+  }
+
   return (
     <AdminTablePanel title="Offers" eyebrow="Retail offers" empty={<AdminEmptyState label="offers" />} hasItems={items.length > 0}>
       <div className="admin-table-wrap">
@@ -944,6 +1201,683 @@ function AdminOffersView({ items }: { items: AdminOfferItem[] }) {
             ))}
           </tbody>
         </table>
+      </div>
+
+      <section className="admin-form-panel">
+        <div className="admin-form-heading">
+          <div>
+            <strong>Manual override safety</strong>
+            <p>Only single-pack, total-price, non-conditional overrides are marked eligible for future ordinary best-price use. Bundle, multipack, member, subscription, coupon, and minimum-spend prices remain admin-only in this sprint.</p>
+          </div>
+        </div>
+      </section>
+
+      {overrides.length > 0 ? (
+        <div className="admin-table-wrap">
+          <table className="admin-data-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Retailer</th>
+                <th>Offer shape</th>
+                <th>Price safety</th>
+                <th>Active</th>
+              </tr>
+            </thead>
+            <tbody>
+              {overrides.map((item) => (
+                <tr key={item.id}>
+                  <td>{item.product_name || item.product_slug || item.product_id || '-'}</td>
+                  <td>{item.retailer_name}</td>
+                  <td>{item.offer_type} / {item.price_basis}</td>
+                  <td>{item.ordinary_best_price_eligible ? 'Ordinary-safe' : 'Conditional/admin-only'}</td>
+                  <td>{item.is_active ? 'Active' : 'Disabled'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <AdminEmptyState label="manual offer overrides" />
+      )}
+
+      <div className="admin-form-split">
+        <form className="admin-form-panel" onSubmit={handleCreate}>
+          <div className="admin-form-heading">
+            <div>
+              <strong>Add manual offer override</strong>
+              <p>Use this for exceptional retailer corrections without mutating ingestion-owned `retail_offers` rows.</p>
+            </div>
+          </div>
+          <div className="admin-form-grid">
+            <label>
+              Product
+              <select onChange={(event) => setCreateForm((current) => ({ ...current, product_id: event.target.value }))} value={createForm.product_id}>
+                {products.map((product) => (
+                  <option key={product.product_id} value={product.product_id}>
+                    {product.product_id} - {product.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Product slug (optional)
+              <input onChange={(event) => setCreateForm((current) => ({ ...current, product_slug: event.target.value }))} type="text" value={createForm.product_slug} />
+            </label>
+            <label>
+              Retailer name
+              <input onChange={(event) => setCreateForm((current) => ({ ...current, retailer_name: event.target.value }))} required type="text" value={createForm.retailer_name} />
+            </label>
+            <label>
+              Retailer slug
+              <input onChange={(event) => setCreateForm((current) => ({ ...current, retailer_slug: event.target.value }))} required type="text" value={createForm.retailer_slug} />
+            </label>
+            <label>
+              Source reference
+              <select onChange={(event) => setCreateForm((current) => ({ ...current, source_id: event.target.value }))} value={createForm.source_id}>
+                <option value="">No source record</option>
+                {sources.map((source) => (
+                  <option key={source.source_id} value={source.source_id}>
+                    {source.source_id} - {source.product_name || source.source_url}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Market
+              <input onChange={(event) => setCreateForm((current) => ({ ...current, market: event.target.value }))} required type="text" value={createForm.market} />
+            </label>
+            <label>
+              Currency
+              <input onChange={(event) => setCreateForm((current) => ({ ...current, currency: event.target.value }))} required type="text" value={createForm.currency} />
+            </label>
+            <label>
+              Stock status
+              <input onChange={(event) => setCreateForm((current) => ({ ...current, stock_status: event.target.value }))} required type="text" value={createForm.stock_status} />
+            </label>
+            <label className="admin-form-grid-span-2">
+              Source URL
+              <input onChange={(event) => setCreateForm((current) => ({ ...current, source_url: event.target.value }))} required type="url" value={createForm.source_url} />
+            </label>
+            <label>
+              Pack size (g)
+              <input onChange={(event) => setCreateForm((current) => ({ ...current, pack_size_g: event.target.value }))} required type="number" value={createForm.pack_size_g} />
+            </label>
+            <label>
+              Unit count
+              <input onChange={(event) => setCreateForm((current) => ({ ...current, unit_count: event.target.value }))} type="number" value={createForm.unit_count} />
+            </label>
+            <label>
+              Total pack size (g)
+              <input onChange={(event) => setCreateForm((current) => ({ ...current, total_pack_size_g: event.target.value }))} type="number" value={createForm.total_pack_size_g} />
+            </label>
+            <label>
+              Offer type
+              <select onChange={(event) => setCreateForm((current) => ({ ...current, offer_type: event.target.value }))} value={createForm.offer_type}>
+                <option value="single_pack">single_pack</option>
+                <option value="multi_pack">multi_pack</option>
+                <option value="bundle">bundle</option>
+                <option value="unknown">unknown</option>
+              </select>
+            </label>
+            <label>
+              Price basis
+              <select onChange={(event) => setCreateForm((current) => ({ ...current, price_basis: event.target.value }))} value={createForm.price_basis}>
+                <option value="total">total</option>
+                <option value="per_bag">per_bag</option>
+                <option value="per_unit">per_unit</option>
+                <option value="unknown">unknown</option>
+              </select>
+            </label>
+            <label>
+              Base price
+              <input onChange={(event) => setCreateForm((current) => ({ ...current, base_price: event.target.value }))} type="number" value={createForm.base_price} />
+            </label>
+            <label>
+              Sale price
+              <input onChange={(event) => setCreateForm((current) => ({ ...current, sale_price: event.target.value }))} type="number" value={createForm.sale_price} />
+            </label>
+            <label>
+              Member price
+              <input onChange={(event) => setCreateForm((current) => ({ ...current, member_price: event.target.value }))} type="number" value={createForm.member_price} />
+            </label>
+            <label>
+              Subscription price
+              <input onChange={(event) => setCreateForm((current) => ({ ...current, subscription_price: event.target.value }))} type="number" value={createForm.subscription_price} />
+            </label>
+            <label>
+              Coupon price
+              <input onChange={(event) => setCreateForm((current) => ({ ...current, coupon_price: event.target.value }))} type="number" value={createForm.coupon_price} />
+            </label>
+            <label>
+              Minimum spend
+              <input onChange={(event) => setCreateForm((current) => ({ ...current, minimum_spend: event.target.value }))} type="number" value={createForm.minimum_spend} />
+            </label>
+            <label className="admin-form-grid-span-2">
+              Conditional flags (comma separated)
+              <input onChange={(event) => setCreateForm((current) => ({ ...current, conditional_flags: event.target.value }))} type="text" value={createForm.conditional_flags} />
+            </label>
+            <label className="admin-form-grid-span-2">
+              Reason
+              <input onChange={(event) => setCreateForm((current) => ({ ...current, reason: event.target.value }))} required type="text" value={createForm.reason} />
+            </label>
+            <label className="admin-checkbox-field">
+              <input checked={createForm.is_active} onChange={(event) => setCreateForm((current) => ({ ...current, is_active: event.target.checked }))} type="checkbox" />
+              Override is active
+            </label>
+            <label className="admin-form-grid-span-2">
+              Notes
+              <textarea onChange={(event) => setCreateForm((current) => ({ ...current, notes: event.target.value }))} rows={4} value={createForm.notes} />
+            </label>
+          </div>
+          <AdminFormNotice error={error} success={success} />
+          <div className="admin-form-actions">
+            <button className="primary-button" disabled={createSubmitting || !csrfToken || !products.length} type="submit">
+              {createSubmitting ? 'Saving...' : 'Create override'}
+            </button>
+          </div>
+        </form>
+
+        <form className="admin-form-panel" onSubmit={handleEdit}>
+          <div className="admin-form-heading">
+            <div>
+              <strong>Edit manual override</strong>
+              <p>Conditional and bundle-like prices remain clearly separated from ordinary best-price use.</p>
+            </div>
+            <label className="admin-inline-field">
+              Override
+              <select onChange={(event) => setSelectedOverrideId(Number(event.target.value))} value={selectedOverrideId ?? ''}>
+                {overrides.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.id} - {item.product_name || item.retailer_name}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+          <div className="admin-form-grid">
+            <label>
+              Product
+              <select onChange={(event) => setEditForm((current) => ({ ...current, product_id: event.target.value }))} value={editForm.product_id}>
+                <option value="">No bound product</option>
+                {products.map((product) => (
+                  <option key={product.product_id} value={product.product_id}>
+                    {product.product_id} - {product.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Product slug
+              <input onChange={(event) => setEditForm((current) => ({ ...current, product_slug: event.target.value }))} type="text" value={editForm.product_slug} />
+            </label>
+            <label>
+              Retailer name
+              <input onChange={(event) => setEditForm((current) => ({ ...current, retailer_name: event.target.value }))} required type="text" value={editForm.retailer_name} />
+            </label>
+            <label>
+              Retailer slug
+              <input onChange={(event) => setEditForm((current) => ({ ...current, retailer_slug: event.target.value }))} required type="text" value={editForm.retailer_slug} />
+            </label>
+            <label>
+              Source reference
+              <select onChange={(event) => setEditForm((current) => ({ ...current, source_id: event.target.value }))} value={editForm.source_id}>
+                <option value="">No source record</option>
+                {sources.map((source) => (
+                  <option key={source.source_id} value={source.source_id}>
+                    {source.source_id} - {source.product_name || source.source_url}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Market
+              <input onChange={(event) => setEditForm((current) => ({ ...current, market: event.target.value }))} required type="text" value={editForm.market} />
+            </label>
+            <label>
+              Currency
+              <input onChange={(event) => setEditForm((current) => ({ ...current, currency: event.target.value }))} required type="text" value={editForm.currency} />
+            </label>
+            <label>
+              Stock status
+              <input onChange={(event) => setEditForm((current) => ({ ...current, stock_status: event.target.value }))} required type="text" value={editForm.stock_status} />
+            </label>
+            <label className="admin-form-grid-span-2">
+              Source URL
+              <input onChange={(event) => setEditForm((current) => ({ ...current, source_url: event.target.value }))} required type="url" value={editForm.source_url} />
+            </label>
+            <label>
+              Pack size (g)
+              <input onChange={(event) => setEditForm((current) => ({ ...current, pack_size_g: event.target.value }))} required type="number" value={editForm.pack_size_g} />
+            </label>
+            <label>
+              Unit count
+              <input onChange={(event) => setEditForm((current) => ({ ...current, unit_count: event.target.value }))} type="number" value={editForm.unit_count} />
+            </label>
+            <label>
+              Total pack size (g)
+              <input onChange={(event) => setEditForm((current) => ({ ...current, total_pack_size_g: event.target.value }))} type="number" value={editForm.total_pack_size_g} />
+            </label>
+            <label>
+              Offer type
+              <select onChange={(event) => setEditForm((current) => ({ ...current, offer_type: event.target.value }))} value={editForm.offer_type}>
+                <option value="single_pack">single_pack</option>
+                <option value="multi_pack">multi_pack</option>
+                <option value="bundle">bundle</option>
+                <option value="unknown">unknown</option>
+              </select>
+            </label>
+            <label>
+              Price basis
+              <select onChange={(event) => setEditForm((current) => ({ ...current, price_basis: event.target.value }))} value={editForm.price_basis}>
+                <option value="total">total</option>
+                <option value="per_bag">per_bag</option>
+                <option value="per_unit">per_unit</option>
+                <option value="unknown">unknown</option>
+              </select>
+            </label>
+            <label>
+              Base price
+              <input onChange={(event) => setEditForm((current) => ({ ...current, base_price: event.target.value }))} type="number" value={editForm.base_price} />
+            </label>
+            <label>
+              Sale price
+              <input onChange={(event) => setEditForm((current) => ({ ...current, sale_price: event.target.value }))} type="number" value={editForm.sale_price} />
+            </label>
+            <label>
+              Member price
+              <input onChange={(event) => setEditForm((current) => ({ ...current, member_price: event.target.value }))} type="number" value={editForm.member_price} />
+            </label>
+            <label>
+              Subscription price
+              <input onChange={(event) => setEditForm((current) => ({ ...current, subscription_price: event.target.value }))} type="number" value={editForm.subscription_price} />
+            </label>
+            <label>
+              Coupon price
+              <input onChange={(event) => setEditForm((current) => ({ ...current, coupon_price: event.target.value }))} type="number" value={editForm.coupon_price} />
+            </label>
+            <label>
+              Minimum spend
+              <input onChange={(event) => setEditForm((current) => ({ ...current, minimum_spend: event.target.value }))} type="number" value={editForm.minimum_spend} />
+            </label>
+            <label className="admin-form-grid-span-2">
+              Conditional flags (comma separated)
+              <input onChange={(event) => setEditForm((current) => ({ ...current, conditional_flags: event.target.value }))} type="text" value={editForm.conditional_flags} />
+            </label>
+            <label className="admin-form-grid-span-2">
+              Reason
+              <input onChange={(event) => setEditForm((current) => ({ ...current, reason: event.target.value }))} required type="text" value={editForm.reason} />
+            </label>
+            <label className="admin-checkbox-field">
+              <input checked={editForm.is_active} onChange={(event) => setEditForm((current) => ({ ...current, is_active: event.target.checked }))} type="checkbox" />
+              Override is active
+            </label>
+            <label className="admin-form-grid-span-2">
+              Notes
+              <textarea onChange={(event) => setEditForm((current) => ({ ...current, notes: event.target.value }))} rows={4} value={editForm.notes} />
+            </label>
+          </div>
+          <AdminFormNotice error={error} success={success} />
+          <div className="admin-form-actions">
+            <button className="primary-button" disabled={editSubmitting || !csrfToken || !selectedOverrideId} type="submit">
+              {editSubmitting ? 'Saving...' : 'Save override'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </AdminTablePanel>
+  );
+}
+
+function AdminImagesView({
+  items,
+  products,
+  csrfToken,
+  onSaved,
+}: {
+  items: AdminImageItem[];
+  products: AdminProductItem[];
+  csrfToken: string;
+  onSaved: () => Promise<void>;
+}) {
+  const [selectedImageId, setSelectedImageId] = useState<number | null>(null);
+  const [createForm, setCreateForm] = useState({
+    product_id: products[0]?.product_id?.toString() ?? '',
+    image_url: '',
+    source_url: '',
+    source_type: 'admin_manual',
+    retailer: '',
+    alt_text: '',
+    source_note: '',
+    status: 'active',
+    is_primary: false,
+    width: '',
+    height: '',
+  });
+  const [editForm, setEditForm] = useState({
+    product_id: '',
+    image_url: '',
+    source_url: '',
+    source_type: 'admin_manual',
+    retailer: '',
+    alt_text: '',
+    source_note: '',
+    status: 'active',
+    is_primary: false,
+    width: '',
+    height: '',
+  });
+  const [createSubmitting, setCreateSubmitting] = useState(false);
+  const [editSubmitting, setEditSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!products.length) return;
+    setCreateForm((current) => ({
+      ...current,
+      product_id: current.product_id || String(products[0].product_id),
+    }));
+  }, [products]);
+
+  useEffect(() => {
+    if (!items.length) {
+      setSelectedImageId(null);
+      return;
+    }
+
+    if (!selectedImageId || !items.some((item) => item.image_id === selectedImageId)) {
+      setSelectedImageId(items[0].image_id);
+    }
+  }, [items, selectedImageId]);
+
+  useEffect(() => {
+    const selected = items.find((item) => item.image_id === selectedImageId);
+    if (!selected) return;
+
+    setEditForm({
+      product_id: selected.product_id ? String(selected.product_id) : '',
+      image_url: selected.image_url,
+      source_url: selected.source_url,
+      source_type: selected.source_type,
+      retailer: selected.retailer ?? '',
+      alt_text: selected.alt_text ?? '',
+      source_note: selected.source_note ?? '',
+      status: selected.status,
+      is_primary: selected.is_primary,
+      width: selected.width ? String(selected.width) : '',
+      height: selected.height ? String(selected.height) : '',
+    });
+    setError(null);
+    setSuccess(null);
+  }, [items, selectedImageId]);
+
+  async function handleCreate(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setCreateSubmitting(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      await createAdminImage(
+        {
+          product_id: createForm.product_id ? Number(createForm.product_id) : null,
+          image_url: createForm.image_url.trim(),
+          source_url: createForm.source_url.trim(),
+          source_type: createForm.source_type.trim(),
+          retailer: normalizeTextInput(createForm.retailer),
+          alt_text: normalizeTextInput(createForm.alt_text),
+          source_note: normalizeTextInput(createForm.source_note),
+          status: createForm.status as 'active' | 'disabled',
+          is_primary: createForm.is_primary,
+          width: parseOptionalInteger(createForm.width),
+          height: parseOptionalInteger(createForm.height),
+        },
+        csrfToken,
+      );
+      await onSaved();
+      setCreateForm((current) => ({
+        ...current,
+        image_url: '',
+        source_url: '',
+        retailer: '',
+        alt_text: '',
+        source_note: '',
+        width: '',
+        height: '',
+        is_primary: false,
+      }));
+      setSuccess('Image metadata saved.');
+    } catch (submitError) {
+      setError(submitError instanceof Error ? submitError.message : 'Image registration failed.');
+    } finally {
+      setCreateSubmitting(false);
+    }
+  }
+
+  async function handleEdit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!selectedImageId) return;
+
+    setEditSubmitting(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      await patchAdminImage(
+        selectedImageId,
+        {
+          product_id: editForm.product_id ? Number(editForm.product_id) : null,
+          image_url: editForm.image_url.trim(),
+          source_url: editForm.source_url.trim(),
+          source_type: editForm.source_type.trim(),
+          retailer: normalizeTextInput(editForm.retailer),
+          alt_text: normalizeTextInput(editForm.alt_text),
+          source_note: normalizeTextInput(editForm.source_note),
+          status: editForm.status as 'active' | 'disabled',
+          is_primary: editForm.is_primary,
+          width: parseOptionalInteger(editForm.width),
+          height: parseOptionalInteger(editForm.height),
+        },
+        csrfToken,
+      );
+      await onSaved();
+      setSuccess('Image metadata updated.');
+    } catch (submitError) {
+      setError(submitError instanceof Error ? submitError.message : 'Image update failed.');
+    } finally {
+      setEditSubmitting(false);
+    }
+  }
+
+  return (
+    <AdminTablePanel title="Images" eyebrow="Product image metadata" empty={<AdminEmptyState label="product images" />} hasItems={items.length > 0 || products.length > 0}>
+      {items.length > 0 ? (
+        <div className="admin-table-wrap">
+          <table className="admin-data-table">
+            <thead>
+              <tr>
+                <th>Preview</th>
+                <th>Product</th>
+                <th>Source</th>
+                <th>Primary</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {items.map((item) => (
+                <tr key={item.image_id}>
+                  <td>
+                    {item.image_url ? (
+                      <a href={item.image_url} rel="noreferrer" target="_blank">
+                        <img alt={item.alt_text || item.product_name || 'Product image'} src={item.image_url} style={{ width: '4.5rem', height: '4.5rem', borderRadius: '1rem', objectFit: 'cover', border: '1px solid rgba(90, 82, 70, 0.14)' }} />
+                      </a>
+                    ) : '-'}
+                  </td>
+                  <td>{item.product_name || item.product_id || '-'}</td>
+                  <td>{item.source_type}</td>
+                  <td>{item.is_primary ? 'Primary' : 'Secondary'}</td>
+                  <td>{item.status}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <AdminEmptyState label="image metadata rows" />
+      )}
+
+      <div className="admin-form-split">
+        <form className="admin-form-panel" onSubmit={handleCreate}>
+          <div className="admin-form-heading">
+            <div>
+              <strong>Register image metadata</strong>
+              <p>Storage upload is intentionally deferred. This screen binds image URLs, alt text, and primary-image status to a product.</p>
+            </div>
+          </div>
+          <div className="admin-form-grid">
+            <label>
+              Product
+              <select onChange={(event) => setCreateForm((current) => ({ ...current, product_id: event.target.value }))} value={createForm.product_id}>
+                {products.map((product) => (
+                  <option key={product.product_id} value={product.product_id}>
+                    {product.product_id} - {product.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Source type
+              <input onChange={(event) => setCreateForm((current) => ({ ...current, source_type: event.target.value }))} required type="text" value={createForm.source_type} />
+            </label>
+            <label className="admin-form-grid-span-2">
+              Image URL
+              <input onChange={(event) => setCreateForm((current) => ({ ...current, image_url: event.target.value }))} required type="url" value={createForm.image_url} />
+            </label>
+            <label className="admin-form-grid-span-2">
+              Source URL
+              <input onChange={(event) => setCreateForm((current) => ({ ...current, source_url: event.target.value }))} required type="url" value={createForm.source_url} />
+            </label>
+            <label>
+              Retailer
+              <input onChange={(event) => setCreateForm((current) => ({ ...current, retailer: event.target.value }))} type="text" value={createForm.retailer} />
+            </label>
+            <label>
+              Status
+              <select onChange={(event) => setCreateForm((current) => ({ ...current, status: event.target.value }))} value={createForm.status}>
+                <option value="active">active</option>
+                <option value="disabled">disabled</option>
+              </select>
+            </label>
+            <label>
+              Width
+              <input onChange={(event) => setCreateForm((current) => ({ ...current, width: event.target.value }))} type="number" value={createForm.width} />
+            </label>
+            <label>
+              Height
+              <input onChange={(event) => setCreateForm((current) => ({ ...current, height: event.target.value }))} type="number" value={createForm.height} />
+            </label>
+            <label className="admin-checkbox-field">
+              <input checked={createForm.is_primary} onChange={(event) => setCreateForm((current) => ({ ...current, is_primary: event.target.checked }))} type="checkbox" />
+              Set as primary image
+            </label>
+            <label className="admin-form-grid-span-2">
+              Alt text
+              <input onChange={(event) => setCreateForm((current) => ({ ...current, alt_text: event.target.value }))} type="text" value={createForm.alt_text} />
+            </label>
+            <label className="admin-form-grid-span-2">
+              Source note
+              <textarea onChange={(event) => setCreateForm((current) => ({ ...current, source_note: event.target.value }))} rows={4} value={createForm.source_note} />
+            </label>
+          </div>
+          <AdminFormNotice error={error} success={success} />
+          <div className="admin-form-actions">
+            <button className="primary-button" disabled={createSubmitting || !csrfToken || !products.length} type="submit">
+              {createSubmitting ? 'Saving...' : 'Register image metadata'}
+            </button>
+          </div>
+        </form>
+
+        <form className="admin-form-panel" onSubmit={handleEdit}>
+          <div className="admin-form-heading">
+            <div>
+              <strong>Edit image metadata</strong>
+              <p>Use this to preview, rebind, or switch the primary image for a product.</p>
+            </div>
+            <label className="admin-inline-field">
+              Image
+              <select onChange={(event) => setSelectedImageId(Number(event.target.value))} value={selectedImageId ?? ''}>
+                {items.map((item) => (
+                  <option key={item.image_id} value={item.image_id}>
+                    {item.image_id} - {item.product_name || item.image_url}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+          <div className="admin-form-grid">
+            <label>
+              Product
+              <select onChange={(event) => setEditForm((current) => ({ ...current, product_id: event.target.value }))} value={editForm.product_id}>
+                <option value="">No bound product</option>
+                {products.map((product) => (
+                  <option key={product.product_id} value={product.product_id}>
+                    {product.product_id} - {product.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Source type
+              <input onChange={(event) => setEditForm((current) => ({ ...current, source_type: event.target.value }))} required type="text" value={editForm.source_type} />
+            </label>
+            <label className="admin-form-grid-span-2">
+              Image URL
+              <input onChange={(event) => setEditForm((current) => ({ ...current, image_url: event.target.value }))} required type="url" value={editForm.image_url} />
+            </label>
+            <label className="admin-form-grid-span-2">
+              Source URL
+              <input onChange={(event) => setEditForm((current) => ({ ...current, source_url: event.target.value }))} required type="url" value={editForm.source_url} />
+            </label>
+            <label>
+              Retailer
+              <input onChange={(event) => setEditForm((current) => ({ ...current, retailer: event.target.value }))} type="text" value={editForm.retailer} />
+            </label>
+            <label>
+              Status
+              <select onChange={(event) => setEditForm((current) => ({ ...current, status: event.target.value }))} value={editForm.status}>
+                <option value="active">active</option>
+                <option value="disabled">disabled</option>
+              </select>
+            </label>
+            <label>
+              Width
+              <input onChange={(event) => setEditForm((current) => ({ ...current, width: event.target.value }))} type="number" value={editForm.width} />
+            </label>
+            <label>
+              Height
+              <input onChange={(event) => setEditForm((current) => ({ ...current, height: event.target.value }))} type="number" value={editForm.height} />
+            </label>
+            <label className="admin-checkbox-field">
+              <input checked={editForm.is_primary} onChange={(event) => setEditForm((current) => ({ ...current, is_primary: event.target.checked }))} type="checkbox" />
+              Set as primary image
+            </label>
+            <label className="admin-form-grid-span-2">
+              Alt text
+              <input onChange={(event) => setEditForm((current) => ({ ...current, alt_text: event.target.value }))} type="text" value={editForm.alt_text} />
+            </label>
+            <label className="admin-form-grid-span-2">
+              Source note
+              <textarea onChange={(event) => setEditForm((current) => ({ ...current, source_note: event.target.value }))} rows={4} value={editForm.source_note} />
+            </label>
+          </div>
+          <AdminFormNotice error={error} success={success} />
+          <div className="admin-form-actions">
+            <button className="primary-button" disabled={editSubmitting || !csrfToken || !selectedImageId} type="submit">
+              {editSubmitting ? 'Saving...' : 'Save image metadata'}
+            </button>
+          </div>
+        </form>
       </div>
     </AdminTablePanel>
   );
@@ -1010,7 +1944,9 @@ export function AdminAppShell({ navigate, view: rawView }: { navigate: (path: st
   const [dashboard, setDashboard] = useState<AdminDashboardResponse | null>(null);
   const [products, setProducts] = useState<AdminProductItem[]>([]);
   const [offers, setOffers] = useState<AdminOfferItem[]>([]);
+  const [offerOverrides, setOfferOverrides] = useState<AdminOfferOverrideItem[]>([]);
   const [sources, setSources] = useState<AdminSourceItem[]>([]);
+  const [images, setImages] = useState<AdminImageItem[]>([]);
   const [dictionaryItems, setDictionaryItems] = useState<AdminDictionaryItem[]>([]);
   const [auditLog, setAuditLog] = useState<AdminAuditLogItem[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
@@ -1053,10 +1989,23 @@ export function AdminAppShell({ navigate, view: rawView }: { navigate: (path: st
       } else if (targetView === 'products') {
         setProducts((await getAdminProducts()).items);
       } else if (targetView === 'offers') {
-        setOffers((await getAdminOffers()).items);
+        const [offerData, overrideData, productData, sourceData] = await Promise.all([
+          getAdminOffers(),
+          getAdminOfferOverrides(),
+          getAdminProducts(),
+          getAdminSources(),
+        ]);
+        setOffers(offerData.items);
+        setOfferOverrides(overrideData.items);
+        setProducts(productData.items);
+        setSources(sourceData.items);
       } else if (targetView === 'sources') {
         const [sourceData, productData] = await Promise.all([getAdminSources(), getAdminProducts()]);
         setSources(sourceData.items);
+        setProducts(productData.items);
+      } else if (targetView === 'images') {
+        const [imageData, productData] = await Promise.all([getAdminImages(), getAdminProducts()]);
+        setImages(imageData.items);
         setProducts(productData.items);
       } else if (targetView === 'dictionary') {
         setDictionaryItems((await getAdminDictionary()).items);
@@ -1127,8 +2076,18 @@ export function AdminAppShell({ navigate, view: rawView }: { navigate: (path: st
         {!dataLoading && dataError && <section className="admin-dashboard-shell"><div className="admin-empty-state"><strong>{dataError}</strong></div></section>}
         {!dataLoading && !dataError && view === 'dashboard' && <AdminDashboardView csrfReady={Boolean(csrfToken)} dashboard={dashboard} />}
         {!dataLoading && !dataError && view === 'products' && <AdminProductsView csrfToken={csrfToken} items={products} onSaved={() => loadAdminView('products')} />}
-        {!dataLoading && !dataError && view === 'offers' && <AdminOffersView items={offers} />}
+        {!dataLoading && !dataError && view === 'offers' && (
+          <AdminOffersView
+            csrfToken={csrfToken}
+            items={offers}
+            onSaved={() => loadAdminView('offers')}
+            overrides={offerOverrides}
+            products={products}
+            sources={sources}
+          />
+        )}
         {!dataLoading && !dataError && view === 'sources' && <AdminSourcesView csrfToken={csrfToken} items={sources} onSaved={() => loadAdminView('sources')} products={products} />}
+        {!dataLoading && !dataError && view === 'images' && <AdminImagesView csrfToken={csrfToken} items={images} onSaved={() => loadAdminView('images')} products={products} />}
         {!dataLoading && !dataError && view === 'dictionary' && <AdminDictionaryView csrfToken={csrfToken} items={dictionaryItems} onSaved={() => loadAdminView('dictionary')} />}
         {!dataLoading && !dataError && view === 'audit' && <AdminAuditView items={auditLog} />}
       </section>

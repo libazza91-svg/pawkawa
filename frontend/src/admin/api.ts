@@ -52,6 +52,37 @@ export type AdminOfferItem = {
   last_checked_at: string;
 };
 
+export type AdminOfferOverrideItem = {
+  id: number;
+  product_id: number | null;
+  product_slug: string | null;
+  product_name: string | null;
+  retailer_name: string;
+  retailer_slug: string;
+  source_id: number | null;
+  source_url: string;
+  market: string;
+  currency: string;
+  base_price: string | number | null;
+  sale_price: string | number | null;
+  member_price: string | number | null;
+  subscription_price: string | number | null;
+  coupon_price: string | number | null;
+  minimum_spend: string | number | null;
+  stock_status: string;
+  pack_size_g: number;
+  unit_count: number;
+  total_pack_size_g: number | null;
+  offer_type: string;
+  price_basis: string;
+  conditional_flags: string[];
+  ordinary_best_price_eligible: boolean;
+  reason: string;
+  notes: string | null;
+  is_active: boolean;
+  updated_at: string | null;
+};
+
 export type AdminSourceItem = {
   source_id: number;
   product_id: number | null;
@@ -77,6 +108,24 @@ export type AdminAuditLogItem = {
   entity_id: string;
   reason: string | null;
   created_at: string;
+};
+
+export type AdminImageItem = {
+  image_id: number;
+  product_id: number | null;
+  product_name: string | null;
+  image_url: string;
+  source_url: string;
+  source_type: string;
+  retailer: string | null;
+  alt_text: string | null;
+  source_note: string | null;
+  status: string;
+  is_primary: boolean;
+  width: number | null;
+  height: number | null;
+  captured_at: string | null;
+  updated_at: string | null;
 };
 
 export type AdminDictionaryCategory =
@@ -138,6 +187,47 @@ export type AdminDictionaryWriteInput = {
   needs_review?: boolean;
 };
 
+export type AdminOfferOverrideWriteInput = {
+  product_id?: number | null;
+  product_slug?: string | null;
+  retailer_name?: string;
+  retailer_slug?: string;
+  source_id?: number | null;
+  source_url?: string;
+  market?: string;
+  currency?: string;
+  base_price?: number | null;
+  sale_price?: number | null;
+  member_price?: number | null;
+  subscription_price?: number | null;
+  coupon_price?: number | null;
+  minimum_spend?: number | null;
+  stock_status?: string;
+  pack_size_g?: number;
+  unit_count?: number;
+  total_pack_size_g?: number | null;
+  offer_type?: string;
+  price_basis?: string;
+  conditional_flags?: string[];
+  reason?: string;
+  notes?: string | null;
+  is_active?: boolean;
+};
+
+export type AdminImageWriteInput = {
+  product_id?: number | null;
+  image_url?: string;
+  source_url?: string;
+  source_type?: string;
+  retailer?: string | null;
+  alt_text?: string | null;
+  source_note?: string | null;
+  status?: 'active' | 'disabled';
+  is_primary?: boolean;
+  width?: number | null;
+  height?: number | null;
+};
+
 async function adminApi<T>(url: string, init?: RequestInit): Promise<T> {
   const headers = new Headers(init?.headers);
   if (init?.body && !headers.has('Content-Type')) {
@@ -190,8 +280,16 @@ export function getAdminOffers() {
   return adminApi<{ items: AdminOfferItem[] }>('/api/admin/offers');
 }
 
+export function getAdminOfferOverrides() {
+  return adminApi<{ items: AdminOfferOverrideItem[] }>('/api/admin/offers/overrides');
+}
+
 export function getAdminSources() {
   return adminApi<{ items: AdminSourceItem[] }>('/api/admin/sources');
+}
+
+export function getAdminImages() {
+  return adminApi<{ items: AdminImageItem[] }>('/api/admin/images');
 }
 
 export function getAdminAuditLog() {
@@ -244,6 +342,52 @@ export function createAdminDictionaryTerm(input: Required<Pick<AdminDictionaryWr
 
 export function patchAdminDictionaryTerm(termId: number, input: AdminDictionaryWriteInput, csrfToken: string) {
   return adminApi<{ item: AdminDictionaryItem }>(`/api/admin/dictionary/${termId}`, {
+    method: 'PATCH',
+    headers: {
+      'X-CSRF-Token': csrfToken,
+    },
+    body: JSON.stringify(input),
+  });
+}
+
+export function createAdminOfferOverride(
+  input: Required<Pick<AdminOfferOverrideWriteInput, 'retailer_name' | 'retailer_slug' | 'source_url' | 'currency' | 'stock_status' | 'pack_size_g' | 'offer_type' | 'price_basis' | 'reason'>> & AdminOfferOverrideWriteInput,
+  csrfToken: string,
+) {
+  return adminApi<{ item: AdminOfferOverrideItem }>('/api/admin/offers/overrides', {
+    method: 'POST',
+    headers: {
+      'X-CSRF-Token': csrfToken,
+    },
+    body: JSON.stringify(input),
+  });
+}
+
+export function patchAdminOfferOverride(overrideId: number, input: AdminOfferOverrideWriteInput, csrfToken: string) {
+  return adminApi<{ item: AdminOfferOverrideItem }>(`/api/admin/offers/overrides/${overrideId}`, {
+    method: 'PATCH',
+    headers: {
+      'X-CSRF-Token': csrfToken,
+    },
+    body: JSON.stringify(input),
+  });
+}
+
+export function createAdminImage(
+  input: Required<Pick<AdminImageWriteInput, 'image_url' | 'source_url' | 'source_type'>> & AdminImageWriteInput,
+  csrfToken: string,
+) {
+  return adminApi<{ item: AdminImageItem }>('/api/admin/images', {
+    method: 'POST',
+    headers: {
+      'X-CSRF-Token': csrfToken,
+    },
+    body: JSON.stringify(input),
+  });
+}
+
+export function patchAdminImage(imageId: number, input: AdminImageWriteInput, csrfToken: string) {
+  return adminApi<{ item: AdminImageItem }>(`/api/admin/images/${imageId}`, {
     method: 'PATCH',
     headers: {
       'X-CSRF-Token': csrfToken,

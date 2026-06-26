@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { sql, eq } from 'drizzle-orm';
 import { db } from '../db/client';
-import { adminAuditLogs, brands, products, retailOffers, sources } from '../db/schema';
+import { adminAuditLogs, brands, manualOfferOverrides, productImages, products, retailOffers, sources } from '../db/schema';
 import { requireAdminAuth } from '../middleware/admin-auth';
 import { sendSuccess } from '../middleware/response';
 
@@ -106,6 +106,50 @@ adminReadonlyRouter.get(
 );
 
 adminReadonlyRouter.get(
+  '/offers/overrides',
+  asyncHandler(async (req: Request, res: Response) => {
+    const limit = limitFromQuery(req.query.limit);
+    const items = await db
+      .select({
+        id: manualOfferOverrides.id,
+        product_id: manualOfferOverrides.product_id,
+        product_slug: manualOfferOverrides.product_slug,
+        product_name: products.name,
+        retailer_name: manualOfferOverrides.retailer_name,
+        retailer_slug: manualOfferOverrides.retailer_slug,
+        source_id: manualOfferOverrides.source_id,
+        source_url: manualOfferOverrides.source_url,
+        market: manualOfferOverrides.market,
+        currency: manualOfferOverrides.currency,
+        base_price: manualOfferOverrides.base_price,
+        sale_price: manualOfferOverrides.sale_price,
+        member_price: manualOfferOverrides.member_price,
+        subscription_price: manualOfferOverrides.subscription_price,
+        coupon_price: manualOfferOverrides.coupon_price,
+        minimum_spend: manualOfferOverrides.minimum_spend,
+        stock_status: manualOfferOverrides.stock_status,
+        pack_size_g: manualOfferOverrides.pack_size_g,
+        unit_count: manualOfferOverrides.unit_count,
+        total_pack_size_g: manualOfferOverrides.total_pack_size_g,
+        offer_type: manualOfferOverrides.offer_type,
+        price_basis: manualOfferOverrides.price_basis,
+        conditional_flags: manualOfferOverrides.conditional_flags,
+        ordinary_best_price_eligible: manualOfferOverrides.ordinary_best_price_eligible,
+        reason: manualOfferOverrides.reason,
+        notes: manualOfferOverrides.notes,
+        is_active: manualOfferOverrides.is_active,
+        updated_at: manualOfferOverrides.updated_at,
+      })
+      .from(manualOfferOverrides)
+      .leftJoin(products, eq(manualOfferOverrides.product_id, products.product_id))
+      .orderBy(manualOfferOverrides.id)
+      .limit(limit);
+
+    sendSuccess(res, { items });
+  }),
+);
+
+adminReadonlyRouter.get(
   '/sources',
   asyncHandler(async (req: Request, res: Response) => {
     const limit = limitFromQuery(req.query.limit);
@@ -129,6 +173,37 @@ adminReadonlyRouter.get(
       .from(sources)
       .leftJoin(products, eq(sources.product_id, products.product_id))
       .orderBy(sources.source_id)
+      .limit(limit);
+
+    sendSuccess(res, { items });
+  }),
+);
+
+adminReadonlyRouter.get(
+  '/images',
+  asyncHandler(async (req: Request, res: Response) => {
+    const limit = limitFromQuery(req.query.limit);
+    const items = await db
+      .select({
+        image_id: productImages.image_id,
+        product_id: productImages.product_id,
+        product_name: products.name,
+        image_url: productImages.image_url,
+        source_url: productImages.source_url,
+        source_type: productImages.source_type,
+        retailer: productImages.retailer,
+        alt_text: productImages.alt_text,
+        source_note: productImages.source_note,
+        status: productImages.status,
+        is_primary: productImages.is_primary,
+        width: productImages.width,
+        height: productImages.height,
+        captured_at: productImages.captured_at,
+        updated_at: productImages.updated_at,
+      })
+      .from(productImages)
+      .leftJoin(products, eq(productImages.product_id, products.product_id))
+      .orderBy(productImages.image_id)
       .limit(limit);
 
     sendSuccess(res, { items });

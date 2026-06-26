@@ -9,6 +9,7 @@ export { productPrices } from './product_prices';
 export { retailOffers } from './retail_offers';
 export { priceSnapshots } from './price_snapshots';
 export { productImages } from './product_images';
+export { manualOfferOverrides } from './manual_offer_overrides';
 export { retailerProductMappings } from './retailer_product_mappings';
 export { sources } from './sources';
 export { healthRules } from './health_rules';

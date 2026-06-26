@@ -1,4 +1,4 @@
-import { pgTable, serial, integer, text, varchar, timestamp, jsonb } from 'drizzle-orm/pg-core';
+import { pgTable, serial, integer, text, varchar, timestamp, jsonb, boolean } from 'drizzle-orm/pg-core';
 import { products } from './products';
 
 export const productImages = pgTable('product_images', {
@@ -9,10 +9,14 @@ export const productImages = pgTable('product_images', {
   source_type: varchar('source_type').notNull(),
   retailer: varchar('retailer'),
   alt_text: text('alt_text'),
+  source_note: text('source_note'),
+  status: varchar('status').notNull().default('active'),
+  is_primary: boolean('is_primary').notNull().default(false),
   width: integer('width'),
   height: integer('height'),
   metadata: jsonb('metadata').default({}),
   captured_at: timestamp('captured_at').defaultNow(),
+  updated_at: timestamp('updated_at').defaultNow(),
 });
 
 export type ProductImage = typeof productImages.$inferSelect;

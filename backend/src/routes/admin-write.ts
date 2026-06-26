@@ -3,7 +3,7 @@ import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 import { recordAdminAuditEvent } from '../admin/audit';
 import { db } from '../db/client';
-import { adminDictionaryTerms, products, sources } from '../db/schema';
+import { adminDictionaryTerms, manualOfferOverrides, productImages, products, sources } from '../db/schema';
 import { requireAdminAuth } from '../middleware/admin-auth';
 import { requireAdminCsrf } from '../middleware/admin-csrf';
 import { sendError, sendSuccess } from '../middleware/response';
@@ -87,6 +87,99 @@ const dictionaryUpdateSchema = z
   .strict()
   .refine((value) => Object.keys(value).length > 0, 'At least one field is required');
 
+const conditionalFlagsSchema = z.array(z.string().trim().min(1).max(64)).max(20);
+
+const overrideCreateSchema = z
+  .object({
+    product_id: z.number().int().positive().nullable().optional(),
+    product_slug: z.string().trim().min(1).max(255).nullable().optional(),
+    retailer_name: z.string().trim().min(1).max(255),
+    retailer_slug: z.string().trim().min(1).max(128),
+    source_id: z.number().int().positive().nullable().optional(),
+    source_url: z.string().trim().url(),
+    market: z.string().trim().min(2).max(8).optional(),
+    currency: z.string().trim().min(3).max(8),
+    base_price: z.number().positive().nullable().optional(),
+    sale_price: z.number().positive().nullable().optional(),
+    member_price: z.number().positive().nullable().optional(),
+    subscription_price: z.number().positive().nullable().optional(),
+    coupon_price: z.number().positive().nullable().optional(),
+    minimum_spend: z.number().positive().nullable().optional(),
+    stock_status: z.string().trim().min(1).max(32),
+    pack_size_g: z.number().int().positive(),
+    unit_count: z.number().int().positive().optional(),
+    total_pack_size_g: z.number().int().positive().nullable().optional(),
+    offer_type: z.string().trim().min(1).max(64),
+    price_basis: z.string().trim().min(1).max(64),
+    conditional_flags: conditionalFlagsSchema.optional(),
+    reason: z.string().trim().min(1).max(1000),
+    notes: z.string().trim().max(4000).nullable().optional(),
+    is_active: z.boolean().optional(),
+  })
+  .strict()
+  .refine((value) => value.product_id || value.product_slug, 'product_id or product_slug is required');
+
+const overrideUpdateSchema = z
+  .object({
+    product_id: z.number().int().positive().nullable().optional(),
+    product_slug: z.string().trim().min(1).max(255).nullable().optional(),
+    retailer_name: z.string().trim().min(1).max(255).optional(),
+    retailer_slug: z.string().trim().min(1).max(128).optional(),
+    source_id: z.number().int().positive().nullable().optional(),
+    source_url: z.string().trim().url().optional(),
+    market: z.string().trim().min(2).max(8).optional(),
+    currency: z.string().trim().min(3).max(8).optional(),
+    base_price: z.number().positive().nullable().optional(),
+    sale_price: z.number().positive().nullable().optional(),
+    member_price: z.number().positive().nullable().optional(),
+    subscription_price: z.number().positive().nullable().optional(),
+    coupon_price: z.number().positive().nullable().optional(),
+    minimum_spend: z.number().positive().nullable().optional(),
+    stock_status: z.string().trim().min(1).max(32).optional(),
+    pack_size_g: z.number().int().positive().optional(),
+    unit_count: z.number().int().positive().optional(),
+    total_pack_size_g: z.number().int().positive().nullable().optional(),
+    offer_type: z.string().trim().min(1).max(64).optional(),
+    price_basis: z.string().trim().min(1).max(64).optional(),
+    conditional_flags: conditionalFlagsSchema.optional(),
+    reason: z.string().trim().min(1).max(1000).optional(),
+    notes: z.string().trim().max(4000).nullable().optional(),
+    is_active: z.boolean().optional(),
+  })
+  .strict()
+  .refine((value) => Object.keys(value).length > 0, 'At least one field is required');
+
+const imageCreateSchema = z.object({
+  product_id: z.number().int().positive().nullable().optional(),
+  image_url: z.string().trim().url(),
+  source_url: z.string().trim().url(),
+  source_type: z.string().trim().min(1).max(64),
+  retailer: z.string().trim().max(128).nullable().optional(),
+  alt_text: z.string().trim().max(500).nullable().optional(),
+  source_note: z.string().trim().max(2000).nullable().optional(),
+  status: z.enum(['active', 'disabled']).optional(),
+  is_primary: z.boolean().optional(),
+  width: z.number().int().positive().nullable().optional(),
+  height: z.number().int().positive().nullable().optional(),
+});
+
+const imageUpdateSchema = z
+  .object({
+    product_id: z.number().int().positive().nullable().optional(),
+    image_url: z.string().trim().url().optional(),
+    source_url: z.string().trim().url().optional(),
+    source_type: z.string().trim().min(1).max(64).optional(),
+    retailer: z.string().trim().max(128).nullable().optional(),
+    alt_text: z.string().trim().max(500).nullable().optional(),
+    source_note: z.string().trim().max(2000).nullable().optional(),
+    status: z.enum(['active', 'disabled']).optional(),
+    is_primary: z.boolean().optional(),
+    width: z.number().int().positive().nullable().optional(),
+    height: z.number().int().positive().nullable().optional(),
+  })
+  .strict()
+  .refine((value) => Object.keys(value).length > 0, 'At least one field is required');
+
 function asyncHandler(fn: (req: Request, res: Response) => Promise<void>) {
   return (req: Request, res: Response, next: NextFunction) => {
     fn(req, res).catch(next);
@@ -112,6 +205,69 @@ function nullableText(value: string | null | undefined): string | null | undefin
 
 function withoutUndefined<T extends Record<string, unknown>>(value: T): Partial<T> {
   return Object.fromEntries(Object.entries(value).filter(([, entryValue]) => entryValue !== undefined)) as Partial<T>;
+}
+
+function normalizeConditionalFlags(value: string[] | undefined): string[] {
+  return [...new Set((value ?? []).map((item) => item.trim()).filter(Boolean))];
+}
+
+function numericString(value: number | null | undefined): string | null | undefined {
+  if (value === undefined) return undefined;
+  if (value === null) return null;
+  return String(value);
+}
+
+function isOrdinaryBestPriceEligible(input: {
+  offer_type: string;
+  price_basis: string;
+  conditional_flags?: string[];
+  base_price?: number | null;
+  sale_price?: number | null;
+  member_price?: number | null;
+  subscription_price?: number | null;
+  coupon_price?: number | null;
+  minimum_spend?: number | null;
+}): boolean {
+  const conditionalFlags = new Set(normalizeConditionalFlags(input.conditional_flags));
+  const hasOrdinaryPrice = Number(input.sale_price ?? input.base_price ?? 0) > 0;
+  if (!hasOrdinaryPrice) return false;
+  if (input.offer_type !== 'single_pack') return false;
+  if (input.price_basis !== 'total') return false;
+  if (conditionalFlags.size > 0) return false;
+  if (input.member_price || input.subscription_price || input.coupon_price || input.minimum_spend) return false;
+  return true;
+}
+
+async function assertRelatedProductExists(productId: number | null | undefined): Promise<void> {
+  if (!productId) return;
+  const [product] = await db.select({ product_id: products.product_id }).from(products).where(eq(products.product_id, productId));
+  if (!product) {
+    throw new Error('Product not found');
+  }
+}
+
+async function assertRelatedSourceExists(sourceId: number | null | undefined): Promise<void> {
+  if (!sourceId) return;
+  const [source] = await db.select({ source_id: sources.source_id }).from(sources).where(eq(sources.source_id, sourceId));
+  if (!source) {
+    throw new Error('Source not found');
+  }
+}
+
+async function clearPrimaryImageForProduct(productId: number | null | undefined, exceptImageId?: number): Promise<void> {
+  if (!productId) return;
+  const existingImages = await db
+    .select({ image_id: productImages.image_id })
+    .from(productImages)
+    .where(eq(productImages.product_id, productId));
+
+  for (const image of existingImages) {
+    await db.update(productImages).set({ is_primary: false, updated_at: new Date() }).where(eq(productImages.image_id, image.image_id));
+  }
+
+  if (exceptImageId) {
+    await db.update(productImages).set({ is_primary: true, updated_at: new Date() }).where(eq(productImages.image_id, exceptImageId));
+  }
 }
 
 adminWriteRouter.use(requireAdminAuth);
@@ -165,6 +321,171 @@ adminWriteRouter.patch(
       action: 'product_updated',
       entityType: 'product',
       entityId: String(productId),
+      beforeJson: existing,
+      afterJson: updated,
+    });
+
+    sendSuccess(res, { item: updated });
+  }),
+);
+
+adminWriteRouter.post(
+  '/offers/overrides',
+  requireAdminCsrf,
+  asyncHandler(async (req: Request, res: Response) => {
+    const parsed = overrideCreateSchema.safeParse(req.body);
+    if (!parsed.success) {
+      sendError(res, 'INVALID_PARAMETER', parsed.error.issues[0]?.message || 'Invalid manual override payload', 400);
+      return;
+    }
+
+    try {
+      await assertRelatedProductExists(parsed.data.product_id ?? null);
+      await assertRelatedSourceExists(parsed.data.source_id ?? null);
+    } catch (error) {
+      sendError(res, 'NOT_FOUND', (error as Error).message, 404);
+      return;
+    }
+
+    const conditionalFlags = normalizeConditionalFlags(parsed.data.conditional_flags);
+    const ordinaryBestPriceEligible = isOrdinaryBestPriceEligible({
+      offer_type: parsed.data.offer_type,
+      price_basis: parsed.data.price_basis,
+      conditional_flags: conditionalFlags,
+      base_price: parsed.data.base_price ?? null,
+      sale_price: parsed.data.sale_price ?? null,
+      member_price: parsed.data.member_price ?? null,
+      subscription_price: parsed.data.subscription_price ?? null,
+      coupon_price: parsed.data.coupon_price ?? null,
+      minimum_spend: parsed.data.minimum_spend ?? null,
+    });
+
+    const inserted = await db
+      .insert(manualOfferOverrides)
+      .values({
+        product_id: parsed.data.product_id ?? null,
+        product_slug: nullableText(parsed.data.product_slug),
+        retailer_name: parsed.data.retailer_name.trim(),
+        retailer_slug: parsed.data.retailer_slug.trim(),
+        source_id: parsed.data.source_id ?? null,
+        source_url: parsed.data.source_url.trim(),
+        market: parsed.data.market?.trim() || 'AU',
+        currency: parsed.data.currency.trim(),
+        base_price: numericString(parsed.data.base_price ?? null),
+        sale_price: numericString(parsed.data.sale_price ?? null),
+        member_price: numericString(parsed.data.member_price ?? null),
+        subscription_price: numericString(parsed.data.subscription_price ?? null),
+        coupon_price: numericString(parsed.data.coupon_price ?? null),
+        minimum_spend: numericString(parsed.data.minimum_spend ?? null),
+        stock_status: parsed.data.stock_status.trim(),
+        pack_size_g: parsed.data.pack_size_g,
+        unit_count: parsed.data.unit_count ?? 1,
+        total_pack_size_g: parsed.data.total_pack_size_g ?? parsed.data.pack_size_g,
+        offer_type: parsed.data.offer_type.trim(),
+        price_basis: parsed.data.price_basis.trim(),
+        conditional_flags: conditionalFlags,
+        ordinary_best_price_eligible: ordinaryBestPriceEligible,
+        reason: parsed.data.reason.trim(),
+        notes: nullableText(parsed.data.notes),
+        is_active: parsed.data.is_active ?? true,
+        updated_at: new Date(),
+      })
+      .returning({ id: manualOfferOverrides.id });
+
+    const [created] = await db.select().from(manualOfferOverrides).where(eq(manualOfferOverrides.id, inserted[0].id));
+
+    await recordAdminAuditEvent({
+      actorAdminUserId: req.adminUser!.id,
+      action: 'manual_offer_override_created',
+      entityType: 'manual_offer_override',
+      entityId: String(inserted[0].id),
+      afterJson: created,
+    });
+
+    sendSuccess(res, { item: created });
+  }),
+);
+
+adminWriteRouter.patch(
+  '/offers/overrides/:id',
+  requireAdminCsrf,
+  asyncHandler(async (req: Request, res: Response) => {
+    const overrideId = parseEntityId(req.params.id);
+    if (!overrideId) {
+      sendError(res, 'INVALID_PARAMETER', 'Valid override id is required', 400);
+      return;
+    }
+
+    const parsed = overrideUpdateSchema.safeParse(req.body);
+    if (!parsed.success) {
+      sendError(res, 'INVALID_PARAMETER', parsed.error.issues[0]?.message || 'Invalid manual override update payload', 400);
+      return;
+    }
+
+    const [existing] = await db.select().from(manualOfferOverrides).where(eq(manualOfferOverrides.id, overrideId));
+    if (!existing) {
+      sendError(res, 'NOT_FOUND', 'Manual offer override not found', 404);
+      return;
+    }
+
+    try {
+      await assertRelatedProductExists(parsed.data.product_id ?? undefined);
+      await assertRelatedSourceExists(parsed.data.source_id ?? undefined);
+    } catch (error) {
+      sendError(res, 'NOT_FOUND', (error as Error).message, 404);
+      return;
+    }
+
+    const conditionalFlags = parsed.data.conditional_flags ? normalizeConditionalFlags(parsed.data.conditional_flags) : undefined;
+    const effectiveCandidate = {
+      offer_type: parsed.data.offer_type ?? existing.offer_type,
+      price_basis: parsed.data.price_basis ?? existing.price_basis,
+      conditional_flags: conditionalFlags ?? (Array.isArray(existing.conditional_flags) ? existing.conditional_flags.map(String) : []),
+      base_price: parsed.data.base_price ?? Number(existing.base_price ?? 0),
+      sale_price: parsed.data.sale_price ?? Number(existing.sale_price ?? 0),
+      member_price: parsed.data.member_price ?? Number(existing.member_price ?? 0),
+      subscription_price: parsed.data.subscription_price ?? Number((existing as { subscription_price?: string | number | null }).subscription_price ?? 0),
+      coupon_price: parsed.data.coupon_price ?? Number(existing.coupon_price ?? 0),
+      minimum_spend: parsed.data.minimum_spend ?? Number(existing.minimum_spend ?? 0),
+    };
+
+    const updateValues = withoutUndefined({
+      product_id: parsed.data.product_id ?? undefined,
+      product_slug: parsed.data.product_slug !== undefined ? nullableText(parsed.data.product_slug) : undefined,
+      retailer_name: parsed.data.retailer_name?.trim(),
+      retailer_slug: parsed.data.retailer_slug?.trim(),
+      source_id: parsed.data.source_id ?? undefined,
+      source_url: parsed.data.source_url?.trim(),
+      market: parsed.data.market?.trim(),
+      currency: parsed.data.currency?.trim(),
+      base_price: numericString(parsed.data.base_price),
+      sale_price: numericString(parsed.data.sale_price),
+      member_price: numericString(parsed.data.member_price),
+      subscription_price: numericString(parsed.data.subscription_price),
+      coupon_price: numericString(parsed.data.coupon_price),
+      minimum_spend: numericString(parsed.data.minimum_spend),
+      stock_status: parsed.data.stock_status?.trim(),
+      pack_size_g: parsed.data.pack_size_g ?? undefined,
+      unit_count: parsed.data.unit_count ?? undefined,
+      total_pack_size_g: parsed.data.total_pack_size_g ?? undefined,
+      offer_type: parsed.data.offer_type?.trim(),
+      price_basis: parsed.data.price_basis?.trim(),
+      conditional_flags: conditionalFlags,
+      ordinary_best_price_eligible: isOrdinaryBestPriceEligible(effectiveCandidate),
+      reason: parsed.data.reason?.trim(),
+      notes: parsed.data.notes !== undefined ? nullableText(parsed.data.notes) : undefined,
+      is_active: parsed.data.is_active,
+      updated_at: new Date(),
+    });
+
+    await db.update(manualOfferOverrides).set(updateValues).where(eq(manualOfferOverrides.id, overrideId));
+    const [updated] = await db.select().from(manualOfferOverrides).where(eq(manualOfferOverrides.id, overrideId));
+
+    await recordAdminAuditEvent({
+      actorAdminUserId: req.adminUser!.id,
+      action: 'manual_offer_override_updated',
+      entityType: 'manual_offer_override',
+      entityId: String(overrideId),
       beforeJson: existing,
       afterJson: updated,
     });
@@ -350,6 +671,124 @@ adminWriteRouter.patch(
       action: 'dictionary_term_updated',
       entityType: 'dictionary_term',
       entityId: String(termId),
+      beforeJson: existing,
+      afterJson: updated,
+    });
+
+    sendSuccess(res, { item: updated });
+  }),
+);
+
+adminWriteRouter.post(
+  '/images',
+  requireAdminCsrf,
+  asyncHandler(async (req: Request, res: Response) => {
+    const parsed = imageCreateSchema.safeParse(req.body);
+    if (!parsed.success) {
+      sendError(res, 'INVALID_PARAMETER', parsed.error.issues[0]?.message || 'Invalid image payload', 400);
+      return;
+    }
+
+    try {
+      await assertRelatedProductExists(parsed.data.product_id ?? null);
+    } catch (error) {
+      sendError(res, 'NOT_FOUND', (error as Error).message, 404);
+      return;
+    }
+
+    const inserted = await db
+      .insert(productImages)
+      .values({
+        product_id: parsed.data.product_id ?? null,
+        image_url: parsed.data.image_url.trim(),
+        source_url: parsed.data.source_url.trim(),
+        source_type: parsed.data.source_type.trim(),
+        retailer: nullableText(parsed.data.retailer),
+        alt_text: nullableText(parsed.data.alt_text),
+        source_note: nullableText(parsed.data.source_note),
+        status: parsed.data.status ?? 'active',
+        is_primary: parsed.data.is_primary ?? false,
+        width: parsed.data.width ?? null,
+        height: parsed.data.height ?? null,
+        updated_at: new Date(),
+      })
+      .returning({ image_id: productImages.image_id, product_id: productImages.product_id });
+
+    if ((parsed.data.is_primary ?? false) && inserted[0].product_id) {
+      await clearPrimaryImageForProduct(inserted[0].product_id, inserted[0].image_id);
+    }
+
+    const [created] = await db.select().from(productImages).where(eq(productImages.image_id, inserted[0].image_id));
+
+    await recordAdminAuditEvent({
+      actorAdminUserId: req.adminUser!.id,
+      action: 'product_image_created',
+      entityType: 'product_image',
+      entityId: String(inserted[0].image_id),
+      afterJson: created,
+    });
+
+    sendSuccess(res, { item: created });
+  }),
+);
+
+adminWriteRouter.patch(
+  '/images/:id',
+  requireAdminCsrf,
+  asyncHandler(async (req: Request, res: Response) => {
+    const imageId = parseEntityId(req.params.id);
+    if (!imageId) {
+      sendError(res, 'INVALID_PARAMETER', 'Valid image id is required', 400);
+      return;
+    }
+
+    const parsed = imageUpdateSchema.safeParse(req.body);
+    if (!parsed.success) {
+      sendError(res, 'INVALID_PARAMETER', parsed.error.issues[0]?.message || 'Invalid image update payload', 400);
+      return;
+    }
+
+    const [existing] = await db.select().from(productImages).where(eq(productImages.image_id, imageId));
+    if (!existing) {
+      sendError(res, 'NOT_FOUND', 'Product image not found', 404);
+      return;
+    }
+
+    try {
+      await assertRelatedProductExists(parsed.data.product_id ?? undefined);
+    } catch (error) {
+      sendError(res, 'NOT_FOUND', (error as Error).message, 404);
+      return;
+    }
+
+    const targetProductId = parsed.data.product_id ?? existing.product_id ?? null;
+
+    const updateValues = withoutUndefined({
+      product_id: parsed.data.product_id ?? undefined,
+      image_url: parsed.data.image_url?.trim(),
+      source_url: parsed.data.source_url?.trim(),
+      source_type: parsed.data.source_type?.trim(),
+      retailer: parsed.data.retailer !== undefined ? nullableText(parsed.data.retailer) : undefined,
+      alt_text: parsed.data.alt_text !== undefined ? nullableText(parsed.data.alt_text) : undefined,
+      source_note: parsed.data.source_note !== undefined ? nullableText(parsed.data.source_note) : undefined,
+      status: parsed.data.status,
+      is_primary: parsed.data.is_primary,
+      width: parsed.data.width ?? undefined,
+      height: parsed.data.height ?? undefined,
+      updated_at: new Date(),
+    });
+
+    await db.update(productImages).set(updateValues).where(eq(productImages.image_id, imageId));
+    if (parsed.data.is_primary === true && targetProductId) {
+      await clearPrimaryImageForProduct(targetProductId, imageId);
+    }
+    const [updated] = await db.select().from(productImages).where(eq(productImages.image_id, imageId));
+
+    await recordAdminAuditEvent({
+      actorAdminUserId: req.adminUser!.id,
+      action: 'product_image_updated',
+      entityType: 'product_image',
+      entityId: String(imageId),
       beforeJson: existing,
       afterJson: updated,
     });

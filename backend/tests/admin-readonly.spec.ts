@@ -51,6 +51,24 @@ function createAdminReadonlyTables(memDb: IMemoryDb) {
       updated_at TIMESTAMP DEFAULT NOW()
     );
 
+    CREATE TABLE product_images (
+      image_id SERIAL PRIMARY KEY,
+      product_id INTEGER REFERENCES products(product_id),
+      image_url TEXT NOT NULL,
+      source_url TEXT NOT NULL,
+      source_type VARCHAR NOT NULL,
+      retailer VARCHAR,
+      alt_text TEXT,
+      source_note TEXT,
+      status VARCHAR NOT NULL DEFAULT 'active',
+      is_primary BOOLEAN NOT NULL DEFAULT FALSE,
+      width INTEGER,
+      height INTEGER,
+      metadata JSONB DEFAULT '{}',
+      captured_at TIMESTAMP DEFAULT NOW(),
+      updated_at TIMESTAMP DEFAULT NOW()
+    );
+
     CREATE TABLE retail_offers (
       retail_offer_id SERIAL PRIMARY KEY,
       product_id INTEGER REFERENCES products(product_id),
@@ -77,6 +95,37 @@ function createAdminReadonlyTables(memDb: IMemoryDb) {
       shipping_threshold NUMERIC,
       last_checked_at TIMESTAMP NOT NULL,
       metadata JSONB DEFAULT '{}',
+      created_at TIMESTAMP DEFAULT NOW(),
+      updated_at TIMESTAMP DEFAULT NOW()
+    );
+
+    CREATE TABLE manual_offer_overrides (
+      id SERIAL PRIMARY KEY,
+      product_id INTEGER REFERENCES products(product_id),
+      product_slug VARCHAR,
+      retailer_name VARCHAR NOT NULL,
+      retailer_slug VARCHAR NOT NULL,
+      source_id INTEGER REFERENCES sources(source_id),
+      source_url TEXT NOT NULL,
+      market VARCHAR NOT NULL DEFAULT 'AU',
+      currency VARCHAR NOT NULL,
+      base_price NUMERIC,
+      sale_price NUMERIC,
+      member_price NUMERIC,
+      subscription_price NUMERIC,
+      coupon_price NUMERIC,
+      minimum_spend NUMERIC,
+      stock_status VARCHAR NOT NULL DEFAULT 'UNKNOWN',
+      pack_size_g INTEGER NOT NULL,
+      unit_count INTEGER NOT NULL DEFAULT 1,
+      total_pack_size_g INTEGER,
+      offer_type VARCHAR NOT NULL DEFAULT 'single_pack',
+      price_basis VARCHAR NOT NULL DEFAULT 'total',
+      conditional_flags JSONB NOT NULL DEFAULT '[]',
+      ordinary_best_price_eligible BOOLEAN NOT NULL DEFAULT FALSE,
+      reason TEXT NOT NULL,
+      notes TEXT,
+      is_active BOOLEAN NOT NULL DEFAULT TRUE,
       created_at TIMESTAMP DEFAULT NOW(),
       updated_at TIMESTAMP DEFAULT NOW()
     );
@@ -133,6 +182,25 @@ function seedAdminReadonlyData(memDb: IMemoryDb) {
   memDb.public.none(`
     INSERT INTO sources (product_id, source_url, source_type, confidence_score)
     VALUES (1, 'https://example.com/source', 'retailer', 0.9)
+  `);
+  memDb.public.none(`
+    INSERT INTO product_images (product_id, image_url, source_url, source_type, retailer, alt_text, is_primary)
+    VALUES (1, 'https://cdn.example/royal.jpg', 'https://example.com/source', 'retailer', 'petstock', 'Royal Canin indoor bag', TRUE)
+  `);
+  memDb.public.none(`
+    INSERT INTO manual_offer_overrides (
+      product_id, product_slug, retailer_name, retailer_slug, source_id, source_url, market, currency,
+      base_price, stock_status, pack_size_g, unit_count, total_pack_size_g, offer_type, price_basis,
+      conditional_flags, ordinary_best_price_eligible, reason, is_active
+    ) VALUES (
+      1, 'royal-canin-indoor-adult-4000g', 'Petbarn', 'petbarn', 1, 'https://example.com/manual', 'AU', 'AUD',
+      69.99, 'IN_STOCK', 4000, 1, 4000, 'single_pack', 'total',
+      '[]', TRUE, 'Manual check after retailer promo mismatch', TRUE
+    )
+  `);
+  memDb.public.none(`
+    INSERT INTO admin_audit_logs (action, entity_type, entity_id, reason)
+    VALUES ('product_updated', 'product', '1', 'Seed audit event')
   `);
 }
 
@@ -204,14 +272,16 @@ describe('Admin read-only APIs', () => {
     expect(response.body.data.summary.retailers).toBe(1);
   });
 
-  it('returns read-only products, offers, sources, and audit log lists', async () => {
+  it('returns read-only products, offers, sources, images, overrides, and audit log lists', async () => {
     const { app, createAdminUser } = await setupApp();
     const cookie = await login(app, createAdminUser);
 
-    const [productsResponse, offersResponse, sourcesResponse, auditResponse] = await Promise.all([
+    const [productsResponse, offersResponse, overridesResponse, sourcesResponse, imagesResponse, auditResponse] = await Promise.all([
       request(app).get('/api/admin/products').set('Cookie', cookie),
       request(app).get('/api/admin/offers').set('Cookie', cookie),
+      request(app).get('/api/admin/offers/overrides').set('Cookie', cookie),
       request(app).get('/api/admin/sources').set('Cookie', cookie),
+      request(app).get('/api/admin/images').set('Cookie', cookie),
       request(app).get('/api/admin/audit-log').set('Cookie', cookie),
     ]);
 
@@ -219,8 +289,12 @@ describe('Admin read-only APIs', () => {
     expect(productsResponse.body.data.items[0].name).toBe('Indoor Adult Dry Cat Food');
     expect(offersResponse.status).toBe(200);
     expect(offersResponse.body.data.items[0].retailer_name).toBe('Petstock');
+    expect(overridesResponse.status).toBe(200);
+    expect(overridesResponse.body.data.items[0].retailer_name).toBe('Petbarn');
     expect(sourcesResponse.status).toBe(200);
     expect(sourcesResponse.body.data.items[0].source_type).toBe('retailer');
+    expect(imagesResponse.status).toBe(200);
+    expect(imagesResponse.body.data.items[0].is_primary).toBe(true);
     expect(auditResponse.status).toBe(200);
     expect(auditResponse.body.data.items.length).toBeGreaterThan(0);
   });
