@@ -1,5 +1,5 @@
 import { verifiedProducts } from '../verified-products/catalog';
-import { isRealIngestionOffer } from './audit';
+import { isTrackedPublicOffer } from './audit';
 import { DbPriceComparisonRepository } from './db-repository';
 import { FallbackPriceComparisonRepository, fixtureFallbackEnabled } from './fallback-repository';
 import { fixturePriceComparisonRepository } from './fixture-repository';
@@ -28,7 +28,7 @@ function lowestUnitOffer(offers: RetailOffer[]): RetailOffer | null {
 
 function publicVisibleOffers(offers: RetailOffer[]): RetailOffer[] {
   if (fixtureFallbackEnabled()) return offers;
-  return offers.filter(isRealIngestionOffer);
+  return offers.filter(isTrackedPublicOffer);
 }
 
 function textMatches(product: CanonicalProduct, query: string): boolean {

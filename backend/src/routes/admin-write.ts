@@ -7,6 +7,7 @@ import { adminDictionaryTerms, manualOfferOverrides, productImages, products, so
 import { requireAdminAuth } from '../middleware/admin-auth';
 import { requireAdminCsrf } from '../middleware/admin-csrf';
 import { sendError, sendSuccess } from '../middleware/response';
+import { isOrdinaryBestPriceEligible, normalizeConditionalFlags } from '../price-comparison/manual-overrides';
 
 export const adminWriteRouter = Router();
 
@@ -207,35 +208,10 @@ function withoutUndefined<T extends Record<string, unknown>>(value: T): Partial<
   return Object.fromEntries(Object.entries(value).filter(([, entryValue]) => entryValue !== undefined)) as Partial<T>;
 }
 
-function normalizeConditionalFlags(value: string[] | undefined): string[] {
-  return [...new Set((value ?? []).map((item) => item.trim()).filter(Boolean))];
-}
-
 function numericString(value: number | null | undefined): string | null | undefined {
   if (value === undefined) return undefined;
   if (value === null) return null;
   return String(value);
-}
-
-function isOrdinaryBestPriceEligible(input: {
-  offer_type: string;
-  price_basis: string;
-  conditional_flags?: string[];
-  base_price?: number | null;
-  sale_price?: number | null;
-  member_price?: number | null;
-  subscription_price?: number | null;
-  coupon_price?: number | null;
-  minimum_spend?: number | null;
-}): boolean {
-  const conditionalFlags = new Set(normalizeConditionalFlags(input.conditional_flags));
-  const hasOrdinaryPrice = Number(input.sale_price ?? input.base_price ?? 0) > 0;
-  if (!hasOrdinaryPrice) return false;
-  if (input.offer_type !== 'single_pack') return false;
-  if (input.price_basis !== 'total') return false;
-  if (conditionalFlags.size > 0) return false;
-  if (input.member_price || input.subscription_price || input.coupon_price || input.minimum_spend) return false;
-  return true;
 }
 
 async function assertRelatedProductExists(productId: number | null | undefined): Promise<void> {

@@ -36,6 +36,10 @@ describe('offer coverage audit', () => {
     expect(classifyOfferSource({ source: 'fixture_backfill_v1' })).toBe('fixture');
   });
 
+  it('classifies manual_override_v1 as manual_override', () => {
+    expect(classifyOfferSource({ source: 'manual_override_v1' })).toBe('manual_override');
+  });
+
   it('handles unknown source safely', () => {
     expect(classifyOfferSource({ source: 'mystery_loader_v9' })).toBe('unknown');
     expect(classifyOfferSource(null)).toBe('unknown');

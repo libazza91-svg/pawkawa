@@ -2,7 +2,7 @@ import { canonicalProducts } from './fixture-data';
 import { CanonicalProduct, MarketRegion, StockStatus } from './types';
 
 export type OfferCoverageStatus = 'NO_OFFERS' | 'LIMITED' | 'BASIC' | 'GOOD';
-export type OfferSourceType = 'real_ingestion' | 'fixture' | 'seed' | 'demo' | 'unknown';
+export type OfferSourceType = 'real_ingestion' | 'manual_override' | 'fixture' | 'seed' | 'demo' | 'unknown';
 export type OfferCoverageWarning =
   | 'NO_OFFERS'
   | 'ONLY_ONE_RETAILER'
@@ -117,6 +117,7 @@ export function classifyOfferSource(metadata?: Record<string, unknown> | null): 
   if (!raw) return 'unknown';
   if (raw === 'petstock_ingestion_pilot_v1') return 'real_ingestion';
   if (raw === 'petbarn_ingestion_pilot_v1') return 'real_ingestion';
+  if (raw === 'manual_override_v1' || raw === 'manual_override') return 'manual_override';
   if (raw === 'fixture_backfill_v1' || raw === 'fixture_in_memory_v1' || raw === 'fixture' || raw.includes('fixture')) return 'fixture';
   if (raw.startsWith('seed') || raw.includes('seed')) return 'seed';
   if (raw.startsWith('demo') || raw.includes('demo')) return 'demo';
@@ -125,6 +126,11 @@ export function classifyOfferSource(metadata?: Record<string, unknown> | null): 
 
 export function isRealIngestionOffer(offer: { metadata?: Record<string, unknown> | null }): boolean {
   return classifyOfferSource(offer.metadata) === 'real_ingestion';
+}
+
+export function isTrackedPublicOffer(offer: { metadata?: Record<string, unknown> | null }): boolean {
+  const sourceType = classifyOfferSource(offer.metadata);
+  return sourceType === 'real_ingestion' || sourceType === 'manual_override';
 }
 
 export function isFixtureLikeOffer(offer: { metadata?: Record<string, unknown> | null }): boolean {
@@ -263,6 +269,7 @@ export function buildOfferCoverageAuditReport(
 
   const sourceBreakdown: Record<OfferSourceType, number> = {
     real_ingestion: 0,
+    manual_override: 0,
     fixture: 0,
     seed: 0,
     demo: 0,

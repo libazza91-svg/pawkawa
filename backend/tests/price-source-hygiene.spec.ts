@@ -5,6 +5,7 @@ import { buildOfferCoverageAuditReport, classifyOfferSource } from '../src/price
 import { canonicalProducts, fixtureRetailOffers } from '../src/price-comparison/fixture-data';
 import { FixturePriceComparisonRepository } from '../src/price-comparison/fixture-repository';
 import { FallbackPriceComparisonRepository, fixtureFallbackEnabled } from '../src/price-comparison/fallback-repository';
+import { isSafePublicManualOverride } from '../src/price-comparison/manual-overrides';
 import { PriceComparisonRepository } from '../src/price-comparison/repository';
 import { PriceComparisonService } from '../src/price-comparison/service';
 import { CanonicalProduct, MarketRegion, RetailOffer } from '../src/price-comparison/types';
@@ -131,6 +132,33 @@ describe('price source hygiene', () => {
     expect(await fallback.listOffersForProduct('royal-canin-indoor-adult-4000g', 'AU')).toEqual([]);
   });
 
+  it('keeps tracked manual overrides visible in public price results when fixture fallback is off', async () => {
+    process.env.PRICE_COMPARISON_FIXTURE_FALLBACK = 'false';
+    const service = new PriceComparisonService(
+      new TestRepository(canonicalProducts, [
+        {
+          ...realOffer(),
+          retailer_name: 'Approved Manual Override',
+          retailer_slug: 'approved-manual',
+          effective_price: 79,
+          unit_price_per_kg: 19.75,
+          product_url: 'https://example.com/manual',
+          metadata: {
+            source: 'manual_override_v1',
+            source_type: 'manual_override',
+            override_id: 123,
+            source_url: 'https://example.com/manual',
+          },
+        },
+      ]),
+    );
+
+    const result = await service.getPriceComparison('royal-canin-indoor-adult-4000g', 'AU');
+    expect(result?.offers).toHaveLength(1);
+    expect(result?.offers[0]?.retailer_slug).toBe('approved-manual');
+    expect(result?.best_retailer).toBe('Approved Manual Override');
+  });
+
   it('warns when fixture fallback is enabled outside local or test context', async () => {
     process.env.PRICE_COMPARISON_FIXTURE_FALLBACK = 'true';
     process.env.NODE_ENV = 'staging';
@@ -145,9 +173,72 @@ describe('price source hygiene', () => {
     expect(classifyOfferSource({ source: 'fixture_backfill_v1' })).toBe('fixture');
     expect(classifyOfferSource({ source: 'petstock_ingestion_pilot_v1' })).toBe('real_ingestion');
     expect(classifyOfferSource({ source: 'petbarn_ingestion_pilot_v1' })).toBe('real_ingestion');
+    expect(classifyOfferSource({ source: 'manual_override_v1' })).toBe('manual_override');
     expect(classifyOfferSource({ source: 'seed_validation_v1' })).toBe('seed');
     expect(classifyOfferSource({ source: 'demo_loader_v1' })).toBe('demo');
     expect(classifyOfferSource({ source: 'mystery' })).toBe('unknown');
+  });
+
+  it('only treats safe active single-pack manual overrides as public-eligible', () => {
+    expect(
+      isSafePublicManualOverride({
+        is_active: true,
+        ordinary_best_price_eligible: true,
+        offer_type: 'single_pack',
+        price_basis: 'total',
+        conditional_flags: [],
+        member_price: null,
+        subscription_price: null,
+        coupon_price: null,
+        minimum_spend: null,
+        source_url: 'https://example.com/product',
+        product_slug: 'royal-canin-indoor-adult-4000g',
+        pack_size_g: 4000,
+        total_pack_size_g: 4000,
+        base_price: '100',
+        sale_price: '95',
+      }),
+    ).toBe(true);
+
+    expect(
+      isSafePublicManualOverride({
+        is_active: true,
+        ordinary_best_price_eligible: true,
+        offer_type: 'multi_pack',
+        price_basis: 'total',
+        conditional_flags: [],
+        member_price: null,
+        subscription_price: null,
+        coupon_price: null,
+        minimum_spend: null,
+        source_url: 'https://example.com/product',
+        product_slug: 'royal-canin-indoor-adult-4000g',
+        pack_size_g: 4000,
+        total_pack_size_g: 8000,
+        base_price: '180',
+        sale_price: null,
+      }),
+    ).toBe(false);
+
+    expect(
+      isSafePublicManualOverride({
+        is_active: true,
+        ordinary_best_price_eligible: true,
+        offer_type: 'single_pack',
+        price_basis: 'total',
+        conditional_flags: ['member_only'],
+        member_price: '80',
+        subscription_price: null,
+        coupon_price: null,
+        minimum_spend: null,
+        source_url: 'https://example.com/product',
+        product_slug: 'royal-canin-indoor-adult-4000g',
+        pack_size_g: 4000,
+        total_pack_size_g: 4000,
+        base_price: '100',
+        sale_price: null,
+      }),
+    ).toBe(false);
   });
 
   it('in-memory fixture offers classify as fixture, not unknown', () => {
