@@ -59,6 +59,9 @@ adminReadonlyRouter.get(
         brand_name: brands.name,
         species: products.species,
         life_stage: products.life_stage,
+        product_type: products.product_type,
+        format: products.format,
+        origin: products.origin,
         package_size_g: products.package_size_g,
         status: products.status,
         source_count: products.source_count,
@@ -113,8 +116,15 @@ adminReadonlyRouter.get(
         product_name: products.name,
         source_url: sources.source_url,
         source_type: sources.source_type,
+        status: sources.status,
+        needs_review: sources.needs_review,
+        notes: sources.notes,
+        expected_pack_size_g: sources.expected_pack_size_g,
+        expected_offer_type: sources.expected_offer_type,
+        expected_unit_count: sources.expected_unit_count,
         confidence_score: sources.confidence_score,
         captured_at: sources.captured_at,
+        updated_at: sources.updated_at,
       })
       .from(sources)
       .leftJoin(products, eq(sources.product_id, products.product_id))

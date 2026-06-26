@@ -26,6 +26,9 @@ export type AdminProductItem = {
   brand_name: string | null;
   species: string | null;
   life_stage: string | null;
+  product_type: string | null;
+  format: string | null;
+  origin: string | null;
   package_size_g: number | null;
   status: string | null;
   source_count: number | null;
@@ -55,8 +58,15 @@ export type AdminSourceItem = {
   product_name: string | null;
   source_url: string | null;
   source_type: string | null;
+  status: string | null;
+  needs_review: boolean | null;
+  notes: string | null;
+  expected_pack_size_g: number | null;
+  expected_offer_type: string | null;
+  expected_unit_count: number | null;
   confidence_score: string | number | null;
   captured_at: string | null;
+  updated_at: string | null;
 };
 
 export type AdminAuditLogItem = {
@@ -67,6 +77,65 @@ export type AdminAuditLogItem = {
   entity_id: string;
   reason: string | null;
   created_at: string;
+};
+
+export type AdminDictionaryCategory =
+  | 'brand_alias'
+  | 'product_alias'
+  | 'formula_token'
+  | 'ingredient_normalization'
+  | 'pack_size_pattern'
+  | 'bundle_keyword'
+  | 'conditional_price_keyword'
+  | 'retailer_mapping'
+  | 'exclusion_keyword';
+
+export type AdminDictionaryItem = {
+  id: number;
+  category: AdminDictionaryCategory;
+  raw_term: string;
+  normalized_value: string | null;
+  pattern: string | null;
+  retailer_slug: string | null;
+  notes: string | null;
+  status: string;
+  needs_review: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type AdminProductUpdateInput = {
+  name?: string;
+  species?: string | null;
+  life_stage?: string | null;
+  product_type?: string | null;
+  format?: string | null;
+  origin?: string | null;
+  status?: string;
+  verification_status?: string;
+};
+
+export type AdminSourceWriteInput = {
+  product_id?: number;
+  source_url?: string;
+  source_type?: string;
+  status?: 'active' | 'disabled';
+  needs_review?: boolean;
+  notes?: string | null;
+  expected_pack_size_g?: number | null;
+  expected_offer_type?: string | null;
+  expected_unit_count?: number | null;
+};
+
+export type AdminDictionaryWriteInput = {
+  category?: AdminDictionaryCategory;
+  raw_term?: string;
+  normalized_value?: string | null;
+  pattern?: string | null;
+  retailer_slug?: string | null;
+  notes?: string | null;
+  status?: 'active' | 'disabled';
+  needs_review?: boolean;
 };
 
 async function adminApi<T>(url: string, init?: RequestInit): Promise<T> {
@@ -127,4 +196,58 @@ export function getAdminSources() {
 
 export function getAdminAuditLog() {
   return adminApi<{ items: AdminAuditLogItem[] }>('/api/admin/audit-log');
+}
+
+export function getAdminDictionary() {
+  return adminApi<{ items: AdminDictionaryItem[] }>('/api/admin/dictionary');
+}
+
+export function patchAdminProduct(productId: number, input: AdminProductUpdateInput, csrfToken: string) {
+  return adminApi<{ item: AdminProductItem }>(`/api/admin/products/${productId}`, {
+    method: 'PATCH',
+    headers: {
+      'X-CSRF-Token': csrfToken,
+    },
+    body: JSON.stringify(input),
+  });
+}
+
+export function createAdminSource(input: Required<Pick<AdminSourceWriteInput, 'product_id' | 'source_url'>> & AdminSourceWriteInput, csrfToken: string) {
+  return adminApi<{ item: AdminSourceItem }>('/api/admin/sources', {
+    method: 'POST',
+    headers: {
+      'X-CSRF-Token': csrfToken,
+    },
+    body: JSON.stringify(input),
+  });
+}
+
+export function patchAdminSource(sourceId: number, input: AdminSourceWriteInput, csrfToken: string) {
+  return adminApi<{ item: AdminSourceItem }>(`/api/admin/sources/${sourceId}`, {
+    method: 'PATCH',
+    headers: {
+      'X-CSRF-Token': csrfToken,
+    },
+    body: JSON.stringify(input),
+  });
+}
+
+export function createAdminDictionaryTerm(input: Required<Pick<AdminDictionaryWriteInput, 'category' | 'raw_term'>> & AdminDictionaryWriteInput, csrfToken: string) {
+  return adminApi<{ item: AdminDictionaryItem }>('/api/admin/dictionary', {
+    method: 'POST',
+    headers: {
+      'X-CSRF-Token': csrfToken,
+    },
+    body: JSON.stringify(input),
+  });
+}
+
+export function patchAdminDictionaryTerm(termId: number, input: AdminDictionaryWriteInput, csrfToken: string) {
+  return adminApi<{ item: AdminDictionaryItem }>(`/api/admin/dictionary/${termId}`, {
+    method: 'PATCH',
+    headers: {
+      'X-CSRF-Token': csrfToken,
+    },
+    body: JSON.stringify(input),
+  });
 }

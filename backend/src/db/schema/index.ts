@@ -13,6 +13,7 @@ export { retailerProductMappings } from './retailer_product_mappings';
 export { sources } from './sources';
 export { healthRules } from './health_rules';
 export { ingredientDictionary } from './ingredient_dictionary';
+export { adminDictionaryTerms } from './admin_dictionary_terms';
 export { recommendationLogs } from './recommendation_logs';
 export { crawlerJobs } from './crawler_jobs';
 export { importBatches } from './import_batches';

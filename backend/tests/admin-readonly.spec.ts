@@ -40,8 +40,15 @@ function createAdminReadonlyTables(memDb: IMemoryDb) {
       product_id INTEGER REFERENCES products(product_id),
       source_url TEXT,
       source_type VARCHAR,
+      status VARCHAR DEFAULT 'active',
+      needs_review BOOLEAN DEFAULT FALSE,
+      notes TEXT,
+      expected_pack_size_g INTEGER,
+      expected_offer_type VARCHAR,
+      expected_unit_count INTEGER,
       captured_at TIMESTAMP DEFAULT NOW(),
-      confidence_score NUMERIC DEFAULT 0
+      confidence_score NUMERIC DEFAULT 0,
+      updated_at TIMESTAMP DEFAULT NOW()
     );
 
     CREATE TABLE retail_offers (
