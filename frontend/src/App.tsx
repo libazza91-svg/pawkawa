@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   brands,
   getAverageConfidence,
@@ -1540,11 +1540,11 @@ export default function App() {
     };
   }, [route.name, route.slug, verifiedProductDetailsBySlug, verifiedProductItems]);
 
-  function navigate(path: string) {
+  const navigate = useCallback((path: string) => {
     window.history.pushState({}, '', path);
     setRoute(parseRoute(path));
     window.scrollTo({ top: 0 });
-  }
+  }, []);
 
   useEffect(() => {
     const selectedMarketConfig = markets.find((market) => market.market === selectedMarket);
