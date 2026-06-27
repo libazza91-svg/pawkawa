@@ -627,6 +627,26 @@ a {
   accent-color: var(--forest);
 }
 
+.admin-upload-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.64);
+  padding: 12px;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.admin-upload-preview img {
+  width: 72px;
+  height: 72px;
+  border-radius: 14px;
+  object-fit: cover;
+  border: 1px solid rgba(90, 82, 70, 0.14);
+}
+
 .admin-form-success {
   margin: 0;
   border: 1px solid rgba(79, 124, 94, 0.24);

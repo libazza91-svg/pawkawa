@@ -1,7 +1,15 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { eq } from 'drizzle-orm';
+import multer from 'multer';
 import { z } from 'zod';
 import { recordAdminAuditEvent } from '../admin/audit';
+import {
+  ALLOWED_PRODUCT_IMAGE_TYPES,
+  PRODUCT_IMAGE_MAX_BYTES,
+  ProductImageStorageConfigError,
+  ProductImageStorageUploadError,
+  uploadProductImageToStorage,
+} from '../admin/product-image-storage';
 import { db } from '../db/client';
 import { adminDictionaryTerms, manualOfferOverrides, productImages, products, sources } from '../db/schema';
 import { requireAdminAuth } from '../middleware/admin-auth';
@@ -10,6 +18,21 @@ import { sendError, sendSuccess } from '../middleware/response';
 import { isOrdinaryBestPriceEligible, normalizeConditionalFlags } from '../price-comparison/manual-overrides';
 
 export const adminWriteRouter = Router();
+
+const productImageUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: PRODUCT_IMAGE_MAX_BYTES,
+    files: 1,
+  },
+  fileFilter: (_req, file, callback) => {
+    if (!ALLOWED_PRODUCT_IMAGE_TYPES.has(file.mimetype)) {
+      callback(new Error('Unsupported image type. Use JPEG, PNG, or WebP.'));
+      return;
+    }
+    callback(null, true);
+  },
+}).single('file');
 
 const dictionaryCategorySchema = z.enum([
   'brand_alias',
@@ -181,6 +204,16 @@ const imageUpdateSchema = z
   .strict()
   .refine((value) => Object.keys(value).length > 0, 'At least one field is required');
 
+const imageUploadSchema = z.object({
+  product_id: z.coerce.number().int().positive(),
+  source_url: z.string().trim().url().optional(),
+  alt_text: z.string().trim().max(500).nullable().optional(),
+  source_note: z.string().trim().max(2000).nullable().optional(),
+  is_primary: z
+    .preprocess((value) => value === true || value === 'true' || value === 'on' || value === '1', z.boolean())
+    .optional(),
+});
+
 function asyncHandler(fn: (req: Request, res: Response) => Promise<void>) {
   return (req: Request, res: Response, next: NextFunction) => {
     fn(req, res).catch(next);
@@ -212,6 +245,15 @@ function numericString(value: number | null | undefined): string | null | undefi
   if (value === undefined) return undefined;
   if (value === null) return null;
   return String(value);
+}
+
+function parseProductImageUpload(req: Request, res: Response): Promise<void> {
+  return new Promise((resolve, reject) => {
+    productImageUpload(req, res, (error) => {
+      if (error) reject(error);
+      else resolve();
+    });
+  });
 }
 
 async function assertRelatedProductExists(productId: number | null | undefined): Promise<void> {
@@ -704,7 +746,122 @@ adminWriteRouter.post(
       afterJson: created,
     });
 
+    if (created?.is_primary) {
+      await recordAdminAuditEvent({
+        actorAdminUserId: req.adminUser!.id,
+        action: 'product_image_primary_set',
+        entityType: 'product_image',
+        entityId: String(inserted[0].image_id),
+        afterJson: created,
+      });
+    }
+
     sendSuccess(res, { item: created });
+  }),
+);
+
+adminWriteRouter.post(
+  '/images/upload',
+  requireAdminCsrf,
+  asyncHandler(async (req: Request, res: Response) => {
+    try {
+      await parseProductImageUpload(req, res);
+    } catch (error) {
+      const message =
+        error instanceof multer.MulterError && error.code === 'LIMIT_FILE_SIZE'
+          ? 'Image must be 5MB or smaller'
+          : error instanceof Error
+            ? error.message
+            : 'Invalid image upload';
+      sendError(res, 'INVALID_IMAGE_UPLOAD', message, 400);
+      return;
+    }
+
+    const parsed = imageUploadSchema.safeParse(req.body);
+    if (!parsed.success) {
+      sendError(res, 'INVALID_PARAMETER', parsed.error.issues[0]?.message || 'Invalid image upload payload', 400);
+      return;
+    }
+
+    if (!req.file) {
+      sendError(res, 'INVALID_IMAGE_UPLOAD', 'Image file is required', 400);
+      return;
+    }
+
+    try {
+      await assertRelatedProductExists(parsed.data.product_id);
+    } catch (error) {
+      sendError(res, 'NOT_FOUND', (error as Error).message, 404);
+      return;
+    }
+
+    try {
+      const uploaded = await uploadProductImageToStorage({
+        productId: parsed.data.product_id,
+        buffer: req.file.buffer,
+        contentType: req.file.mimetype,
+        originalName: req.file.originalname,
+      });
+      const storageMetadata = {
+        storage_bucket: uploaded.bucket,
+        storage_path: uploaded.objectPath,
+        content_type: req.file.mimetype,
+        size_bytes: req.file.size,
+        original_filename: req.file.originalname,
+      };
+
+      const inserted = await db
+        .insert(productImages)
+        .values({
+          product_id: parsed.data.product_id,
+          image_url: uploaded.publicUrl,
+          source_url: parsed.data.source_url?.trim() || uploaded.publicUrl,
+          source_type: 'supabase_storage',
+          alt_text: nullableText(parsed.data.alt_text),
+          source_note: nullableText(parsed.data.source_note),
+          status: 'active',
+          is_primary: parsed.data.is_primary ?? false,
+          metadata: JSON.stringify(storageMetadata) as unknown as Record<string, unknown>,
+          updated_at: new Date(),
+        })
+        .returning({ image_id: productImages.image_id, product_id: productImages.product_id });
+
+      if ((parsed.data.is_primary ?? false) && inserted[0].product_id) {
+        await clearPrimaryImageForProduct(inserted[0].product_id, inserted[0].image_id);
+      }
+
+      const [created] = await db.select().from(productImages).where(eq(productImages.image_id, inserted[0].image_id));
+
+      await recordAdminAuditEvent({
+        actorAdminUserId: req.adminUser!.id,
+        action: 'product_image_uploaded',
+        entityType: 'product_image',
+        entityId: String(inserted[0].image_id),
+        afterJson: created,
+      });
+
+      if (created?.is_primary) {
+        await recordAdminAuditEvent({
+          actorAdminUserId: req.adminUser!.id,
+          action: 'product_image_primary_set',
+          entityType: 'product_image',
+          entityId: String(inserted[0].image_id),
+          afterJson: created,
+        });
+      }
+
+      sendSuccess(res, { item: created });
+    } catch (error) {
+      if (error instanceof ProductImageStorageConfigError) {
+        sendError(res, 'STORAGE_NOT_CONFIGURED', error.message, 503);
+        return;
+      }
+      if (error instanceof ProductImageStorageUploadError) {
+        sendError(res, 'STORAGE_UPLOAD_FAILED', error.message, 502);
+        return;
+      }
+      throw error;
+    }
   }),
 );
 
@@ -768,6 +925,17 @@ adminWriteRouter.patch(
       beforeJson: existing,
       afterJson: updated,
     });
+
+    if (parsed.data.is_primary === true) {
+      await recordAdminAuditEvent({
+        actorAdminUserId: req.adminUser!.id,
+        action: 'product_image_primary_set',
+        entityType: 'product_image',
+        entityId: String(imageId),
+        beforeJson: existing,
+        afterJson: updated,
+      });
+    }
 
     sendSuccess(res, { item: updated });
   }),

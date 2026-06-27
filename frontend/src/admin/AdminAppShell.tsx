@@ -20,6 +20,7 @@ import {
   patchAdminDictionaryTerm,
   patchAdminProduct,
   patchAdminSource,
+  uploadAdminImage,
   type AdminAuditLogItem,
   type AdminDashboardResponse,
   type AdminDictionaryCategory,
@@ -1554,6 +1555,15 @@ function AdminImagesView({
     width: '',
     height: '',
   });
+  const [uploadForm, setUploadForm] = useState({
+    product_id: products[0]?.product_id?.toString() ?? '',
+    alt_text: '',
+    source_note: '',
+    source_url: '',
+    is_primary: false,
+  });
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [uploadPreviewUrl, setUploadPreviewUrl] = useState('');
   const [editForm, setEditForm] = useState({
     product_id: '',
     image_url: '',
@@ -1568,6 +1578,7 @@ function AdminImagesView({
     height: '',
   });
   const [createSubmitting, setCreateSubmitting] = useState(false);
+  const [uploadSubmitting, setUploadSubmitting] = useState(false);
   const [editSubmitting, setEditSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -1578,7 +1589,25 @@ function AdminImagesView({
       ...current,
       product_id: current.product_id || String(products[0].product_id),
     }));
+    setUploadForm((current) => ({
+      ...current,
+      product_id: current.product_id || String(products[0].product_id),
+    }));
   }, [products]);
+
+  useEffect(() => {
+    if (!uploadFile) {
+      setUploadPreviewUrl('');
+      return;
+    }
+
+    const previewUrl = URL.createObjectURL(uploadFile);
+    setUploadPreviewUrl(previewUrl);
+
+    return () => {
+      URL.revokeObjectURL(previewUrl);
+    };
+  }, [uploadFile]);
 
   useEffect(() => {
     if (!items.length) {
@@ -1655,6 +1684,45 @@ function AdminImagesView({
     }
   }
 
+  async function handleUpload(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setUploadSubmitting(true);
+    setError(null);
+    setSuccess(null);
+
+    if (!uploadFile) {
+      setError('Choose an image file before uploading.');
+      setUploadSubmitting(false);
+      return;
+    }
+
+    try {
+      const payload = new FormData();
+      payload.set('product_id', uploadForm.product_id);
+      payload.set('file', uploadFile);
+      if (uploadForm.alt_text.trim()) payload.set('alt_text', uploadForm.alt_text.trim());
+      if (uploadForm.source_note.trim()) payload.set('source_note', uploadForm.source_note.trim());
+      if (uploadForm.source_url.trim()) payload.set('source_url', uploadForm.source_url.trim());
+      payload.set('is_primary', String(uploadForm.is_primary));
+
+      await uploadAdminImage(payload, csrfToken);
+      await onSaved();
+      setUploadForm((current) => ({
+        ...current,
+        alt_text: '',
+        source_note: '',
+        source_url: '',
+        is_primary: false,
+      }));
+      setUploadFile(null);
+      setSuccess('Image uploaded and bound to product.');
+    } catch (submitError) {
+      setError(submitError instanceof Error ? submitError.message : 'Image upload failed.');
+    } finally {
+      setUploadSubmitting(false);
+    }
+  }
+
   async function handleEdit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!selectedImageId) return;
@@ -1728,11 +1796,74 @@ function AdminImagesView({
       )}
 
       <div className="admin-form-split">
+        <form className="admin-form-panel" onSubmit={handleUpload}>
+          <div className="admin-form-heading">
+            <div>
+              <strong>Upload product image</strong>
+              <p>Uploads JPEG, PNG, or WebP files to the configured product image bucket, then writes product image metadata.</p>
+            </div>
+          </div>
+          <div className="admin-form-grid">
+            <label>
+              Product
+              <select onChange={(event) => setUploadForm((current) => ({ ...current, product_id: event.target.value }))} value={uploadForm.product_id}>
+                {products.map((product) => (
+                  <option key={product.product_id} value={product.product_id}>
+                    {product.product_id} - {product.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Image file
+              <input
+                accept="image/jpeg,image/png,image/webp"
+                onChange={(event) => setUploadFile(event.target.files?.[0] ?? null)}
+                required
+                type="file"
+              />
+            </label>
+            <label className="admin-form-grid-span-2">
+              Source URL
+              <input
+                onChange={(event) => setUploadForm((current) => ({ ...current, source_url: event.target.value }))}
+                placeholder="Optional original source URL"
+                type="url"
+                value={uploadForm.source_url}
+              />
+            </label>
+            <label className="admin-form-grid-span-2">
+              Alt text
+              <input onChange={(event) => setUploadForm((current) => ({ ...current, alt_text: event.target.value }))} type="text" value={uploadForm.alt_text} />
+            </label>
+            <label className="admin-checkbox-field">
+              <input checked={uploadForm.is_primary} onChange={(event) => setUploadForm((current) => ({ ...current, is_primary: event.target.checked }))} type="checkbox" />
+              Set as primary image
+            </label>
+            <label className="admin-form-grid-span-2">
+              Source note
+              <textarea onChange={(event) => setUploadForm((current) => ({ ...current, source_note: event.target.value }))} rows={4} value={uploadForm.source_note} />
+            </label>
+            {uploadFile && uploadPreviewUrl && (
+              <div className="admin-upload-preview admin-form-grid-span-2">
+                <img alt="Selected upload preview" src={uploadPreviewUrl} />
+                <span>{uploadFile.name} · {(uploadFile.size / 1024 / 1024).toFixed(2)}MB</span>
+              </div>
+            )}
+          </div>
+          <AdminFormNotice error={error} success={success} />
+          <div className="admin-form-actions">
+            <button className="primary-button" disabled={uploadSubmitting || !csrfToken || !products.length || !uploadFile} type="submit">
+              {uploadSubmitting ? 'Uploading...' : 'Upload image'}
+            </button>
+          </div>
+        </form>
+
         <form className="admin-form-panel" onSubmit={handleCreate}>
           <div className="admin-form-heading">
             <div>
               <strong>Register image metadata</strong>
-              <p>Storage upload is intentionally deferred. This screen binds image URLs, alt text, and primary-image status to a product.</p>
+              <p>Use this when an approved external image URL is already available and should be bound to a product.</p>
             </div>
           </div>
           <div className="admin-form-grid">

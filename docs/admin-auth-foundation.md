@@ -65,3 +65,33 @@ Security notes:
 - `ADMIN_CSRF_SECRET` should be configured for staging/production.
 - The development fallback secret is only for local development and tests.
 - The in-memory login rate limit still needs a shared store before multi-instance production deployment.
+
+## Product Image Storage
+
+Sprint 3.1I adds backend-owned product image upload for the Admin Console.
+
+Storage model:
+
+- Supabase Storage bucket: `product-images`
+- bucket mode: public-read for product image display
+- upload actor: backend only, using Supabase service role credentials
+- frontend receives only normal admin API responses and public image URLs
+- `SUPABASE_SERVICE_ROLE_KEY` must never be exposed to frontend code
+
+Required backend environment variables:
+
+```env
+SUPABASE_URL=https://PROJECT_REF.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=SUPABASE_SERVICE_ROLE_KEY_PLACEHOLDER
+SUPABASE_STORAGE_BUCKET_PRODUCT_IMAGES=product-images
+```
+
+Upload behavior:
+
+- `POST /api/admin/images/upload` requires `requireAdminAuth` and `requireAdminCsrf`.
+- Accepted file types are JPEG, PNG, and WebP.
+- Maximum upload size is 5MB.
+- Product binding is required.
+- Uploaded files are saved under `products/{product_id}/...`.
+- `product_images` stores the public image URL and storage metadata.
+- Upload, image creation, image update, and primary-image changes are recorded in `admin_audit_logs`.

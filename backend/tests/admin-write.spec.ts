@@ -244,9 +244,20 @@ async function fetchCsrf(app: express.Express, cookie: string) {
 }
 
 describe('Admin write APIs', () => {
+  const originalSupabaseUrl = process.env.SUPABASE_URL;
+  const originalSupabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const originalSupabaseProductImageBucket = process.env.SUPABASE_STORAGE_BUCKET_PRODUCT_IMAGES;
+
   beforeEach(() => {
     vi.resetModules();
     vi.clearAllMocks();
+    vi.unstubAllGlobals();
+    if (originalSupabaseUrl === undefined) delete process.env.SUPABASE_URL;
+    else process.env.SUPABASE_URL = originalSupabaseUrl;
+    if (originalSupabaseServiceRoleKey === undefined) delete process.env.SUPABASE_SERVICE_ROLE_KEY;
+    else process.env.SUPABASE_SERVICE_ROLE_KEY = originalSupabaseServiceRoleKey;
+    if (originalSupabaseProductImageBucket === undefined) delete process.env.SUPABASE_STORAGE_BUCKET_PRODUCT_IMAGES;
+    else process.env.SUPABASE_STORAGE_BUCKET_PRODUCT_IMAGES = originalSupabaseProductImageBucket;
   });
 
   it('requires csrf protection for admin product updates', async () => {
@@ -468,5 +479,87 @@ describe('Admin write APIs', () => {
     const logs = memDb.public.many(`SELECT action FROM admin_audit_logs ORDER BY id`);
     expect(logs.some((log: { action: string }) => log.action === 'product_image_created')).toBe(true);
     expect(logs.some((log: { action: string }) => log.action === 'product_image_updated')).toBe(true);
+    expect(logs.some((log: { action: string }) => log.action === 'product_image_primary_set')).toBe(true);
+  });
+
+  it('rejects image uploads when Supabase Storage is not configured', async () => {
+    delete process.env.SUPABASE_URL;
+    delete process.env.SUPABASE_SERVICE_ROLE_KEY;
+    delete process.env.SUPABASE_STORAGE_BUCKET_PRODUCT_IMAGES;
+
+    const { app, createAdminUser } = await setupApp();
+    const cookie = await login(app, createAdminUser);
+    const csrfToken = await fetchCsrf(app, cookie);
+
+    const response = await request(app)
+      .post('/api/admin/images/upload')
+      .set('Cookie', cookie)
+      .set('X-CSRF-Token', csrfToken)
+      .field('product_id', '1')
+      .attach('file', Buffer.from('fake-png'), { filename: 'pack.png', contentType: 'image/png' });
+
+    expect(response.status).toBe(503);
+    expect(response.body.error.code).toBe('STORAGE_NOT_CONFIGURED');
+  });
+
+  it('rejects unsupported admin product image upload types', async () => {
+    process.env.SUPABASE_URL = 'https://example.supabase.co';
+    process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-service-role-key';
+    process.env.SUPABASE_STORAGE_BUCKET_PRODUCT_IMAGES = 'product-images';
+
+    const { app, createAdminUser } = await setupApp();
+    const cookie = await login(app, createAdminUser);
+    const csrfToken = await fetchCsrf(app, cookie);
+
+    const response = await request(app)
+      .post('/api/admin/images/upload')
+      .set('Cookie', cookie)
+      .set('X-CSRF-Token', csrfToken)
+      .field('product_id', '1')
+      .attach('file', Buffer.from('not-an-image'), { filename: 'pack.txt', contentType: 'text/plain' });
+
+    expect(response.status).toBe(400);
+    expect(response.body.error.code).toBe('INVALID_IMAGE_UPLOAD');
+  });
+
+  it('uploads product images, writes metadata, and records audit events', async () => {
+    process.env.SUPABASE_URL = 'https://example.supabase.co';
+    process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-service-role-key';
+    process.env.SUPABASE_STORAGE_BUCKET_PRODUCT_IMAGES = 'product-images';
+    const fetchMock = vi.fn().mockResolvedValue(new Response('', { status: 200 }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    const { app, createAdminUser, memDb } = await setupApp();
+    const cookie = await login(app, createAdminUser);
+    const csrfToken = await fetchCsrf(app, cookie);
+
+    const response = await request(app)
+      .post('/api/admin/images/upload')
+      .set('Cookie', cookie)
+      .set('X-CSRF-Token', csrfToken)
+      .field('product_id', '1')
+      .field('alt_text', 'Royal Canin uploaded packshot')
+      .field('source_note', 'Uploaded by admin QA')
+      .field('is_primary', 'true')
+      .attach('file', Buffer.from('fake-webp'), { filename: 'royal-canin.webp', contentType: 'image/webp' });
+
+    expect(response.status).toBe(200);
+    expect(response.body.data.item.source_type).toBe('supabase_storage');
+    expect(response.body.data.item.image_url).toContain('/storage/v1/object/public/product-images/products/1/');
+    expect(response.body.data.item.is_primary).toBe(true);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    const images = memDb.public.many(`
+      SELECT image_id, image_url, source_type, alt_text, is_primary, metadata
+      FROM product_images
+      ORDER BY image_id DESC
+    `);
+    expect(images[0].source_type).toBe('supabase_storage');
+    expect(images[0].metadata.storage_bucket).toBe('product-images');
+    expect(images[0].metadata.content_type).toBe('image/webp');
+
+    const logs = memDb.public.many(`SELECT action FROM admin_audit_logs ORDER BY id`);
+    expect(logs.some((log: { action: string }) => log.action === 'product_image_uploaded')).toBe(true);
+    expect(logs.some((log: { action: string }) => log.action === 'product_image_primary_set')).toBe(true);
   });
 });

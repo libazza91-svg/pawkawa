@@ -230,7 +230,8 @@ export type AdminImageWriteInput = {
 
 async function adminApi<T>(url: string, init?: RequestInit): Promise<T> {
   const headers = new Headers(init?.headers);
-  if (init?.body && !headers.has('Content-Type')) {
+  const isFormData = typeof FormData !== 'undefined' && init?.body instanceof FormData;
+  if (init?.body && !isFormData && !headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json');
   }
 
@@ -383,6 +384,16 @@ export function createAdminImage(
       'X-CSRF-Token': csrfToken,
     },
     body: JSON.stringify(input),
+  });
+}
+
+export function uploadAdminImage(input: FormData, csrfToken: string) {
+  return adminApi<{ item: AdminImageItem }>('/api/admin/images/upload', {
+    method: 'POST',
+    headers: {
+      'X-CSRF-Token': csrfToken,
+    },
+    body: input,
   });
 }
 
